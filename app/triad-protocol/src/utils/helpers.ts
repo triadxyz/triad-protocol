@@ -1,12 +1,12 @@
 import { PublicKey } from '@solana/web3.js'
 
-export const getTicketPDA = (address: PublicKey, programId: PublicKey) => {
-  const [TicketPDA] = PublicKey.findProgramAddressSync(
-    [Buffer.from('ticket'), address.toBuffer()],
+export const getTickerPDA = (address: PublicKey, programId: PublicKey) => {
+  const [TickerPDA] = PublicKey.findProgramAddressSync(
+    [Buffer.from('ticker'), address.toBuffer()],
     programId
   )
 
-  return TicketPDA
+  return TickerPDA
 }
 
 export const encodeString = (value: string): number[] => {

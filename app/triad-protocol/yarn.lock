@@ -132,6 +132,20 @@
   resolved "https://registry.yarnpkg.com/@eslint/js/-/js-8.50.0.tgz#9e93b850f0f3fa35f5fa59adfd03adae8488e484"
   integrity sha512-NCC3zz2+nvYd+Ckfh87rA47zfu2QsQpvc6k1yzTk+b9KzRj0wkGa8LSoGOXN6Zv4lRf/EIoZ80biDh9HOI+RNQ==
 
+"@firethreexyz/firethree-protocol@^0.19.1":
+  version "0.19.1"
+  resolved "https://registry.yarnpkg.com/@firethreexyz/firethree-protocol/-/firethree-protocol-0.19.1.tgz#6355280b0cc1b55ba7a4eae677a440e4a93fa91a"
+  integrity sha512-O3o6l3C7UFKsGZUhdAy2NSWGSf355/wAjCIkYcWUoBmvKlX60frRq0vr5YSG+ZT2j4vEWNcyVejj6WS1lidR1Q==
+  dependencies:
+    "@coral-xyz/anchor" "0.28.0"
+    "@pythnetwork/client" "^2.19.0"
+    "@shadow-drive/sdk" "5.0.0"
+    "@solana/spl-token" "^0.3.11"
+    "@solana/web3.js" "1.89.1"
+    axios "^1.5.1"
+    bs58 "5.0.0"
+    uuid "^9.0.1"
+
 "@hapi/hoek@^9.0.0", "@hapi/hoek@^9.3.0":
   version "9.3.0"
   resolved "https://registry.yarnpkg.com/@hapi/hoek/-/hoek-9.3.0.tgz#8368869dcb735be2e7f5cb7647de78e167a251fb"

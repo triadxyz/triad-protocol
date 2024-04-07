@@ -1,5 +1,5 @@
 {
-  "name": "triad-markets",
+  "name": "triad-protocol",
   "version": "0.0.1",
   "main": "./dist/index.js",
   "module": "./dist/index.js",
@@ -30,13 +30,14 @@
   "license": "ISC",
   "dependencies": {
     "@coral-xyz/anchor": "0.28.0",
-    "@solana/web3.js": "1.89.1",
-    "@solana/spl-token": "^0.3.11",
+    "@firethreexyz/firethree-protocol": "^0.19.1",
+    "@pythnetwork/client": "^2.19.0",
     "@shadow-drive/sdk": "5.0.0",
+    "@solana/spl-token": "^0.3.11",
+    "@solana/web3.js": "1.89.1",
     "axios": "^1.5.1",
     "bs58": "5.0.0",
-    "uuid": "^9.0.1",
-    "@pythnetwork/client": "^2.19.0"
+    "uuid": "^9.0.1"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "6.7.3",

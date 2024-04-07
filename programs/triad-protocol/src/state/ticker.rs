@@ -1,27 +1,27 @@
 use anchor_lang::prelude::*;
 
 #[account]
-pub struct Ticket {
-    /// The bump for the ticket pda
+pub struct Ticker {
+    /// The bump for the ticker pda
     pub bump: u8,
-    /// authority for the ticket
+    /// authority for the ticker
     pub authority: Pubkey,
     /// name of the ticekt
     pub name: [u8; 32],
-    /// token account for the ticket e.g. $tDRIFT
+    /// token account for the ticker e.g. $tDRIFT
     pub token_account: Pubkey,
-    /// timestamp ticket initialized
+    /// timestamp ticker initialized
     pub init_ts: i64,
 }
 
 #[derive(AnchorSerialize, AnchorDeserialize)]
-pub struct CreateTicketArgs {
-    pub name: String,
+pub struct CreateTickerArgs {
+    pub name: [u8; 32],
 }
 
-impl Ticket {
+impl Ticker {
     /// static prefix seed string used to derive the PDAs
-    pub const PREFIX_SEED: &[u8] = b"ticket";
+    pub const PREFIX_SEED: &[u8] = b"ticker";
 
     /// total on-chain space needed to allocate the account
     pub const SPACE: usize =

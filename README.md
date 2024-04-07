@@ -1,12 +1,12 @@
 <div align="center">
-  <h1>Triad Markets</h1>
+  <h1>Triad Protocol</h1>
 </div>
 
-The official Triad Markets. trading your prefer companie in web3.
+The official Triad Protocol. trading your prefer companie in web3.
 
 ### Docs
 
-[https://triadxyz.github.io/triad-markets/](https://docs.triadfi.co/)
+[https://triadxyz.github.io/triad-protocol/](https://docs.triadfi.co/)
 
 ## Quick Setup
 
@@ -17,11 +17,11 @@ Install these dependencies over:
 npm:
 
 ```shell
-npm install @triadxyz/triad-markets
+npm install @triadxyz/triad-protocol
 ```
 
 yarn:
 
 ```shell
-yarn add @triadxyz/triad-markets
+yarn add @triadxyz/triad-protocol
 ```

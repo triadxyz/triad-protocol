@@ -1,7 +1,7 @@
 use anchor_lang::prelude::*;
 
 #[error_code]
-pub enum TriadMarketsError {
+pub enum TriadProtocolError {
     #[msg("Invalid account")]
     InvalidAccount,
 

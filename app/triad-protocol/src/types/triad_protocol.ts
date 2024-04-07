@@ -1,9 +1,9 @@
-export type TriadMarkets = {
+export type TriadProtocol = {
   version: '0.1.0'
-  name: 'triad_markets'
+  name: 'triad_protocol'
   instructions: [
     {
-      name: 'createTicket'
+      name: 'createTicker'
       accounts: [
         {
           name: 'signer'
@@ -11,7 +11,7 @@ export type TriadMarkets = {
           isSigner: true
         },
         {
-          name: 'ticket'
+          name: 'ticker'
           isMut: true
           isSigner: false
         },
@@ -25,7 +25,7 @@ export type TriadMarkets = {
         {
           name: 'arg'
           type: {
-            defined: 'CreateTicketArgs'
+            defined: 'CreateTickerArgs'
           }
         }
       ]
@@ -33,18 +33,18 @@ export type TriadMarkets = {
   ]
   accounts: [
     {
-      name: 'ticket'
+      name: 'ticker'
       type: {
         kind: 'struct'
         fields: [
           {
             name: 'bump'
-            docs: ['The bump for the ticket pda']
+            docs: ['The bump for the ticker pda']
             type: 'u8'
           },
           {
             name: 'authority'
-            docs: ['authority for the ticket']
+            docs: ['authority for the ticker']
             type: 'publicKey'
           },
           {
@@ -56,12 +56,12 @@ export type TriadMarkets = {
           },
           {
             name: 'tokenAccount'
-            docs: ['token account for the ticket e.g. $tDRIFT']
+            docs: ['token account for the ticker e.g. $tDRIFT']
             type: 'publicKey'
           },
           {
             name: 'initTs'
-            docs: ['timestamp ticket initialized']
+            docs: ['timestamp ticker initialized']
             type: 'i64'
           }
         ]
@@ -70,13 +70,15 @@ export type TriadMarkets = {
   ]
   types: [
     {
-      name: 'CreateTicketArgs'
+      name: 'CreateTickerArgs'
       type: {
         kind: 'struct'
         fields: [
           {
             name: 'name'
-            type: 'string'
+            type: {
+              array: ['u8', 32]
+            }
           }
         ]
       }
@@ -126,12 +128,12 @@ export type TriadMarkets = {
   ]
 }
 
-export const IDL: TriadMarkets = {
+export const IDL: TriadProtocol = {
   version: '0.1.0',
-  name: 'triad_markets',
+  name: 'triad_protocol',
   instructions: [
     {
-      name: 'createTicket',
+      name: 'createTicker',
       accounts: [
         {
           name: 'signer',
@@ -139,7 +141,7 @@ export const IDL: TriadMarkets = {
           isSigner: true
         },
         {
-          name: 'ticket',
+          name: 'ticker',
           isMut: true,
           isSigner: false
         },
@@ -153,7 +155,7 @@ export const IDL: TriadMarkets = {
         {
           name: 'arg',
           type: {
-            defined: 'CreateTicketArgs'
+            defined: 'CreateTickerArgs'
           }
         }
       ]
@@ -161,18 +163,18 @@ export const IDL: TriadMarkets = {
   ],
   accounts: [
     {
-      name: 'ticket',
+      name: 'ticker',
       type: {
         kind: 'struct',
         fields: [
           {
             name: 'bump',
-            docs: ['The bump for the ticket pda'],
+            docs: ['The bump for the ticker pda'],
             type: 'u8'
           },
           {
             name: 'authority',
-            docs: ['authority for the ticket'],
+            docs: ['authority for the ticker'],
             type: 'publicKey'
           },
           {
@@ -184,12 +186,12 @@ export const IDL: TriadMarkets = {
           },
           {
             name: 'tokenAccount',
-            docs: ['token account for the ticket e.g. $tDRIFT'],
+            docs: ['token account for the ticker e.g. $tDRIFT'],
             type: 'publicKey'
           },
           {
             name: 'initTs',
-            docs: ['timestamp ticket initialized'],
+            docs: ['timestamp ticker initialized'],
             type: 'i64'
           }
         ]
@@ -198,13 +200,15 @@ export const IDL: TriadMarkets = {
   ],
   types: [
     {
-      name: 'CreateTicketArgs',
+      name: 'CreateTickerArgs',
       type: {
         kind: 'struct',
         fields: [
           {
             name: 'name',
-            type: 'string'
+            type: {
+              array: ['u8', 32]
+            }
           }
         ]
       }
