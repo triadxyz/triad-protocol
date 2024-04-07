@@ -1,9 +1,4 @@
 {
- "rust-analyzer.linkedProjects": [
-  "./programs/triad-markets/Cargo.toml",
-  "./programs/triad-markets/Cargo.toml",
-  "./programs/triad-markets/Cargo.toml",
-  "./programs/triad-markets/Cargo.toml"
- ],
- "rust-analyzer.showUnlinkedFileNotification": false
+  "rust-analyzer.linkedProjects": ["./programs/triad-protocol/Cargo.toml"],
+  "rust-analyzer.showUnlinkedFileNotification": false
 }
