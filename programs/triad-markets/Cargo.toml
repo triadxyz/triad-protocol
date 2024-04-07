@@ -1,7 +1,6 @@
 [package]
 name = "triad-markets"
 version = "0.1.0"
-description = "Created with Anchor"
 edition = "2021"
 
 [lib]
@@ -17,3 +16,4 @@ default = []
 
 [dependencies]
 anchor-lang = "0.28.0"
+ahash = "=0.8.6"
