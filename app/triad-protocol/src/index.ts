@@ -25,18 +25,3 @@ export default class TriadProtocolClient {
     )
   }
 }
-
-const connection = new Connection(
-  'https://renaissancebr-pit.rpcpool.com/24aa1f64-6e92-4c7b-9599-91956a4220e4'
-)
-
-const keypair = convertSecretKeyToKeypair(
-  'DG4SC7Hjk6szDCQWv4kpcmwzUC2A5kkA4t4rPhDMVLhGm1mR9yrVkCseyQZknvfaaTis5Q1dHVtNRmMPVZreRfL'
-)
-
-const wallet = new Wallet(keypair)
-
-const triad = new TriadProtocolClient(connection, wallet)
-const main = () => {}
-
-main()
