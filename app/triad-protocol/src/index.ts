@@ -2,7 +2,6 @@ import { AnchorProvider, Program, Wallet } from '@coral-xyz/anchor'
 import { Connection } from '@solana/web3.js'
 import { IDL, TriadProtocol } from './types/triad_protocol'
 import { TRIAD_PROTOCOL_PROGRAM_ID } from './utils/constants'
-import { convertSecretKeyToKeypair } from './utils/convertSecretKeyToKeypair'
 
 export default class TriadProtocolClient {
   program: Program<TriadProtocol>
