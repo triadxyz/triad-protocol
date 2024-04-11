@@ -17,3 +17,5 @@ default = []
 [dependencies]
 anchor-lang = "0.28.0"
 ahash = "=0.8.6"
+pyth-solana-receiver-sdk ="0.1.0"
+

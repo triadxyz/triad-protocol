@@ -21,7 +21,7 @@ pub struct CreateTickerArgs {
 
 impl Ticker {
     /// static prefix seed string used to derive the PDAs
-    pub const PREFIX_SEED: &[u8] = b"ticker";
+    pub const PREFIX_SEED: &'static[u8] = b"ticker";
 
     /// total on-chain space needed to allocate the account
     pub const SPACE: usize =
