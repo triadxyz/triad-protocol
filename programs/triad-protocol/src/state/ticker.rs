@@ -10,6 +10,8 @@ pub struct Ticker {
     pub name: [u8; 32],
     /// token account for the ticker e.g. $tDRIFT
     pub token_account: Pubkey,
+    /// token mint for the ticker e.g. $tDRIFT
+    pub token_mint: Pubkey,
     /// timestamp ticker initialized
     pub init_ts: i64,
 }
