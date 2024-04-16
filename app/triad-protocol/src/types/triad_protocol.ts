@@ -16,6 +16,11 @@ export type TriadProtocol = {
           isSigner: false
         },
         {
+          name: 'priceUpdate'
+          isMut: false
+          isSigner: false
+        },
+        {
           name: 'systemProgram'
           isMut: false
           isSigner: false
@@ -216,6 +221,11 @@ export type TriadProtocol = {
             }
           },
           {
+            name: 'pythPricePubKey'
+            docs: ['The pubkey of a token pairs']
+            type: 'publicKey'
+          },
+          {
             name: 'tokenAccount'
             docs: ['token account for the ticker e.g. $tDRIFT']
             type: 'publicKey'
@@ -369,6 +379,10 @@ export type TriadProtocol = {
             type: {
               array: ['u8', 32]
             }
+          },
+          {
+            name: 'pythPricePubKey'
+            type: 'publicKey'
           }
         ]
       }
@@ -479,6 +493,11 @@ export const IDL: TriadProtocol = {
         {
           name: 'ticker',
           isMut: true,
+          isSigner: false
+        },
+        {
+          name: 'priceUpdate',
+          isMut: false,
           isSigner: false
         },
         {
@@ -682,6 +701,11 @@ export const IDL: TriadProtocol = {
             }
           },
           {
+            name: 'pythPricePubKey',
+            docs: ['The pubkey of a token pairs'],
+            type: 'publicKey'
+          },
+          {
             name: 'tokenAccount',
             docs: ['token account for the ticker e.g. $tDRIFT'],
             type: 'publicKey'
@@ -835,6 +859,10 @@ export const IDL: TriadProtocol = {
             type: {
               array: ['u8', 32]
             }
+          },
+          {
+            name: 'pythPricePubKey',
+            type: 'publicKey'
           }
         ]
       }
