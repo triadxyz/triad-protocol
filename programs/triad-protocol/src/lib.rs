@@ -18,7 +18,7 @@ pub mod triad_protocol {
     pub fn create_ticker(ctx: Context<CreateTicker>, arg: CreateTickerArgs) -> Result<()> {
         instructions::create_ticker(ctx, arg)
     }
-
+    
     pub fn create_vault(ctx: Context<CreateVault>, args: CreateVaultArgs) -> Result<()> {
         instructions::create_vault(ctx, args)
     }
@@ -26,8 +26,9 @@ pub mod triad_protocol {
     pub fn deposit<'info>(
         ctx: Context<'_, '_, '_, 'info, Deposit<'info>>,
         amount: u64,
+        is_long: bool
     ) -> Result<()> {
-        instructions::deposit(ctx, amount)
+        instructions::deposit(ctx, amount, is_long)
     }
 
     pub fn create_vault_depositor(ctx: Context<CreateVaultDepositor>) -> Result<()> {

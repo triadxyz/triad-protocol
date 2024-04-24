@@ -10,7 +10,7 @@ use crate::errors::TriadProtocolError;
 use crate::{state::Vault, VaultDepositor};
 
 #[derive(Accounts)]
-#[instruction(amount: u64)]
+#[instruction(amount: u64, is_long: bool)]
 pub struct Deposit<'info> {
     #[account(mut)]
     pub signer: Signer<'info>,
@@ -46,7 +46,11 @@ pub struct Deposit<'info> {
     pub token_program: Program<'info, Token>,
 }
 
-pub fn deposit<'info>(ctx: Context<'_, '_, '_, 'info, Deposit<'info>>, amount: u64) -> Result<()> {
+pub fn deposit<'info>(
+    ctx: Context<'_, '_, '_, 'info, Deposit<'info>>,
+    amount: u64,
+    is_long: bool,
+) -> Result<()> {
     let vault_depositor = &mut ctx.accounts.vault_depositor;
     let vault = &mut ctx.accounts.vault;
 
@@ -60,6 +64,12 @@ pub fn deposit<'info>(ctx: Context<'_, '_, '_, 'info, Deposit<'info>>, amount: u
 
     if amount > vault.max_tokens.saturating_add(vault.total_deposits) {
         return Err(TriadProtocolError::InvalidDepositAmount.into());
+    }
+
+    if is_long {
+        vault_depositor.long_balance = vault_depositor.long_balance.saturating_add(amount);
+    } else {
+        vault_depositor.short_balance = vault_depositor.short_balance.saturating_add(amount);
     }
 
     vault_depositor.total_deposits = vault_depositor.total_deposits.saturating_add(amount);

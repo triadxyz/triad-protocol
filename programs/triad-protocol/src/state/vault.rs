@@ -30,6 +30,10 @@ pub struct Vault {
     pub total_shares: u128,
     /// percentage of gains for vault
     pub profit_share: u32,
+    /// Long bet balance
+    pub long_balance: u64,
+    /// Short bet balance
+    pub short_balance: u64
 }
 
 #[derive(AnchorSerialize, AnchorDeserialize)]
@@ -54,6 +58,10 @@ pub struct VaultDepositor {
     /// lifetime total withdraws
     pub total_withdraws: u64,
     pub lp_shares: u64,
+    /// Long bet balance
+    pub long_balance: u64,
+    /// Short bet balance
+    pub short_balance: u64
 }
 
 impl Vault {

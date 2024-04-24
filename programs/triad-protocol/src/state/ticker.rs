@@ -21,12 +21,12 @@ pub struct Ticker {
 #[derive(AnchorSerialize, AnchorDeserialize)]
 pub struct CreateTickerArgs {
     pub name: [u8; 32],
-    pub pyth_price_pub_key: Pubkey
+    pub pyth_price_pub_key: Pubkey,
 }
 
 impl Ticker {
     /// static prefix seed string used to derive the PDAs
-    pub const PREFIX_SEED: &'static[u8] = b"ticker";
+    pub const PREFIX_SEED: &'static [u8] = b"ticker";
 
     /// total on-chain space needed to allocate the account
     pub const SPACE: usize =
