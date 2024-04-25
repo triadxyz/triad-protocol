@@ -8,6 +8,7 @@ mod errors;
 mod instructions;
 mod macros;
 mod state;
+mod position;
 
 declare_id!("8naBpcEohvxphPTAcuNHVCZEBDNn5aX41HfqxdcjNQ2W");
 
@@ -31,8 +32,8 @@ pub mod triad_protocol {
         instructions::deposit(ctx, amount, is_long)
     }
 
-    pub fn create_vault_depositor(ctx: Context<CreateVaultDepositor>) -> Result<()> {
-        instructions::create_vault_depositor(ctx)
+    pub fn create_vault_depositor(ctx: Context<CreateVaultDepositor>, args: CreateVaultDepositorArgs) -> Result<()> {
+        instructions::create_vault_depositor(ctx, args)
     }
 
     pub fn withdraw<'info>(

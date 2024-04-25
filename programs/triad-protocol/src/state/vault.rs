@@ -10,6 +10,8 @@ pub struct Vault {
     pub name: [u8; 32],
     /// token account for the vault e.g. USDC
     pub token_account: Pubkey,
+    /// ticker address
+    pub ticker_address: Pubkey,
     /// delegate account for the vault
     pub delegate: Pubkey,
     /// max number of tokens that can be deposited
@@ -33,7 +35,7 @@ pub struct Vault {
     /// Long bet balance
     pub long_balance: u64,
     /// Short bet balance
-    pub short_balance: u64
+    pub short_balance: u64,
 }
 
 #[derive(AnchorSerialize, AnchorDeserialize)]
@@ -41,6 +43,7 @@ pub struct CreateVaultArgs {
     pub name: [u8; 32],
     pub max_tokens: u64,
     pub min_deposit_amount: u64,
+    pub ticker_address: Pubkey,
     pub profit_share: u32,
 }
 
@@ -61,12 +64,20 @@ pub struct VaultDepositor {
     /// Long bet balance
     pub long_balance: u64,
     /// Short bet balance
-    pub short_balance: u64
+    pub short_balance: u64,
+    pub long_positions: Vec<(String, f64, f64)>,
+    pub short_positions: Vec<(String, f64, f64)>,
+}
+
+#[derive(AnchorSerialize, AnchorDeserialize)]
+pub struct CreateVaultDepositorArgs {
+    pub long_positions: Vec<(String, f64, f64)>,
+    pub short_positions: Vec<(String, f64, f64)>,
 }
 
 impl Vault {
     /// static prefix seed string used to derive the PDAs
-    pub const PREFIX_SEED: &'static[u8] = b"vault";
+    pub const PREFIX_SEED: &'static [u8] = b"vault";
 
     /// total on-chain space needed to allocate the account
     pub const SPACE: usize =
@@ -77,11 +88,11 @@ impl Vault {
         [b"vault".as_ref(), name, bytemuck::bytes_of(bump)]
     }
 
-    pub const PREFIX_SEED_VAULT_TOKEN_ACCOUNT: &'static[u8] = b"vault_token_account";
+    pub const PREFIX_SEED_VAULT_TOKEN_ACCOUNT: &'static [u8] = b"vault_token_account";
 
     pub const SPACE_VAULT_DEPOSITOR: usize =
         // anchor descriminator + all static variables
         8 + std::mem::size_of::<VaultDepositor>();
 
-    pub const PREFIX_SEED_VAULT_DEPOSITOR: &'static[u8] = b"vault_depositor";
+    pub const PREFIX_SEED_VAULT_DEPOSITOR: &'static [u8] = b"vault_depositor";
 }

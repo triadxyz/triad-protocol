@@ -44,7 +44,8 @@ pub fn create_vault(ctx: Context<CreateVault>, args: CreateVaultArgs) -> Result<
 
     vault.bump = *ctx.bumps.get("vault").unwrap();
     vault.authority = *ctx.accounts.signer.key;
-    vault.name = args.name;
+    vault.name = args.name; 
+    vault.ticker_address = args.ticker_address;
     vault.token_account = *ctx.accounts.token_account.to_account_info().key;
     vault.delegate = *ctx.accounts.signer.key;
     vault.max_tokens = args.max_tokens;
