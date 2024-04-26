@@ -74,7 +74,7 @@ export default class Vault {
         name: vaultName,
         minDepositAmount,
         maxTokens,
-        profitShare
+        profitShare,
       })
       .accounts({
         signer: this.wallet.publicKey,

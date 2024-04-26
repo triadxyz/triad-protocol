@@ -16,12 +16,15 @@ pub struct Ticker {
     pub token_mint: Pubkey,
     /// timestamp ticker initialized
     pub init_ts: i64,
+    /// ticker price
+    pub price: i64,
 }
 
 #[derive(AnchorSerialize, AnchorDeserialize)]
 pub struct CreateTickerArgs {
     pub name: [u8; 32],
     pub pyth_price_pub_key: Pubkey,
+    pub price_onchain: i64
 }
 
 impl Ticker {
