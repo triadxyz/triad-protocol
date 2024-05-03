@@ -121,6 +121,10 @@ export type TriadProtocol = {
         {
           name: 'amount'
           type: 'u64'
+        },
+        {
+          name: 'isLong'
+          type: 'bool'
         }
       ]
     },
@@ -148,7 +152,14 @@ export type TriadProtocol = {
           isSigner: false
         }
       ]
-      args: []
+      args: [
+        {
+          name: 'args'
+          type: {
+            defined: 'CreateVaultDepositorArgs'
+          }
+        }
+      ]
     },
     {
       name: 'withdraw'
@@ -239,6 +250,11 @@ export type TriadProtocol = {
             name: 'initTs'
             docs: ['timestamp ticker initialized']
             type: 'i64'
+          },
+          {
+            name: 'price'
+            docs: ['ticker price']
+            type: 'i64'
           }
         ]
       }
@@ -268,6 +284,11 @@ export type TriadProtocol = {
           {
             name: 'tokenAccount'
             docs: ['token account for the vault e.g. USDC']
+            type: 'publicKey'
+          },
+          {
+            name: 'tickerAddress'
+            docs: ['ticker address']
             type: 'publicKey'
           },
           {
@@ -319,6 +340,16 @@ export type TriadProtocol = {
             name: 'profitShare'
             docs: ['percentage of gains for vault']
             type: 'u32'
+          },
+          {
+            name: 'longBalance'
+            docs: ['Long bet balance']
+            type: 'u64'
+          },
+          {
+            name: 'shortBalance'
+            docs: ['Short bet balance']
+            type: 'u64'
           }
         ]
       }
@@ -363,12 +394,58 @@ export type TriadProtocol = {
           {
             name: 'lpShares'
             type: 'u64'
+          },
+          {
+            name: 'longBalance'
+            docs: ['Long bet balance']
+            type: 'u64'
+          },
+          {
+            name: 'shortBalance'
+            docs: ['Short bet balance']
+            type: 'u64'
+          },
+          {
+            name: 'longPositions'
+            type: {
+              vec: {
+                defined: '(String,f64,f64)'
+              }
+            }
+          },
+          {
+            name: 'shortPositions'
+            type: {
+              vec: {
+                defined: '(String,f64,f64)'
+              }
+            }
           }
         ]
       }
     }
   ]
   types: [
+    {
+      name: 'Position'
+      type: {
+        kind: 'struct'
+        fields: [
+          {
+            name: 'orderId'
+            type: 'string'
+          },
+          {
+            name: 'value'
+            type: 'f64'
+          },
+          {
+            name: 'targetTickerPrice'
+            type: 'f64'
+          }
+        ]
+      }
+    },
     {
       name: 'CreateTickerArgs'
       type: {
@@ -383,6 +460,10 @@ export type TriadProtocol = {
           {
             name: 'pythPricePubKey'
             type: 'publicKey'
+          },
+          {
+            name: 'priceOnchain'
+            type: 'i64'
           }
         ]
       }
@@ -407,8 +488,36 @@ export type TriadProtocol = {
             type: 'u64'
           },
           {
+            name: 'tickerAddress'
+            type: 'publicKey'
+          },
+          {
             name: 'profitShare'
             type: 'u32'
+          }
+        ]
+      }
+    },
+    {
+      name: 'CreateVaultDepositorArgs'
+      type: {
+        kind: 'struct'
+        fields: [
+          {
+            name: 'longPositions'
+            type: {
+              vec: {
+                defined: '(String,f64,f64)'
+              }
+            }
+          },
+          {
+            name: 'shortPositions'
+            type: {
+              vec: {
+                defined: '(String,f64,f64)'
+              }
+            }
           }
         ]
       }
@@ -601,6 +710,10 @@ export const IDL: TriadProtocol = {
         {
           name: 'amount',
           type: 'u64'
+        },
+        {
+          name: 'isLong',
+          type: 'bool'
         }
       ]
     },
@@ -628,7 +741,14 @@ export const IDL: TriadProtocol = {
           isSigner: false
         }
       ],
-      args: []
+      args: [
+        {
+          name: 'args',
+          type: {
+            defined: 'CreateVaultDepositorArgs'
+          }
+        }
+      ]
     },
     {
       name: 'withdraw',
@@ -719,6 +839,11 @@ export const IDL: TriadProtocol = {
             name: 'initTs',
             docs: ['timestamp ticker initialized'],
             type: 'i64'
+          },
+          {
+            name: 'price',
+            docs: ['ticker price'],
+            type: 'i64'
           }
         ]
       }
@@ -748,6 +873,11 @@ export const IDL: TriadProtocol = {
           {
             name: 'tokenAccount',
             docs: ['token account for the vault e.g. USDC'],
+            type: 'publicKey'
+          },
+          {
+            name: 'tickerAddress',
+            docs: ['ticker address'],
             type: 'publicKey'
           },
           {
@@ -799,6 +929,16 @@ export const IDL: TriadProtocol = {
             name: 'profitShare',
             docs: ['percentage of gains for vault'],
             type: 'u32'
+          },
+          {
+            name: 'longBalance',
+            docs: ['Long bet balance'],
+            type: 'u64'
+          },
+          {
+            name: 'shortBalance',
+            docs: ['Short bet balance'],
+            type: 'u64'
           }
         ]
       }
@@ -843,12 +983,58 @@ export const IDL: TriadProtocol = {
           {
             name: 'lpShares',
             type: 'u64'
+          },
+          {
+            name: 'longBalance',
+            docs: ['Long bet balance'],
+            type: 'u64'
+          },
+          {
+            name: 'shortBalance',
+            docs: ['Short bet balance'],
+            type: 'u64'
+          },
+          {
+            name: 'longPositions',
+            type: {
+              vec: {
+                defined: '(String,f64,f64)'
+              }
+            }
+          },
+          {
+            name: 'shortPositions',
+            type: {
+              vec: {
+                defined: '(String,f64,f64)'
+              }
+            }
           }
         ]
       }
     }
   ],
   types: [
+    {
+      name: 'Position',
+      type: {
+        kind: 'struct',
+        fields: [
+          {
+            name: 'orderId',
+            type: 'string'
+          },
+          {
+            name: 'value',
+            type: 'f64'
+          },
+          {
+            name: 'targetTickerPrice',
+            type: 'f64'
+          }
+        ]
+      }
+    },
     {
       name: 'CreateTickerArgs',
       type: {
@@ -863,6 +1049,10 @@ export const IDL: TriadProtocol = {
           {
             name: 'pythPricePubKey',
             type: 'publicKey'
+          },
+          {
+            name: 'priceOnchain',
+            type: 'i64'
           }
         ]
       }
@@ -887,8 +1077,36 @@ export const IDL: TriadProtocol = {
             type: 'u64'
           },
           {
+            name: 'tickerAddress',
+            type: 'publicKey'
+          },
+          {
             name: 'profitShare',
             type: 'u32'
+          }
+        ]
+      }
+    },
+    {
+      name: 'CreateVaultDepositorArgs',
+      type: {
+        kind: 'struct',
+        fields: [
+          {
+            name: 'longPositions',
+            type: {
+              vec: {
+                defined: '(String,f64,f64)'
+              }
+            }
+          },
+          {
+            name: 'shortPositions',
+            type: {
+              vec: {
+                defined: '(String,f64,f64)'
+              }
+            }
           }
         ]
       }

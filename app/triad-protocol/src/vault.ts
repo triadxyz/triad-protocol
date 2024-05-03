@@ -53,7 +53,7 @@ export default class Vault {
     mint,
     maxTokens,
     minDepositAmount,
-    profitShare
+    profitShare,
   }: {
     name: string
     mint: PublicKey
@@ -62,6 +62,7 @@ export default class Vault {
     profitShare: number
   }) {
     const vaultName = encodeString(name)
+    const tickerAddress = new PublicKey("driftaiasjiasjhias")
 
     const VaultPDA = getVaultAddressSync(this.program.programId, vaultName)
     const TokenAccountPDA = getTokenVaultAddressSync(
@@ -75,6 +76,7 @@ export default class Vault {
         minDepositAmount,
         maxTokens,
         profitShare,
+        tickerAddress
       })
       .accounts({
         signer: this.wallet.publicKey,
@@ -166,7 +168,7 @@ export default class Vault {
   public async deposit({
     vault,
     amount,
-    mint
+    mint,
   }: {
     vault: string
     amount: string
@@ -193,7 +195,10 @@ export default class Vault {
 
     if (!hasDepositor) {
       const depositorIx = await this.program.methods
-        .createVaultDepositor()
+        .createVaultDepositor({
+          longPositions: '',
+          shortPositions: ''
+        })
         .accounts({
           vault: VaultPDA,
           vaultDepositor: VaultDepositorPDA

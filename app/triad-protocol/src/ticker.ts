@@ -2,7 +2,12 @@ import { AnchorProvider, Program, Wallet } from '@coral-xyz/anchor'
 import { IDL, TriadProtocol } from './types/triad_protocol'
 import { Connection, PublicKey } from '@solana/web3.js'
 import { TRIAD_PROTOCOL_PROGRAM_ID } from './utils/constants'
+import { decodeIdlAccount } from '@project-serum/anchor/dist/cjs/idl'
+import { utf8 } from '@project-serum/anchor/dist/cjs/utils/bytes'
+import { inflate } from 'pako'
 import { encodeString } from './utils/helpers'
+import { BN } from 'bn.js'
+import { convertSecretKeyToKeypair } from './utils/convertSecretKeyToKeypair'
 
 export default class Ticker {
   program: Program<TriadProtocol>
@@ -18,6 +23,7 @@ export default class Ticker {
       this.wallet,
       AnchorProvider.defaultOptions()
     )
+
     this.program = new Program<TriadProtocol>(
       IDL,
       TRIAD_PROTOCOL_PROGRAM_ID,
@@ -33,21 +39,46 @@ export default class Ticker {
    */
   public async createTicker({
     name,
-    pythPricePubKey
+    pythPricePubKey,
+    protocolProgramId = new PublicKey(
+      'dRiftyHA39MWEi3m9aunc5MzRF1JYuBsbn6VPcn33UH'
+    )
   }: {
     name: string
     pythPricePubKey: PublicKey
+    protocolProgramId: PublicKey
   }) {
     const tickerName = encodeString(name)
+
+    const base = (
+      await PublicKey.findProgramAddressSync([], protocolProgramId)
+    )[0]
+    const idlAddress = await PublicKey.createWithSeed(
+      base,
+      'anchor:idl',
+      protocolProgramId
+    )
+    const idlAccountInfo = await this.connection.getAccountInfo(idlAddress)
+    const idlAccount = decodeIdlAccount(idlAccountInfo.data.slice(8)) // chop off discriminator
+    const inflatedIdl = inflate(idlAccount.data)
+    const idlJson = JSON.parse(utf8.decode(inflatedIdl))
+
+    console.log(idlJson, 'asasas')
+
+    const p = new Program(idlJson, protocolProgramId)
+
+    console.log(p.account.state!.all())
 
     return this.program.methods
       .createTicker({
         name: tickerName,
-        pythPricePubKey: pythPricePubKey
+        pythPricePubKey: pythPricePubKey,
+        priceOnchain: new BN(10)
       })
       .accounts({
-        signer: this.wallet.publicKey,
+        signer: this.wallet.publicKey
       })
       .rpc()
   }
 }
+
