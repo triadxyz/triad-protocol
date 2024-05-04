@@ -50,35 +50,6 @@ export default class Ticker {
   }) {
     const tickerName = encodeString(name)
 
-    const base = (
-      await PublicKey.findProgramAddressSync([], protocolProgramId)
-    )[0]
-    const idlAddress = await PublicKey.createWithSeed(
-      base,
-      'anchor:idl',
-      protocolProgramId
-    )
-    const idlAccountInfo = await this.connection.getAccountInfo(idlAddress)
-    const idlAccount = decodeIdlAccount(idlAccountInfo.data.slice(8)) // chop off discriminator
-    const inflatedIdl = inflate(idlAccount.data)
-    const idlJson = JSON.parse(utf8.decode(inflatedIdl))
-
-    console.log(idlJson, 'asasas')
-
-    const p = new Program(idlJson, protocolProgramId)
-
-    console.log(p.account.state!.all())
-
-    return this.program.methods
-      .createTicker({
-        name: tickerName,
-        pythPricePubKey: pythPricePubKey,
-        priceOnchain: new BN(10)
-      })
-      .accounts({
-        signer: this.wallet.publicKey
-      })
-      .rpc()
   }
 }
 
