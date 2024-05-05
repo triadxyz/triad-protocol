@@ -8,8 +8,6 @@ pub struct Ticker {
     pub authority: Pubkey,
     /// name of the ticekt
     pub name: [u8; 32],
-    /// The pubkey of a token pairs
-    pub pyth_price_pub_key: Pubkey,
     /// token account for the ticker e.g. $tDRIFT
     pub token_account: Pubkey,
     /// token mint for the ticker e.g. $tDRIFT
@@ -23,8 +21,6 @@ pub struct Ticker {
 #[derive(AnchorSerialize, AnchorDeserialize)]
 pub struct CreateTickerArgs {
     pub name: [u8; 32],
-    pub pyth_price_pub_key: Pubkey,
-    pub price_onchain: i64
 }
 
 impl Ticker {

@@ -14,20 +14,14 @@ pub enum TriadProtocolError {
     #[msg("Unauthorized access")]
     Unauthorized,
 
-    #[msg("Invalid pass type")]
-    InvalidPassType,
-
-    #[msg("Invalid vault depositor authority")]
+    #[msg("Invalid Vault depositor authority")]
     InvalidVaultDepositorAuthority,
 
-    #[msg("Invalid owner authority")]
+    #[msg("Invalid Wwner authority")]
     InvalidOwnerAuthority,
 
-    #[msg("Invalid mint address")]
+    #[msg("Invalid Mint address")]
     InvalidMintAddress,
-
-    #[msg("Invalid Max Tokens")]
-    InvalidMaxTokens,
 
     #[msg("Invalid Profit Share")]
     InvalidProfitShare,

@@ -12,26 +12,16 @@ pub struct Vault {
     pub token_account: Pubkey,
     /// ticker address
     pub ticker_address: Pubkey,
-    /// delegate account for the vault
-    pub delegate: Pubkey,
-    /// max number of tokens that can be deposited
-    pub max_tokens: u64,
     /// lifetime total deposits
     pub total_deposits: u64,
     /// lifetime total withdraws
     pub total_withdraws: u64,
     /// timestamp vault initialized
     pub init_ts: i64,
-    /// the minimum deposit amount
-    pub min_deposit_amount: u64,
     /// lifetime net deposits
     pub net_deposits: i64,
     /// lifetime net withdraws
     pub net_withdraws: i64,
-    /// the sum of all shares
-    pub total_shares: u128,
-    /// percentage of gains for vault
-    pub profit_share: u32,
     /// Long bet balance
     pub long_balance: u64,
     /// Short bet balance
@@ -41,10 +31,7 @@ pub struct Vault {
 #[derive(AnchorSerialize, AnchorDeserialize)]
 pub struct CreateVaultArgs {
     pub name: [u8; 32],
-    pub max_tokens: u64,
-    pub min_deposit_amount: u64,
     pub ticker_address: Pubkey,
-    pub profit_share: u32,
 }
 
 #[account]

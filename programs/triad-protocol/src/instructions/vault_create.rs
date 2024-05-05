@@ -1,8 +1,6 @@
 use anchor_lang::prelude::*;
 use anchor_spl::token::{Mint, Token, TokenAccount};
 
-use crate::errors::TriadProtocolError;
-
 use crate::state::{CreateVaultArgs, Vault};
 
 #[derive(Accounts)]
@@ -34,28 +32,15 @@ pub struct CreateVault<'info> {
 pub fn create_vault(ctx: Context<CreateVault>, args: CreateVaultArgs) -> Result<()> {
     let vault = &mut ctx.accounts.vault;
 
-    if args.max_tokens == 0 {
-        return Err(TriadProtocolError::InvalidMaxTokens.into());
-    }
-
-    if args.profit_share > 100 {
-        return Err(TriadProtocolError::InvalidProfitShare.into());
-    }
-
     vault.bump = *ctx.bumps.get("vault").unwrap();
     vault.authority = *ctx.accounts.signer.key;
-    vault.name = args.name; 
+    vault.name = args.name;
     vault.ticker_address = args.ticker_address;
     vault.token_account = *ctx.accounts.token_account.to_account_info().key;
-    vault.delegate = *ctx.accounts.signer.key;
-    vault.max_tokens = args.max_tokens;
     vault.total_deposits = 0;
     vault.total_withdraws = 0;
     vault.init_ts = Clock::get()?.unix_timestamp;
-    vault.min_deposit_amount = args.min_deposit_amount;
     vault.net_deposits = 0;
-    vault.total_shares = 0;
-    vault.profit_share = args.profit_share;
 
     Ok(())
 }

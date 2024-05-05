@@ -58,14 +58,6 @@ pub fn deposit<'info>(
         return Err(TriadProtocolError::InvalidAccount.into());
     }
 
-    if amount < vault.min_deposit_amount {
-        return Err(TriadProtocolError::InvalidDepositAmount.into());
-    }
-
-    if amount > vault.max_tokens.saturating_add(vault.total_deposits) {
-        return Err(TriadProtocolError::InvalidDepositAmount.into());
-    }
-
     if is_long {
         vault_depositor.long_balance = vault_depositor.long_balance.saturating_add(amount);
     } else {
