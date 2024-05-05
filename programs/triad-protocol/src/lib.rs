@@ -15,6 +15,10 @@ declare_id!("8naBpcEohvxphPTAcuNHVCZEBDNn5aX41HfqxdcjNQ2W");
 pub mod triad_protocol {
     use super::*;
 
+    pub fn create_user(ctx: Context<CreateUser>, arg: CreateUserArgs) -> Result<()> {
+        instructions::create_user(ctx, arg)
+    }
+
     pub fn create_ticker(ctx: Context<CreateTicker>, arg: CreateTickerArgs) -> Result<()> {
         instructions::create_ticker(ctx, arg)
     }
