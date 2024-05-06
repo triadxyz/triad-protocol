@@ -1,2 +1,0 @@
-export const TRIAD_PROTOCOL_PROGRAM_ID =
-  '8naBpcEohvxphPTAcuNHVCZEBDNn5aX41HfqxdcjNQ2W'

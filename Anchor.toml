@@ -2,14 +2,11 @@
 seeds = false
 skip-lint = false
 
-[programs.localnet]
-triad_protocol = "8naBpcEohvxphPTAcuNHVCZEBDNn5aX41HfqxdcjNQ2W"
-
-[registry]
-url = "https://api.apr.dev"
+[programs.devnet]
+triad_protocol = "TRDwq3BN4mP3m9KsuNUWSN6QDff93VKGSwE95Jbr9Ss"
 
 [provider]
-cluster = "Localnet"
+cluster = "devnet"
 wallet = "/Users/dannpl/.config/solana/id.json"
 
 [scripts]
