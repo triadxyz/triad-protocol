@@ -23,23 +23,22 @@ pub mod triad_protocol {
         instructions::create_ticker(ctx, arg)
     }
 
-    pub fn create_vault(ctx: Context<CreateVault>, args: CreateVaultArgs) -> Result<()> {
-        instructions::create_vault(ctx, args)
+    pub fn update_ticker_price<'info>(
+        ctx: Context<UpdateTickerPrice>,
+        args: UpdateTickerPriceArgs,
+    ) -> Result<()> {
+        instructions::update_ticker_price(ctx, args)
+    }
+
+    pub fn create_vault(ctx: Context<CreateVault>) -> Result<()> {
+        instructions::create_vault(ctx)
     }
 
     pub fn deposit<'info>(
         ctx: Context<'_, '_, '_, 'info, Deposit<'info>>,
-        amount: u64,
-        is_long: bool,
+        args: DepositVaultArgs,
     ) -> Result<()> {
-        instructions::deposit(ctx, amount, is_long)
-    }
-
-    pub fn create_vault_depositor(
-        ctx: Context<CreateVaultDepositor>,
-        args: CreateVaultDepositorArgs,
-    ) -> Result<()> {
-        instructions::create_vault_depositor(ctx, args)
+        instructions::deposit(ctx, args)
     }
 
     pub fn withdraw<'info>(

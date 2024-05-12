@@ -2,12 +2,44 @@ use anchor_lang::prelude::*;
 
 #[account]
 pub struct User {
-    pub ts: i64, // timestamp
+    /// timestamp
+    pub ts: i64,
+    /// user's name
     pub name: String,
+    /// bump seed
     pub bump: u8,
+    /// user's authority
     pub authority: Pubkey,
+    /// referrer of the user
     pub referrer: String,
+    /// community the user is part of
     pub community: String,
+    /// lifetime net deposits of user
+    pub net_deposits: i64,
+    /// lifetime net withdraws of user
+    pub net_withdraws: i64,
+    /// lifetime total deposits
+    pub total_deposits: u64,
+    /// lifetime total withdraws
+    pub total_withdraws: u64,
+    /// total available balance
+    pub lp_shares: u64,
+    /// long positions
+    pub long_positions: Vec<Position>,
+    /// short positions
+    pub short_positions: Vec<Position>,
+}
+
+#[derive(AnchorSerialize, AnchorDeserialize, Clone)]
+pub struct Position {
+    pub ticker: Pubkey,
+    pub amount: i64,
+    pub leverage: i64,
+    pub entry_price: i64,
+    pub ts: i64,
+    pub is_long: bool,
+    pub is_open: bool,
+    pub pnl: i64,
 }
 
 #[derive(Debug, Clone, AnchorSerialize, AnchorDeserialize, PartialEq, Eq)]

@@ -1,30 +1,28 @@
+use crate::constraints::{is_authority_for_user, is_token_mint_for_vault};
+use crate::cpi::TokenTransferCPI;
+use crate::errors::TriadProtocolError;
+use crate::state::Vault;
+use crate::{DepositVaultArgs, User};
+
 use anchor_lang::prelude::*;
 use anchor_spl::token::{self, Token, TokenAccount, Transfer};
 
-use crate::constraints::{
-    is_authority_for_vault_depositor, is_depositor_for_vault, is_token_mint_for_vault,
-};
-use crate::cpi::TokenTransferCPI;
-use crate::errors::TriadProtocolError;
-
-use crate::{state::Vault, VaultDepositor};
-
 #[derive(Accounts)]
-#[instruction(amount: u64, is_long: bool)]
+#[instruction(args: DepositVaultArgs)]
 pub struct Deposit<'info> {
     #[account(mut)]
     pub signer: Signer<'info>,
 
-    #[account(mut, constraint = is_depositor_for_vault(&vault_depositor, &vault.key())?)]
+    #[account(mut)]
     pub vault: Account<'info, Vault>,
 
     #[account(
         mut,
-        seeds = [Vault::PREFIX_SEED_VAULT_DEPOSITOR.as_ref(), vault.key().as_ref(), signer.key.as_ref()],
+        seeds = [User::PREFIX_SEED.as_ref(), signer.key.as_ref()],
         bump,
-        constraint = is_authority_for_vault_depositor(&vault_depositor, &signer)?,
+        constraint = is_authority_for_user(&user, &signer)?,
     )]
-    pub vault_depositor: Account<'info, VaultDepositor>,
+    pub user: Account<'info, User>,
 
     #[account(
         mut,
@@ -35,7 +33,7 @@ pub struct Deposit<'info> {
 
     #[account(
         mut,
-        token::authority = vault_depositor.authority,
+        token::authority = user.authority,
         token::mint = vault_token_account.mint,
         constraint = is_token_mint_for_vault(&vault_token_account.mint, &user_token_account.mint)?,
     )]
@@ -48,30 +46,37 @@ pub struct Deposit<'info> {
 
 pub fn deposit<'info>(
     ctx: Context<'_, '_, '_, 'info, Deposit<'info>>,
-    amount: u64,
-    is_long: bool,
+    args: DepositVaultArgs,
 ) -> Result<()> {
-    let vault_depositor = &mut ctx.accounts.vault_depositor;
-    let vault = &mut ctx.accounts.vault;
+    let mut user = ctx.accounts.user.clone();
+    let mut vault = ctx.accounts.vault.clone();
 
-    if vault_depositor.authority != *ctx.accounts.signer.key {
+    if user.authority != *ctx.accounts.signer.key {
         return Err(TriadProtocolError::InvalidAccount.into());
     }
 
-    if is_long {
-        vault_depositor.long_balance = vault_depositor.long_balance.saturating_add(amount);
-    } else {
-        vault_depositor.short_balance = vault_depositor.short_balance.saturating_add(amount);
+    // if is_long {
+    //     user.long_positions = user.long_balance.saturating_add(amount);
+    // } else {
+    //     user.short_balance = user.short_balance.saturating_add(amount);
+    // }
+
+    let transfer = ctx.token_transfer(args.amount);
+
+    if transfer.is_err() {
+        msg!("Deposit failed");
+
+        return Err(TriadProtocolError::DepositFailed.into());
     }
 
-    vault_depositor.total_deposits = vault_depositor.total_deposits.saturating_add(amount);
-    vault_depositor.net_deposits = vault_depositor.net_deposits.saturating_add(1);
-    vault_depositor.lp_shares = vault_depositor.lp_shares.saturating_add(amount);
+    user.total_deposits = user.total_deposits.saturating_add(args.amount);
+    user.net_deposits = user.net_deposits.saturating_add(1);
+    user.lp_shares = user.lp_shares.saturating_add(args.amount);
 
-    vault.total_deposits = vault.total_deposits.saturating_add(amount);
+    vault.total_deposits = vault.total_deposits.saturating_add(args.amount);
     vault.net_deposits = vault.net_deposits.saturating_add(1);
 
-    ctx.token_transfer(amount)?;
+    msg!("Deposit successful");
 
     Ok(())
 }

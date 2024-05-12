@@ -1,6 +1,6 @@
-use anchor_lang::prelude::*;
-
 use crate::state::{CreateUserArgs, User};
+
+use anchor_lang::prelude::*;
 
 #[derive(Accounts)]
 #[instruction(args: CreateUserArgs)]
@@ -22,6 +22,13 @@ pub fn create_user(ctx: Context<CreateUser>, args: CreateUserArgs) -> Result<()>
     user.community = args.community;
     user.bump = *ctx.bumps.get("user").unwrap();
     user.authority = *ctx.accounts.signer.key;
+    user.total_deposits = 0;
+    user.total_withdraws = 0;
+    user.net_deposits = 0;
+    user.net_withdraws = 0;
+    user.lp_shares = 0;
+    user.long_positions = Vec::new();
+    user.short_positions = Vec::new();
 
     let clock: Clock = Clock::get().unwrap();
     user.ts = clock.unix_timestamp;

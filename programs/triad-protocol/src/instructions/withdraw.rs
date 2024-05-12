@@ -1,14 +1,11 @@
+use crate::constraints::{is_authority_for_user, is_token_mint_for_vault};
+use crate::cpi::TokenTransferCPI;
+use crate::errors::TriadProtocolError;
+use crate::state::Vault;
+use crate::{declare_vault_seeds, User};
+
 use anchor_lang::prelude::*;
 use anchor_spl::token::{self, Token, TokenAccount, Transfer};
-
-use crate::constraints::{
-    is_authority_for_vault_depositor, is_depositor_for_vault, is_token_mint_for_vault,
-};
-use crate::cpi::TokenTransferCPI;
-use crate::declare_vault_seeds;
-use crate::errors::TriadProtocolError;
-
-use crate::{state::Vault, VaultDepositor};
 
 #[derive(Accounts)]
 #[instruction(amount: u64)]
@@ -16,16 +13,16 @@ pub struct Withdraw<'info> {
     #[account(mut)]
     pub signer: Signer<'info>,
 
-    #[account(mut, constraint = is_depositor_for_vault(&vault_depositor, &vault.key())?)]
+    #[account(mut)]
     pub vault: Account<'info, Vault>,
 
     #[account(
         mut,
-        seeds = [Vault::PREFIX_SEED_VAULT_DEPOSITOR.as_ref(), vault.key().as_ref(), signer.key.as_ref()],
+        seeds = [User::PREFIX_SEED.as_ref(), signer.key.as_ref()],
         bump,
-        constraint = is_authority_for_vault_depositor(&vault_depositor, &signer)?,
+        constraint = is_authority_for_user(&user, &signer)?,
     )]
-    pub vault_depositor: Account<'info, VaultDepositor>,
+    pub user: Account<'info, User>,
 
     #[account(
         mut,
@@ -36,7 +33,7 @@ pub struct Withdraw<'info> {
 
     #[account(
         mut,
-        token::authority = vault_depositor.authority,
+        token::authority = user.authority,
         token::mint = vault_token_account.mint,
         constraint = is_token_mint_for_vault(&vault_token_account.mint, &user_token_account.mint)?,
     )]
@@ -51,20 +48,20 @@ pub fn withdraw<'info>(
     ctx: Context<'_, '_, '_, 'info, Withdraw<'info>>,
     amount: u64,
 ) -> Result<()> {
-    let vault_depositor = &mut ctx.accounts.vault_depositor;
+    let user = &mut ctx.accounts.user;
     let vault = &mut ctx.accounts.vault;
 
-    if vault_depositor.authority != *ctx.accounts.signer.key {
+    if user.authority != *ctx.accounts.signer.key {
         return Err(TriadProtocolError::InvalidAccount.into());
     }
 
-    if amount > vault_depositor.lp_shares {
+    if amount > user.lp_shares {
         return Err(TriadProtocolError::InvalidWithdrawAmount.into());
     }
 
-    vault_depositor.total_withdraws = vault_depositor.total_withdraws.saturating_add(amount);
-    vault_depositor.net_withdraws = vault_depositor.net_withdraws.saturating_add(1);
-    vault_depositor.lp_shares = vault_depositor.lp_shares.saturating_sub(amount);
+    user.total_withdraws = user.total_withdraws.saturating_add(amount);
+    user.net_withdraws = user.net_withdraws.saturating_add(1);
+    user.lp_shares = user.lp_shares.saturating_sub(amount);
 
     vault.total_withdraws = vault.total_withdraws.saturating_add(amount);
     vault.net_withdraws = vault.net_withdraws.saturating_add(1);

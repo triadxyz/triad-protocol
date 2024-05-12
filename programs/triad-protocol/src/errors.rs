@@ -14,10 +14,10 @@ pub enum TriadProtocolError {
     #[msg("Unauthorized access")]
     Unauthorized,
 
-    #[msg("Invalid Vault depositor authority")]
-    InvalidVaultDepositorAuthority,
+    #[msg("Failed to deposit")]
+    DepositFailed,
 
-    #[msg("Invalid Wwner authority")]
+    #[msg("Invalid Owner authority")]
     InvalidOwnerAuthority,
 
     #[msg("Invalid Mint address")]

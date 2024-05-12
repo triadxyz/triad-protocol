@@ -2,25 +2,33 @@ use anchor_lang::prelude::*;
 
 #[account]
 pub struct Ticker {
+    /// timestamp of the creation of the ticker
+    pub init_ts: i64,
+    /// timestamp of the last update of the ticker
+    pub updated_ts: i64,
     /// The bump for the ticker pda
     pub bump: u8,
     /// authority for the ticker
     pub authority: Pubkey,
     /// name of the ticekt
-    pub name: [u8; 32],
-    /// token account for the ticker e.g. $tDRIFT
-    pub token_account: Pubkey,
-    /// token mint for the ticker e.g. $tDRIFT
-    pub token_mint: Pubkey,
-    /// timestamp ticker initialized
-    pub init_ts: i64,
+    pub name: String,
+    /// protocol program id like dRiftyHA39MWEi3m9aunc5MzRF1JYuBsbn6VPcn33UH to get data info
+    pub protocol_program_id: Pubkey,
     /// ticker price
-    pub price: i64,
+    pub price: u64,
+    /// Vault PDA
+    pub vault: Pubkey,
 }
 
 #[derive(AnchorSerialize, AnchorDeserialize)]
 pub struct CreateTickerArgs {
-    pub name: [u8; 32],
+    pub name: String,
+    pub protocol_program_id: Pubkey,
+}
+
+#[derive(AnchorSerialize, AnchorDeserialize)]
+pub struct UpdateTickerPriceArgs {
+    pub alpha_api_key: [u8; 64],
 }
 
 impl Ticker {

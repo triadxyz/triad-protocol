@@ -7,8 +7,8 @@ pub struct Vault {
     /// authority for the vault
     pub authority: Pubkey,
     /// name of the vault
-    pub name: [u8; 32],
-    /// token account for the vault e.g. USDC
+    pub name: String,
+    /// token account for the vault e.g. tDRIFT
     pub token_account: Pubkey,
     /// ticker address
     pub ticker_address: Pubkey,
@@ -26,40 +26,14 @@ pub struct Vault {
     pub long_balance: u64,
     /// Short bet balance
     pub short_balance: u64,
+    /// Ticker PDA
+    pub ticker: Pubkey,
 }
 
 #[derive(AnchorSerialize, AnchorDeserialize)]
-pub struct CreateVaultArgs {
-    pub name: [u8; 32],
-    pub ticker_address: Pubkey,
-}
-
-#[account]
-pub struct VaultDepositor {
-    pub bump: u8,
-    pub authority: Pubkey,
-    pub vault: Pubkey,
-    /// lifetime net deposits of vault depositor for the vault
-    pub net_deposits: i64,
-    /// lifetime net withdraws of vault depositor for the vault
-    pub net_withdraws: i64,
-    /// lifetime total deposits
-    pub total_deposits: u64,
-    /// lifetime total withdraws
-    pub total_withdraws: u64,
-    pub lp_shares: u64,
-    /// Long bet balance
-    pub long_balance: u64,
-    /// Short bet balance
-    pub short_balance: u64,
-    pub long_positions: Vec<(String, f64, f64)>,
-    pub short_positions: Vec<(String, f64, f64)>,
-}
-
-#[derive(AnchorSerialize, AnchorDeserialize)]
-pub struct CreateVaultDepositorArgs {
-    pub long_positions: Vec<(String, f64, f64)>,
-    pub short_positions: Vec<(String, f64, f64)>,
+pub struct DepositVaultArgs {
+    pub amount: u64,
+    pub is_long: bool,
 }
 
 impl Vault {
@@ -76,10 +50,4 @@ impl Vault {
     }
 
     pub const PREFIX_SEED_VAULT_TOKEN_ACCOUNT: &'static [u8] = b"vault_token_account";
-
-    pub const SPACE_VAULT_DEPOSITOR: usize =
-        // anchor descriminator + all static variables
-        8 + std::mem::size_of::<VaultDepositor>();
-
-    pub const PREFIX_SEED_VAULT_DEPOSITOR: &'static [u8] = b"vault_depositor";
 }
