@@ -34,6 +34,7 @@ export default class Ticker {
     return this.program.methods
       .createTicker({ name, protocolProgramId })
       .accounts({
+        signer: this.provider.wallet.publicKey,
         ticker: TickerPDA,
         vault: VaultPDA
       })

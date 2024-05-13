@@ -57,19 +57,16 @@ export const getTokenVaultAddressSync = (
   return VaultTokenPDA
 }
 
-export function getVaultDepositorAddressSync(
+export function getUserAddressSync(
   programId: PublicKey,
-  vault: PublicKey,
   authority: PublicKey
 ): PublicKey {
-  return PublicKey.findProgramAddressSync(
-    [
-      Buffer.from(anchor.utils.bytes.utf8.encode('vault_depositor')),
-      vault.toBuffer(),
-      authority.toBuffer()
-    ],
+  const [UserPDA] = PublicKey.findProgramAddressSync(
+    [Buffer.from(anchor.utils.bytes.utf8.encode('user')), authority.toBuffer()],
     programId
-  )[0]
+  )
+
+  return UserPDA
 }
 
 export const formatNumber = (number: bigint | BN, decimals = 6) => {
