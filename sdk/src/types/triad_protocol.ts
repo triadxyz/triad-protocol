@@ -3,6 +3,34 @@ export type TriadProtocol = {
   name: 'triad_protocol'
   instructions: [
     {
+      name: 'createUser'
+      accounts: [
+        {
+          name: 'signer'
+          isMut: true
+          isSigner: true
+        },
+        {
+          name: 'user'
+          isMut: true
+          isSigner: false
+        },
+        {
+          name: 'systemProgram'
+          isMut: false
+          isSigner: false
+        }
+      ]
+      args: [
+        {
+          name: 'arg'
+          type: {
+            defined: 'CreateUserArgs'
+          }
+        }
+      ]
+    },
+    {
       name: 'createTicker'
       accounts: [
         {
@@ -11,13 +39,13 @@ export type TriadProtocol = {
           isSigner: true
         },
         {
-          name: 'ticker'
+          name: 'vault'
           isMut: true
           isSigner: false
         },
         {
-          name: 'priceUpdate'
-          isMut: false
+          name: 'ticker'
+          isMut: true
           isSigner: false
         },
         {
@@ -36,12 +64,45 @@ export type TriadProtocol = {
       ]
     },
     {
+      name: 'updateTickerPrice'
+      accounts: [
+        {
+          name: 'signer'
+          isMut: true
+          isSigner: true
+        },
+        {
+          name: 'ticker'
+          isMut: true
+          isSigner: false
+        },
+        {
+          name: 'systemProgram'
+          isMut: false
+          isSigner: false
+        }
+      ]
+      args: [
+        {
+          name: 'args'
+          type: {
+            defined: 'UpdateTickerPriceArgs'
+          }
+        }
+      ]
+    },
+    {
       name: 'createVault'
       accounts: [
         {
           name: 'signer'
           isMut: true
           isSigner: true
+        },
+        {
+          name: 'ticker'
+          isMut: true
+          isSigner: false
         },
         {
           name: 'vault'
@@ -69,14 +130,7 @@ export type TriadProtocol = {
           isSigner: false
         }
       ]
-      args: [
-        {
-          name: 'args'
-          type: {
-            defined: 'CreateVaultArgs'
-          }
-        }
-      ]
+      args: []
     },
     {
       name: 'deposit'
@@ -92,7 +146,7 @@ export type TriadProtocol = {
           isSigner: false
         },
         {
-          name: 'vaultDepositor'
+          name: 'user'
           isMut: true
           isSigner: false
         },
@@ -119,44 +173,9 @@ export type TriadProtocol = {
       ]
       args: [
         {
-          name: 'amount'
-          type: 'u64'
-        },
-        {
-          name: 'isLong'
-          type: 'bool'
-        }
-      ]
-    },
-    {
-      name: 'createVaultDepositor'
-      accounts: [
-        {
-          name: 'signer'
-          isMut: true
-          isSigner: true
-        },
-        {
-          name: 'vault'
-          isMut: false
-          isSigner: false
-        },
-        {
-          name: 'vaultDepositor'
-          isMut: true
-          isSigner: false
-        },
-        {
-          name: 'systemProgram'
-          isMut: false
-          isSigner: false
-        }
-      ]
-      args: [
-        {
           name: 'args'
           type: {
-            defined: 'CreateVaultDepositorArgs'
+            defined: 'DepositVaultArgs'
           }
         }
       ]
@@ -175,7 +194,7 @@ export type TriadProtocol = {
           isSigner: false
         },
         {
-          name: 'vaultDepositor'
+          name: 'user'
           isMut: true
           isSigner: false
         },
@@ -215,6 +234,16 @@ export type TriadProtocol = {
         kind: 'struct'
         fields: [
           {
+            name: 'initTs'
+            docs: ['timestamp of the creation of the ticker']
+            type: 'i64'
+          },
+          {
+            name: 'updatedTs'
+            docs: ['timestamp of the last update of the ticker']
+            type: 'i64'
+          },
+          {
             name: 'bump'
             docs: ['The bump for the ticker pda']
             type: 'u8'
@@ -227,34 +256,105 @@ export type TriadProtocol = {
           {
             name: 'name'
             docs: ['name of the ticekt']
-            type: {
-              array: ['u8', 32]
-            }
+            type: 'string'
           },
           {
-            name: 'pythPricePubKey'
-            docs: ['The pubkey of a token pairs']
+            name: 'protocolProgramId'
+            docs: [
+              'protocol program id like dRiftyHA39MWEi3m9aunc5MzRF1JYuBsbn6VPcn33UH to get data info'
+            ]
             type: 'publicKey'
-          },
-          {
-            name: 'tokenAccount'
-            docs: ['token account for the ticker e.g. $tDRIFT']
-            type: 'publicKey'
-          },
-          {
-            name: 'tokenMint'
-            docs: ['token mint for the ticker e.g. $tDRIFT']
-            type: 'publicKey'
-          },
-          {
-            name: 'initTs'
-            docs: ['timestamp ticker initialized']
-            type: 'i64'
           },
           {
             name: 'price'
             docs: ['ticker price']
+            type: 'u64'
+          },
+          {
+            name: 'vault'
+            docs: ['Vault PDA']
+            type: 'publicKey'
+          }
+        ]
+      }
+    },
+    {
+      name: 'user'
+      type: {
+        kind: 'struct'
+        fields: [
+          {
+            name: 'ts'
+            docs: ['timestamp']
             type: 'i64'
+          },
+          {
+            name: 'name'
+            docs: ["user's name"]
+            type: 'string'
+          },
+          {
+            name: 'bump'
+            docs: ['bump seed']
+            type: 'u8'
+          },
+          {
+            name: 'authority'
+            docs: ["user's authority"]
+            type: 'publicKey'
+          },
+          {
+            name: 'referrer'
+            docs: ['referrer of the user']
+            type: 'string'
+          },
+          {
+            name: 'community'
+            docs: ['community the user is part of']
+            type: 'string'
+          },
+          {
+            name: 'netDeposits'
+            docs: ['lifetime net deposits of user']
+            type: 'i64'
+          },
+          {
+            name: 'netWithdraws'
+            docs: ['lifetime net withdraws of user']
+            type: 'i64'
+          },
+          {
+            name: 'totalDeposits'
+            docs: ['lifetime total deposits']
+            type: 'u64'
+          },
+          {
+            name: 'totalWithdraws'
+            docs: ['lifetime total withdraws']
+            type: 'u64'
+          },
+          {
+            name: 'lpShares'
+            docs: ['total available balance']
+            type: 'u64'
+          },
+          {
+            name: 'longPositions'
+            docs: ['long positions']
+            type: {
+              vec: {
+                defined: 'Position'
+              }
+            }
+          },
+          {
+            name: 'shortPositions'
+            docs: ['short positions']
+            type: {
+              vec: {
+                defined: 'Position'
+              }
+            }
           }
         ]
       }
@@ -277,29 +377,17 @@ export type TriadProtocol = {
           {
             name: 'name'
             docs: ['name of the vault']
-            type: {
-              array: ['u8', 32]
-            }
+            type: 'string'
           },
           {
             name: 'tokenAccount'
-            docs: ['token account for the vault e.g. USDC']
+            docs: ['token account for the vault e.g. tDRIFT']
             type: 'publicKey'
           },
           {
             name: 'tickerAddress'
             docs: ['ticker address']
             type: 'publicKey'
-          },
-          {
-            name: 'delegate'
-            docs: ['delegate account for the vault']
-            type: 'publicKey'
-          },
-          {
-            name: 'maxTokens'
-            docs: ['max number of tokens that can be deposited']
-            type: 'u64'
           },
           {
             name: 'totalDeposits'
@@ -317,11 +405,6 @@ export type TriadProtocol = {
             type: 'i64'
           },
           {
-            name: 'minDepositAmount'
-            docs: ['the minimum deposit amount']
-            type: 'u64'
-          },
-          {
             name: 'netDeposits'
             docs: ['lifetime net deposits']
             type: 'i64'
@@ -332,70 +415,6 @@ export type TriadProtocol = {
             type: 'i64'
           },
           {
-            name: 'totalShares'
-            docs: ['the sum of all shares']
-            type: 'u128'
-          },
-          {
-            name: 'profitShare'
-            docs: ['percentage of gains for vault']
-            type: 'u32'
-          },
-          {
-            name: 'longBalance'
-            docs: ['Long bet balance']
-            type: 'u64'
-          },
-          {
-            name: 'shortBalance'
-            docs: ['Short bet balance']
-            type: 'u64'
-          }
-        ]
-      }
-    },
-    {
-      name: 'vaultDepositor'
-      type: {
-        kind: 'struct'
-        fields: [
-          {
-            name: 'bump'
-            type: 'u8'
-          },
-          {
-            name: 'authority'
-            type: 'publicKey'
-          },
-          {
-            name: 'vault'
-            type: 'publicKey'
-          },
-          {
-            name: 'netDeposits'
-            docs: ['lifetime net deposits of vault depositor for the vault']
-            type: 'i64'
-          },
-          {
-            name: 'netWithdraws'
-            docs: ['lifetime net withdraws of vault depositor for the vault']
-            type: 'i64'
-          },
-          {
-            name: 'totalDeposits'
-            docs: ['lifetime total deposits']
-            type: 'u64'
-          },
-          {
-            name: 'totalWithdraws'
-            docs: ['lifetime total withdraws']
-            type: 'u64'
-          },
-          {
-            name: 'lpShares'
-            type: 'u64'
-          },
-          {
             name: 'longBalance'
             docs: ['Long bet balance']
             type: 'u64'
@@ -406,20 +425,9 @@ export type TriadProtocol = {
             type: 'u64'
           },
           {
-            name: 'longPositions'
-            type: {
-              vec: {
-                defined: '(String,f64,f64)'
-              }
-            }
-          },
-          {
-            name: 'shortPositions'
-            type: {
-              vec: {
-                defined: '(String,f64,f64)'
-              }
-            }
+            name: 'ticker'
+            docs: ['Ticker PDA']
+            type: 'publicKey'
           }
         ]
       }
@@ -427,97 +435,111 @@ export type TriadProtocol = {
   ]
   types: [
     {
-      name: 'Position'
-      type: {
-        kind: 'struct'
-        fields: [
-          {
-            name: 'orderId'
-            type: 'string'
-          },
-          {
-            name: 'value'
-            type: 'f64'
-          },
-          {
-            name: 'targetTickerPrice'
-            type: 'f64'
-          }
-        ]
-      }
-    },
-    {
       name: 'CreateTickerArgs'
       type: {
         kind: 'struct'
         fields: [
           {
             name: 'name'
+            type: 'string'
+          },
+          {
+            name: 'protocolProgramId'
+            type: 'publicKey'
+          }
+        ]
+      }
+    },
+    {
+      name: 'UpdateTickerPriceArgs'
+      type: {
+        kind: 'struct'
+        fields: [
+          {
+            name: 'alphaApiKey'
             type: {
-              array: ['u8', 32]
+              array: ['u8', 64]
             }
           },
           {
-            name: 'pythPricePubKey'
+            name: 'price'
+            type: 'u64'
+          }
+        ]
+      }
+    },
+    {
+      name: 'Position'
+      type: {
+        kind: 'struct'
+        fields: [
+          {
+            name: 'ticker'
             type: 'publicKey'
           },
           {
-            name: 'priceOnchain'
+            name: 'amount'
+            type: 'i64'
+          },
+          {
+            name: 'leverage'
+            type: 'i64'
+          },
+          {
+            name: 'entryPrice'
+            type: 'i64'
+          },
+          {
+            name: 'ts'
+            type: 'i64'
+          },
+          {
+            name: 'isLong'
+            type: 'bool'
+          },
+          {
+            name: 'isOpen'
+            type: 'bool'
+          },
+          {
+            name: 'pnl'
             type: 'i64'
           }
         ]
       }
     },
     {
-      name: 'CreateVaultArgs'
+      name: 'CreateUserArgs'
       type: {
         kind: 'struct'
         fields: [
           {
             name: 'name'
-            type: {
-              array: ['u8', 32]
-            }
+            type: 'string'
           },
           {
-            name: 'maxTokens'
-            type: 'u64'
+            name: 'referrer'
+            type: 'string'
           },
           {
-            name: 'minDepositAmount'
-            type: 'u64'
-          },
-          {
-            name: 'tickerAddress'
-            type: 'publicKey'
-          },
-          {
-            name: 'profitShare'
-            type: 'u32'
+            name: 'community'
+            type: 'string'
           }
         ]
       }
     },
     {
-      name: 'CreateVaultDepositorArgs'
+      name: 'DepositVaultArgs'
       type: {
         kind: 'struct'
         fields: [
           {
-            name: 'longPositions'
-            type: {
-              vec: {
-                defined: '(String,f64,f64)'
-              }
-            }
+            name: 'amount'
+            type: 'u64'
           },
           {
-            name: 'shortPositions'
-            type: {
-              vec: {
-                defined: '(String,f64,f64)'
-              }
-            }
+            name: 'isLong'
+            type: 'bool'
           }
         ]
       }
@@ -546,41 +568,36 @@ export type TriadProtocol = {
     },
     {
       code: 6004
-      name: 'InvalidPassType'
-      msg: 'Invalid pass type'
+      name: 'AlphaVantageApiError'
+      msg: 'Failed to get data from Vybe Network'
     },
     {
       code: 6005
-      name: 'InvalidVaultDepositorAuthority'
-      msg: 'Invalid vault depositor authority'
+      name: 'DepositFailed'
+      msg: 'Failed to deposit'
     },
     {
       code: 6006
       name: 'InvalidOwnerAuthority'
-      msg: 'Invalid owner authority'
+      msg: 'Invalid Owner authority'
     },
     {
       code: 6007
       name: 'InvalidMintAddress'
-      msg: 'Invalid mint address'
+      msg: 'Invalid Mint address'
     },
     {
       code: 6008
-      name: 'InvalidMaxTokens'
-      msg: 'Invalid Max Tokens'
-    },
-    {
-      code: 6009
       name: 'InvalidProfitShare'
       msg: 'Invalid Profit Share'
     },
     {
-      code: 6010
+      code: 6009
       name: 'InvalidDepositAmount'
       msg: 'Invalid Deposit Amount'
     },
     {
-      code: 6011
+      code: 6010
       name: 'InvalidWithdrawAmount'
       msg: 'Invalid Withdraw Amount'
     }
@@ -592,6 +609,34 @@ export const IDL: TriadProtocol = {
   name: 'triad_protocol',
   instructions: [
     {
+      name: 'createUser',
+      accounts: [
+        {
+          name: 'signer',
+          isMut: true,
+          isSigner: true
+        },
+        {
+          name: 'user',
+          isMut: true,
+          isSigner: false
+        },
+        {
+          name: 'systemProgram',
+          isMut: false,
+          isSigner: false
+        }
+      ],
+      args: [
+        {
+          name: 'arg',
+          type: {
+            defined: 'CreateUserArgs'
+          }
+        }
+      ]
+    },
+    {
       name: 'createTicker',
       accounts: [
         {
@@ -600,13 +645,13 @@ export const IDL: TriadProtocol = {
           isSigner: true
         },
         {
-          name: 'ticker',
+          name: 'vault',
           isMut: true,
           isSigner: false
         },
         {
-          name: 'priceUpdate',
-          isMut: false,
+          name: 'ticker',
+          isMut: true,
           isSigner: false
         },
         {
@@ -625,12 +670,45 @@ export const IDL: TriadProtocol = {
       ]
     },
     {
+      name: 'updateTickerPrice',
+      accounts: [
+        {
+          name: 'signer',
+          isMut: true,
+          isSigner: true
+        },
+        {
+          name: 'ticker',
+          isMut: true,
+          isSigner: false
+        },
+        {
+          name: 'systemProgram',
+          isMut: false,
+          isSigner: false
+        }
+      ],
+      args: [
+        {
+          name: 'args',
+          type: {
+            defined: 'UpdateTickerPriceArgs'
+          }
+        }
+      ]
+    },
+    {
       name: 'createVault',
       accounts: [
         {
           name: 'signer',
           isMut: true,
           isSigner: true
+        },
+        {
+          name: 'ticker',
+          isMut: true,
+          isSigner: false
         },
         {
           name: 'vault',
@@ -658,14 +736,7 @@ export const IDL: TriadProtocol = {
           isSigner: false
         }
       ],
-      args: [
-        {
-          name: 'args',
-          type: {
-            defined: 'CreateVaultArgs'
-          }
-        }
-      ]
+      args: []
     },
     {
       name: 'deposit',
@@ -681,7 +752,7 @@ export const IDL: TriadProtocol = {
           isSigner: false
         },
         {
-          name: 'vaultDepositor',
+          name: 'user',
           isMut: true,
           isSigner: false
         },
@@ -708,44 +779,9 @@ export const IDL: TriadProtocol = {
       ],
       args: [
         {
-          name: 'amount',
-          type: 'u64'
-        },
-        {
-          name: 'isLong',
-          type: 'bool'
-        }
-      ]
-    },
-    {
-      name: 'createVaultDepositor',
-      accounts: [
-        {
-          name: 'signer',
-          isMut: true,
-          isSigner: true
-        },
-        {
-          name: 'vault',
-          isMut: false,
-          isSigner: false
-        },
-        {
-          name: 'vaultDepositor',
-          isMut: true,
-          isSigner: false
-        },
-        {
-          name: 'systemProgram',
-          isMut: false,
-          isSigner: false
-        }
-      ],
-      args: [
-        {
           name: 'args',
           type: {
-            defined: 'CreateVaultDepositorArgs'
+            defined: 'DepositVaultArgs'
           }
         }
       ]
@@ -764,7 +800,7 @@ export const IDL: TriadProtocol = {
           isSigner: false
         },
         {
-          name: 'vaultDepositor',
+          name: 'user',
           isMut: true,
           isSigner: false
         },
@@ -804,6 +840,16 @@ export const IDL: TriadProtocol = {
         kind: 'struct',
         fields: [
           {
+            name: 'initTs',
+            docs: ['timestamp of the creation of the ticker'],
+            type: 'i64'
+          },
+          {
+            name: 'updatedTs',
+            docs: ['timestamp of the last update of the ticker'],
+            type: 'i64'
+          },
+          {
             name: 'bump',
             docs: ['The bump for the ticker pda'],
             type: 'u8'
@@ -816,34 +862,105 @@ export const IDL: TriadProtocol = {
           {
             name: 'name',
             docs: ['name of the ticekt'],
-            type: {
-              array: ['u8', 32]
-            }
+            type: 'string'
           },
           {
-            name: 'pythPricePubKey',
-            docs: ['The pubkey of a token pairs'],
+            name: 'protocolProgramId',
+            docs: [
+              'protocol program id like dRiftyHA39MWEi3m9aunc5MzRF1JYuBsbn6VPcn33UH to get data info'
+            ],
             type: 'publicKey'
-          },
-          {
-            name: 'tokenAccount',
-            docs: ['token account for the ticker e.g. $tDRIFT'],
-            type: 'publicKey'
-          },
-          {
-            name: 'tokenMint',
-            docs: ['token mint for the ticker e.g. $tDRIFT'],
-            type: 'publicKey'
-          },
-          {
-            name: 'initTs',
-            docs: ['timestamp ticker initialized'],
-            type: 'i64'
           },
           {
             name: 'price',
             docs: ['ticker price'],
+            type: 'u64'
+          },
+          {
+            name: 'vault',
+            docs: ['Vault PDA'],
+            type: 'publicKey'
+          }
+        ]
+      }
+    },
+    {
+      name: 'user',
+      type: {
+        kind: 'struct',
+        fields: [
+          {
+            name: 'ts',
+            docs: ['timestamp'],
             type: 'i64'
+          },
+          {
+            name: 'name',
+            docs: ["user's name"],
+            type: 'string'
+          },
+          {
+            name: 'bump',
+            docs: ['bump seed'],
+            type: 'u8'
+          },
+          {
+            name: 'authority',
+            docs: ["user's authority"],
+            type: 'publicKey'
+          },
+          {
+            name: 'referrer',
+            docs: ['referrer of the user'],
+            type: 'string'
+          },
+          {
+            name: 'community',
+            docs: ['community the user is part of'],
+            type: 'string'
+          },
+          {
+            name: 'netDeposits',
+            docs: ['lifetime net deposits of user'],
+            type: 'i64'
+          },
+          {
+            name: 'netWithdraws',
+            docs: ['lifetime net withdraws of user'],
+            type: 'i64'
+          },
+          {
+            name: 'totalDeposits',
+            docs: ['lifetime total deposits'],
+            type: 'u64'
+          },
+          {
+            name: 'totalWithdraws',
+            docs: ['lifetime total withdraws'],
+            type: 'u64'
+          },
+          {
+            name: 'lpShares',
+            docs: ['total available balance'],
+            type: 'u64'
+          },
+          {
+            name: 'longPositions',
+            docs: ['long positions'],
+            type: {
+              vec: {
+                defined: 'Position'
+              }
+            }
+          },
+          {
+            name: 'shortPositions',
+            docs: ['short positions'],
+            type: {
+              vec: {
+                defined: 'Position'
+              }
+            }
           }
         ]
       }
@@ -866,29 +983,17 @@ export const IDL: TriadProtocol = {
           {
             name: 'name',
             docs: ['name of the vault'],
-            type: {
-              array: ['u8', 32]
-            }
+            type: 'string'
           },
           {
             name: 'tokenAccount',
-            docs: ['token account for the vault e.g. USDC'],
+            docs: ['token account for the vault e.g. tDRIFT'],
             type: 'publicKey'
           },
           {
             name: 'tickerAddress',
             docs: ['ticker address'],
             type: 'publicKey'
-          },
-          {
-            name: 'delegate',
-            docs: ['delegate account for the vault'],
-            type: 'publicKey'
-          },
-          {
-            name: 'maxTokens',
-            docs: ['max number of tokens that can be deposited'],
-            type: 'u64'
           },
           {
             name: 'totalDeposits',
@@ -906,11 +1011,6 @@ export const IDL: TriadProtocol = {
             type: 'i64'
           },
           {
-            name: 'minDepositAmount',
-            docs: ['the minimum deposit amount'],
-            type: 'u64'
-          },
-          {
             name: 'netDeposits',
             docs: ['lifetime net deposits'],
             type: 'i64'
@@ -921,70 +1021,6 @@ export const IDL: TriadProtocol = {
             type: 'i64'
           },
           {
-            name: 'totalShares',
-            docs: ['the sum of all shares'],
-            type: 'u128'
-          },
-          {
-            name: 'profitShare',
-            docs: ['percentage of gains for vault'],
-            type: 'u32'
-          },
-          {
-            name: 'longBalance',
-            docs: ['Long bet balance'],
-            type: 'u64'
-          },
-          {
-            name: 'shortBalance',
-            docs: ['Short bet balance'],
-            type: 'u64'
-          }
-        ]
-      }
-    },
-    {
-      name: 'vaultDepositor',
-      type: {
-        kind: 'struct',
-        fields: [
-          {
-            name: 'bump',
-            type: 'u8'
-          },
-          {
-            name: 'authority',
-            type: 'publicKey'
-          },
-          {
-            name: 'vault',
-            type: 'publicKey'
-          },
-          {
-            name: 'netDeposits',
-            docs: ['lifetime net deposits of vault depositor for the vault'],
-            type: 'i64'
-          },
-          {
-            name: 'netWithdraws',
-            docs: ['lifetime net withdraws of vault depositor for the vault'],
-            type: 'i64'
-          },
-          {
-            name: 'totalDeposits',
-            docs: ['lifetime total deposits'],
-            type: 'u64'
-          },
-          {
-            name: 'totalWithdraws',
-            docs: ['lifetime total withdraws'],
-            type: 'u64'
-          },
-          {
-            name: 'lpShares',
-            type: 'u64'
-          },
-          {
             name: 'longBalance',
             docs: ['Long bet balance'],
             type: 'u64'
@@ -995,20 +1031,9 @@ export const IDL: TriadProtocol = {
             type: 'u64'
           },
           {
-            name: 'longPositions',
-            type: {
-              vec: {
-                defined: '(String,f64,f64)'
-              }
-            }
-          },
-          {
-            name: 'shortPositions',
-            type: {
-              vec: {
-                defined: '(String,f64,f64)'
-              }
-            }
+            name: 'ticker',
+            docs: ['Ticker PDA'],
+            type: 'publicKey'
           }
         ]
       }
@@ -1016,97 +1041,111 @@ export const IDL: TriadProtocol = {
   ],
   types: [
     {
-      name: 'Position',
-      type: {
-        kind: 'struct',
-        fields: [
-          {
-            name: 'orderId',
-            type: 'string'
-          },
-          {
-            name: 'value',
-            type: 'f64'
-          },
-          {
-            name: 'targetTickerPrice',
-            type: 'f64'
-          }
-        ]
-      }
-    },
-    {
       name: 'CreateTickerArgs',
       type: {
         kind: 'struct',
         fields: [
           {
             name: 'name',
+            type: 'string'
+          },
+          {
+            name: 'protocolProgramId',
+            type: 'publicKey'
+          }
+        ]
+      }
+    },
+    {
+      name: 'UpdateTickerPriceArgs',
+      type: {
+        kind: 'struct',
+        fields: [
+          {
+            name: 'alphaApiKey',
             type: {
-              array: ['u8', 32]
+              array: ['u8', 64]
             }
           },
           {
-            name: 'pythPricePubKey',
+            name: 'price',
+            type: 'u64'
+          }
+        ]
+      }
+    },
+    {
+      name: 'Position',
+      type: {
+        kind: 'struct',
+        fields: [
+          {
+            name: 'ticker',
             type: 'publicKey'
           },
           {
-            name: 'priceOnchain',
+            name: 'amount',
+            type: 'i64'
+          },
+          {
+            name: 'leverage',
+            type: 'i64'
+          },
+          {
+            name: 'entryPrice',
+            type: 'i64'
+          },
+          {
+            name: 'ts',
+            type: 'i64'
+          },
+          {
+            name: 'isLong',
+            type: 'bool'
+          },
+          {
+            name: 'isOpen',
+            type: 'bool'
+          },
+          {
+            name: 'pnl',
             type: 'i64'
           }
         ]
       }
     },
     {
-      name: 'CreateVaultArgs',
+      name: 'CreateUserArgs',
       type: {
         kind: 'struct',
         fields: [
           {
             name: 'name',
-            type: {
-              array: ['u8', 32]
-            }
+            type: 'string'
           },
           {
-            name: 'maxTokens',
-            type: 'u64'
+            name: 'referrer',
+            type: 'string'
           },
           {
-            name: 'minDepositAmount',
-            type: 'u64'
-          },
-          {
-            name: 'tickerAddress',
-            type: 'publicKey'
-          },
-          {
-            name: 'profitShare',
-            type: 'u32'
+            name: 'community',
+            type: 'string'
           }
         ]
       }
     },
     {
-      name: 'CreateVaultDepositorArgs',
+      name: 'DepositVaultArgs',
       type: {
         kind: 'struct',
         fields: [
           {
-            name: 'longPositions',
-            type: {
-              vec: {
-                defined: '(String,f64,f64)'
-              }
-            }
+            name: 'amount',
+            type: 'u64'
           },
           {
-            name: 'shortPositions',
-            type: {
-              vec: {
-                defined: '(String,f64,f64)'
-              }
-            }
+            name: 'isLong',
+            type: 'bool'
           }
         ]
       }
@@ -1135,41 +1174,36 @@ export const IDL: TriadProtocol = {
     },
     {
       code: 6004,
-      name: 'InvalidPassType',
-      msg: 'Invalid pass type'
+      name: 'AlphaVantageApiError',
+      msg: 'Failed to get data from Vybe Network'
     },
     {
       code: 6005,
-      name: 'InvalidVaultDepositorAuthority',
-      msg: 'Invalid vault depositor authority'
+      name: 'DepositFailed',
+      msg: 'Failed to deposit'
     },
     {
       code: 6006,
       name: 'InvalidOwnerAuthority',
-      msg: 'Invalid owner authority'
+      msg: 'Invalid Owner authority'
     },
     {
       code: 6007,
       name: 'InvalidMintAddress',
-      msg: 'Invalid mint address'
+      msg: 'Invalid Mint address'
     },
     {
       code: 6008,
-      name: 'InvalidMaxTokens',
-      msg: 'Invalid Max Tokens'
-    },
-    {
-      code: 6009,
       name: 'InvalidProfitShare',
       msg: 'Invalid Profit Share'
     },
     {
-      code: 6010,
+      code: 6009,
       name: 'InvalidDepositAmount',
       msg: 'Invalid Deposit Amount'
     },
     {
-      code: 6011,
+      code: 6010,
       name: 'InvalidWithdrawAmount',
       msg: 'Invalid Withdraw Amount'
     }

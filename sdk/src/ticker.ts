@@ -1,48 +1,42 @@
-import { AnchorProvider, Program, Wallet } from '@coral-xyz/anchor'
-import { IDL, TriadProtocol } from './types/triad_protocol'
-import { Connection, PublicKey } from '@solana/web3.js'
-import { TRIAD_PROTOCOL_PROGRAM_ID } from './utils/constants'
-import { encodeString } from './utils/helpers'
+import { AnchorProvider, Program } from '@coral-xyz/anchor'
+import { PublicKey } from '@solana/web3.js'
+import { TriadProtocol } from './types/triad_protocol'
+import { getTickerAddressSync, getVaultAddressSync } from './utils/helpers'
 
 export default class Ticker {
   program: Program<TriadProtocol>
   provider: AnchorProvider
-  connection: Connection
-  wallet: Wallet
 
-  constructor(connection: Connection, wallet?: Wallet) {
-    this.connection = connection
-    this.wallet = wallet
-    this.provider = new AnchorProvider(
-      this.connection,
-      this.wallet,
-      AnchorProvider.defaultOptions()
-    )
-
-    this.program = new Program<TriadProtocol>(
-      IDL,
-      TRIAD_PROTOCOL_PROGRAM_ID,
-      this.provider
-    )
+  constructor(program: Program<TriadProtocol>, provider: AnchorProvider) {
+    this.provider = provider
+    this.program = program
   }
 
   /**
    * Create a new ticker
    *  @param name - The ticker's name
-   *  @param pythPricePubKey - The pubkey of a token pairs
+   *  @param protocolProgramId - The program ID of the protocol
    *
    */
   public async createTicker({
     name,
-    pythPricePubKey,
-    protocolProgramId = new PublicKey(
-      'dRiftyHA39MWEi3m9aunc5MzRF1JYuBsbn6VPcn33UH'
-    )
+    protocolProgramId
   }: {
     name: string
-    pythPricePubKey: PublicKey
     protocolProgramId: PublicKey
   }) {
-    const tickerName = encodeString(name)
+    const TickerPDA = getTickerAddressSync(
+      this.program.programId,
+      protocolProgramId
+    )
+    const VaultPDA = getVaultAddressSync(this.program.programId, TickerPDA)
+
+    return this.program.methods
+      .createTicker({ name, protocolProgramId })
+      .accounts({
+        ticker: TickerPDA,
+        vault: VaultPDA
+      })
+      .rpc()
   }
 }

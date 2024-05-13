@@ -12,7 +12,7 @@ pub struct CreateVault<'info> {
     #[account(mut)]
     pub ticker: Account<'info, Ticker>,
 
-    #[account(init, payer = signer, space = Vault::SPACE, seeds = [Vault::PREFIX_SEED.as_ref(), ticker.name.as_ref()], bump)]
+    #[account(init, payer = signer, space = Vault::SPACE, seeds = [Vault::PREFIX_SEED.as_ref(), ticker.to_account_info().key.as_ref()], bump)]
     pub vault: Account<'info, Vault>,
 
     pub payer_token_mint: Account<'info, Mint>,

@@ -2,11 +2,11 @@
 seeds = false
 skip-lint = false
 
-[programs.devnet]
+[programs.mainnet]
 triad_protocol = "TRDwq3BN4mP3m9KsuNUWSN6QDff93VKGSwE95Jbr9Ss"
 
 [provider]
-cluster = "devnet"
+cluster = "mainnet"
 wallet = "/Users/dannpl/.config/solana/id.json"
 
 [scripts]

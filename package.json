@@ -2,7 +2,7 @@
   "scripts": {
     "lint:fix": "prettier */*.js \"*/**/*{.js,.ts}\" -w",
     "lint": "prettier */*.js \"*/**/*{.js,.ts}\" --check",
-    "update-types": "cp target/types/triad_protocol.ts app/triad-protocol/src/types/triad_protocol.ts && prettier --write app/triad-protocol/src/types/triad_protocol.ts",
+    "update-types": "cp target/types/triad_protocol.ts sdk/src/types/triad_protocol.ts && prettier --write sdk/src/types/triad_protocol.ts",
     "build": "anchor build && yarn update-types"
   },
   "dependencies": {

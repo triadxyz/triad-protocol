@@ -14,7 +14,7 @@ pub struct CreateTicker<'info> {
     #[account(mut, constraint = vault.authority == *signer.key && vault.ticker_address == *ticker.to_account_info().key)]
     pub vault: Account<'info, Vault>,
 
-    #[account(init, payer = signer, space = Ticker::SPACE, seeds = [Ticker::PREFIX_SEED.as_ref(), args.name.as_ref()], bump)]
+    #[account(init, payer = signer, space = Ticker::SPACE, seeds = [Ticker::PREFIX_SEED.as_ref(), args.protocol_program_id.as_ref()], bump)]
     pub ticker: Account<'info, Ticker>,
 
     pub system_program: Program<'info, System>,

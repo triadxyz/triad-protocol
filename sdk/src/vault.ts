@@ -1,13 +1,11 @@
-import { TRIAD_PROTOCOL_PROGRAM_ID } from './utils/constants'
-import { AnchorProvider, BN, Program, Wallet } from '@coral-xyz/anchor'
+import { AnchorProvider, BN, Program } from '@coral-xyz/anchor'
 import {
-  Connection,
   PublicKey,
   TransactionInstruction,
   TransactionMessage,
   VersionedTransaction
 } from '@solana/web3.js'
-import { IDL, TriadProtocol } from './types/triad_protocol'
+import { TriadProtocol } from './types/triad_protocol'
 import {
   getVaultAddressSync,
   getTokenVaultAddressSync,
@@ -21,22 +19,10 @@ import { getAccount, getAssociatedTokenAddress } from '@solana/spl-token'
 export default class Vault {
   program: Program<TriadProtocol>
   provider: AnchorProvider
-  connection: Connection
-  wallet: Wallet
 
-  constructor(connection: Connection, wallet?: Wallet) {
-    this.connection = connection
-    this.wallet = wallet
-    this.provider = new AnchorProvider(
-      this.connection,
-      this.wallet,
-      AnchorProvider.defaultOptions()
-    )
-    this.program = new Program<TriadProtocol>(
-      IDL,
-      TRIAD_PROTOCOL_PROGRAM_ID,
-      this.provider
-    )
+  constructor(program: Program<TriadProtocol>, provider: AnchorProvider) {
+    this.provider = provider
+    this.program = program
   }
 
   /**
@@ -53,7 +39,7 @@ export default class Vault {
     mint,
     maxTokens,
     minDepositAmount,
-    profitShare,
+    profitShare
   }: {
     name: string
     mint: PublicKey
@@ -62,7 +48,7 @@ export default class Vault {
     profitShare: number
   }) {
     const vaultName = encodeString(name)
-    const tickerAddress = new PublicKey("driftaiasjiasjhias")
+    const tickerAddress = new PublicKey('driftaiasjiasjhias')
 
     const VaultPDA = getVaultAddressSync(this.program.programId, vaultName)
     const TokenAccountPDA = getTokenVaultAddressSync(
@@ -168,7 +154,7 @@ export default class Vault {
   public async deposit({
     vault,
     amount,
-    mint,
+    mint
   }: {
     vault: string
     amount: string

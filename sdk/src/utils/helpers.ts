@@ -2,9 +2,12 @@ import { PublicKey } from '@solana/web3.js'
 import * as anchor from '@coral-xyz/anchor'
 import BN from 'bn.js'
 
-export const getTickerPDA = (address: PublicKey, programId: PublicKey) => {
+export const getTickerAddressSync = (
+  programId: PublicKey,
+  protocolProgramId: PublicKey
+) => {
   const [TickerPDA] = PublicKey.findProgramAddressSync(
-    [Buffer.from('ticker'), address.toBuffer()],
+    [Buffer.from('ticker'), protocolProgramId.toBuffer()],
     programId
   )
 
@@ -24,30 +27,34 @@ export const decodeString = (bytes: number[]): string => {
   return buffer.toString('utf8').trim()
 }
 
-export function getVaultAddressSync(
+export const getVaultAddressSync = (
   programId: PublicKey,
-  encodedName: number[]
-): PublicKey {
-  return PublicKey.findProgramAddressSync(
+  tickerAddress: PublicKey
+): PublicKey => {
+  const [VaultPDA] = PublicKey.findProgramAddressSync(
     [
       Buffer.from(anchor.utils.bytes.utf8.encode('vault')),
-      Buffer.from(encodedName)
+      tickerAddress.toBuffer()
     ],
     programId
-  )[0]
+  )
+
+  return VaultPDA
 }
 
-export function getTokenVaultAddressSync(
+export const getTokenVaultAddressSync = (
   programId: PublicKey,
   vault: PublicKey
-): PublicKey {
-  return PublicKey.findProgramAddressSync(
+) => {
+  const [VaultTokenPDA] = PublicKey.findProgramAddressSync(
     [
       Buffer.from(anchor.utils.bytes.utf8.encode('vault_token_account')),
       vault.toBuffer()
     ],
     programId
-  )[0]
+  )
+
+  return VaultTokenPDA
 }
 
 export function getVaultDepositorAddressSync(
