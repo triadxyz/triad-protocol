@@ -3,7 +3,7 @@ import { Connection } from '@solana/web3.js'
 import { IDL, TriadProtocol } from './types/triad_protocol'
 import { TRIAD_PROTOCOL_PROGRAM_ID } from './utils/constants'
 import Ticker from './ticker'
-import { getTickerAddressSync, getUserAddressSync } from './utils/helpers'
+import { getUserAddressSync } from './utils/helpers'
 
 export default class TriadProtocolClient {
   program: Program<TriadProtocol>

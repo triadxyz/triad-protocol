@@ -1,4 +1,4 @@
-use crate::{state::Vault, Ticker};
+use crate::{constants::ADMIN, errors::TriadProtocolError, state::Vault, Ticker};
 
 use anchor_lang::prelude::*;
 use anchor_spl::token::{Mint, Token, TokenAccount};
@@ -33,6 +33,10 @@ pub struct CreateVault<'info> {
 }
 
 pub fn create_vault(ctx: Context<CreateVault>) -> Result<()> {
+    if ctx.accounts.signer.key.to_string() != ADMIN {
+        return Err(TriadProtocolError::Unauthorized.into());
+    }
+
     let vault = &mut ctx.accounts.vault;
 
     vault.bump = *ctx.bumps.get("vault").unwrap();

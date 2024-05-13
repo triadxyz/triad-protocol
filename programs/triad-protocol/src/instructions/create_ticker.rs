@@ -1,4 +1,6 @@
 use crate::{
+    constants::ADMIN,
+    errors::TriadProtocolError,
     state::{CreateTickerArgs, Ticker},
     Vault,
 };
@@ -21,6 +23,10 @@ pub struct CreateTicker<'info> {
 }
 
 pub fn create_ticker(ctx: Context<CreateTicker>, args: CreateTickerArgs) -> Result<()> {
+    if ctx.accounts.signer.key.to_string() != ADMIN {
+        return Err(TriadProtocolError::Unauthorized.into());
+    }
+
     let ticker: &mut Account<Ticker> = &mut ctx.accounts.ticker;
 
     ticker.bump = *ctx.bumps.get("ticker").unwrap();

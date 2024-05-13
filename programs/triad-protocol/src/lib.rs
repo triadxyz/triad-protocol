@@ -8,6 +8,7 @@ mod errors;
 mod instructions;
 mod macros;
 mod state;
+mod constants;
 
 declare_id!("TRDwq3BN4mP3m9KsuNUWSN6QDff93VKGSwE95Jbr9Ss");
 
