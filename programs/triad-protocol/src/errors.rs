@@ -14,6 +14,9 @@ pub enum TriadProtocolError {
     #[msg("Unauthorized access")]
     Unauthorized,
 
+    #[msg("Failed to get data from Vybe Network")]
+    AlphaVantageApiError,
+
     #[msg("Failed to deposit")]
     DepositFailed,
 

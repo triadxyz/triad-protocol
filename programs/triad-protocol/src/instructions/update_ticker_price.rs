@@ -16,14 +16,14 @@ pub struct UpdateTickerPrice<'info> {
 
 pub fn update_ticker_price(
     ctx: Context<UpdateTickerPrice>,
-    _args: UpdateTickerPriceArgs,
+    args: UpdateTickerPriceArgs,
 ) -> Result<()> {
     let ticker = &mut ctx.accounts.ticker;
 
     let clock: Clock = Clock::get().unwrap();
 
     ticker.updated_ts = clock.unix_timestamp;
-    ticker.price = 1000;
+    ticker.price = args.price;
 
     msg!("Ticker {:?} Created", ticker.name);
 

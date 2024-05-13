@@ -29,6 +29,7 @@ pub struct CreateTickerArgs {
 #[derive(AnchorSerialize, AnchorDeserialize)]
 pub struct UpdateTickerPriceArgs {
     pub alpha_api_key: [u8; 64],
+    pub price: u64, // TODO REMOVE THIS AND USE THE VYBE NETWORK
 }
 
 impl Ticker {
