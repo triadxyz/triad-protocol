@@ -91,13 +91,13 @@ export default class Vault {
   }
 
   /**
-   * Deposit into a vault
+   * Open Position
    *  @param tickerPDA - Ticker PDA
    *  @param amount - The amount to deposit
    *  @param position - Long or Short
    *  @param mint - Token mint for the vault (e.g. USDC)
    */
-  public async deposit({
+  public async openPosition({
     tickerPDA,
     amount,
     position,
@@ -123,7 +123,7 @@ export default class Vault {
     )
 
     return this.program.methods
-      .deposit({
+      .openPosition({
         amount: new BN(amount),
         isLong: position === 'Long'
       })
@@ -140,16 +140,23 @@ export default class Vault {
    * Withdraw from a vault
    *  @param tickerPDA - Ticker PDA
    *  @param amount - The amount to deposit
+   *  @param position - Long or Short
    *  @param mint - Token mint for the vault (e.g. USDC)
+   *  @param positionPubkey - The position public key
+   *
    */
   public async withdraw({
     tickerPDA,
     amount,
-    mint
+    position,
+    mint,
+    positionPubkey
   }: {
     tickerPDA: PublicKey
     amount: string
+    position: 'Long' | 'Short'
     mint: PublicKey
+    positionPubkey: PublicKey
   }) {
     const UserPDA = getUserAddressSync(
       this.program.programId,
@@ -166,7 +173,11 @@ export default class Vault {
     )
 
     return this.program.methods
-      .withdraw(new BN(amount))
+      .closePosition({
+        amount: new BN(amount),
+        isLong: position === 'Long',
+        pubkey: positionPubkey
+      })
       .accounts({
         user: UserPDA,
         vault: VaultPDA,

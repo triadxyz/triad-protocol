@@ -133,7 +133,60 @@ export type TriadProtocol = {
       args: []
     },
     {
-      name: 'deposit'
+      name: 'openPosition'
+      accounts: [
+        {
+          name: 'signer'
+          isMut: true
+          isSigner: true
+        },
+        {
+          name: 'ticker'
+          isMut: false
+          isSigner: false
+        },
+        {
+          name: 'vault'
+          isMut: true
+          isSigner: false
+        },
+        {
+          name: 'user'
+          isMut: true
+          isSigner: false
+        },
+        {
+          name: 'vaultTokenAccount'
+          isMut: true
+          isSigner: false
+        },
+        {
+          name: 'userTokenAccount'
+          isMut: true
+          isSigner: false
+        },
+        {
+          name: 'systemProgram'
+          isMut: false
+          isSigner: false
+        },
+        {
+          name: 'tokenProgram'
+          isMut: false
+          isSigner: false
+        }
+      ]
+      args: [
+        {
+          name: 'args'
+          type: {
+            defined: 'OpenPositionArgs'
+          }
+        }
+      ]
+    },
+    {
+      name: 'closePosition'
       accounts: [
         {
           name: 'signer'
@@ -175,54 +228,8 @@ export type TriadProtocol = {
         {
           name: 'args'
           type: {
-            defined: 'DepositVaultArgs'
+            defined: 'ClosePositionArgs'
           }
-        }
-      ]
-    },
-    {
-      name: 'withdraw'
-      accounts: [
-        {
-          name: 'signer'
-          isMut: true
-          isSigner: true
-        },
-        {
-          name: 'vault'
-          isMut: true
-          isSigner: false
-        },
-        {
-          name: 'user'
-          isMut: true
-          isSigner: false
-        },
-        {
-          name: 'vaultTokenAccount'
-          isMut: true
-          isSigner: false
-        },
-        {
-          name: 'userTokenAccount'
-          isMut: true
-          isSigner: false
-        },
-        {
-          name: 'systemProgram'
-          isMut: false
-          isSigner: false
-        },
-        {
-          name: 'tokenProgram'
-          isMut: false
-          isSigner: false
-        }
-      ]
-      args: [
-        {
-          name: 'amount'
-          type: 'u64'
         }
       ]
     }
@@ -407,12 +414,12 @@ export type TriadProtocol = {
           {
             name: 'netDeposits'
             docs: ['lifetime net deposits']
-            type: 'i64'
+            type: 'u64'
           },
           {
             name: 'netWithdraws'
             docs: ['lifetime net withdraws']
-            type: 'i64'
+            type: 'u64'
           },
           {
             name: 'longBalance'
@@ -422,6 +429,16 @@ export type TriadProtocol = {
           {
             name: 'shortBalance'
             docs: ['Short bet balance']
+            type: 'u64'
+          },
+          {
+            name: 'longPositionsOpened'
+            docs: ['Opened long positions']
+            type: 'u64'
+          },
+          {
+            name: 'shortPositionsOpened'
+            docs: ['Opened short positions']
             type: 'u64'
           },
           {
@@ -474,20 +491,24 @@ export type TriadProtocol = {
         kind: 'struct'
         fields: [
           {
+            name: 'pubkey'
+            type: 'publicKey'
+          },
+          {
             name: 'ticker'
             type: 'publicKey'
           },
           {
             name: 'amount'
-            type: 'i64'
+            type: 'u64'
           },
           {
             name: 'leverage'
-            type: 'i64'
+            type: 'u64'
           },
           {
             name: 'entryPrice'
-            type: 'i64'
+            type: 'u64'
           },
           {
             name: 'ts'
@@ -529,7 +550,7 @@ export type TriadProtocol = {
       }
     },
     {
-      name: 'DepositVaultArgs'
+      name: 'OpenPositionArgs'
       type: {
         kind: 'struct'
         fields: [
@@ -540,6 +561,26 @@ export type TriadProtocol = {
           {
             name: 'isLong'
             type: 'bool'
+          }
+        ]
+      }
+    },
+    {
+      name: 'ClosePositionArgs'
+      type: {
+        kind: 'struct'
+        fields: [
+          {
+            name: 'amount'
+            type: 'u64'
+          },
+          {
+            name: 'isLong'
+            type: 'bool'
+          },
+          {
+            name: 'pubkey'
+            type: 'publicKey'
           }
         ]
       }
@@ -739,7 +780,60 @@ export const IDL: TriadProtocol = {
       args: []
     },
     {
-      name: 'deposit',
+      name: 'openPosition',
+      accounts: [
+        {
+          name: 'signer',
+          isMut: true,
+          isSigner: true
+        },
+        {
+          name: 'ticker',
+          isMut: false,
+          isSigner: false
+        },
+        {
+          name: 'vault',
+          isMut: true,
+          isSigner: false
+        },
+        {
+          name: 'user',
+          isMut: true,
+          isSigner: false
+        },
+        {
+          name: 'vaultTokenAccount',
+          isMut: true,
+          isSigner: false
+        },
+        {
+          name: 'userTokenAccount',
+          isMut: true,
+          isSigner: false
+        },
+        {
+          name: 'systemProgram',
+          isMut: false,
+          isSigner: false
+        },
+        {
+          name: 'tokenProgram',
+          isMut: false,
+          isSigner: false
+        }
+      ],
+      args: [
+        {
+          name: 'args',
+          type: {
+            defined: 'OpenPositionArgs'
+          }
+        }
+      ]
+    },
+    {
+      name: 'closePosition',
       accounts: [
         {
           name: 'signer',
@@ -781,54 +875,8 @@ export const IDL: TriadProtocol = {
         {
           name: 'args',
           type: {
-            defined: 'DepositVaultArgs'
+            defined: 'ClosePositionArgs'
           }
-        }
-      ]
-    },
-    {
-      name: 'withdraw',
-      accounts: [
-        {
-          name: 'signer',
-          isMut: true,
-          isSigner: true
-        },
-        {
-          name: 'vault',
-          isMut: true,
-          isSigner: false
-        },
-        {
-          name: 'user',
-          isMut: true,
-          isSigner: false
-        },
-        {
-          name: 'vaultTokenAccount',
-          isMut: true,
-          isSigner: false
-        },
-        {
-          name: 'userTokenAccount',
-          isMut: true,
-          isSigner: false
-        },
-        {
-          name: 'systemProgram',
-          isMut: false,
-          isSigner: false
-        },
-        {
-          name: 'tokenProgram',
-          isMut: false,
-          isSigner: false
-        }
-      ],
-      args: [
-        {
-          name: 'amount',
-          type: 'u64'
         }
       ]
     }
@@ -1013,12 +1061,12 @@ export const IDL: TriadProtocol = {
           {
             name: 'netDeposits',
             docs: ['lifetime net deposits'],
-            type: 'i64'
+            type: 'u64'
           },
           {
             name: 'netWithdraws',
             docs: ['lifetime net withdraws'],
-            type: 'i64'
+            type: 'u64'
           },
           {
             name: 'longBalance',
@@ -1028,6 +1076,16 @@ export const IDL: TriadProtocol = {
           {
             name: 'shortBalance',
             docs: ['Short bet balance'],
+            type: 'u64'
+          },
+          {
+            name: 'longPositionsOpened',
+            docs: ['Opened long positions'],
+            type: 'u64'
+          },
+          {
+            name: 'shortPositionsOpened',
+            docs: ['Opened short positions'],
             type: 'u64'
           },
           {
@@ -1080,20 +1138,24 @@ export const IDL: TriadProtocol = {
         kind: 'struct',
         fields: [
           {
+            name: 'pubkey',
+            type: 'publicKey'
+          },
+          {
             name: 'ticker',
             type: 'publicKey'
           },
           {
             name: 'amount',
-            type: 'i64'
+            type: 'u64'
           },
           {
             name: 'leverage',
-            type: 'i64'
+            type: 'u64'
           },
           {
             name: 'entryPrice',
-            type: 'i64'
+            type: 'u64'
           },
           {
             name: 'ts',
@@ -1135,7 +1197,7 @@ export const IDL: TriadProtocol = {
       }
     },
     {
-      name: 'DepositVaultArgs',
+      name: 'OpenPositionArgs',
       type: {
         kind: 'struct',
         fields: [
@@ -1146,6 +1208,26 @@ export const IDL: TriadProtocol = {
           {
             name: 'isLong',
             type: 'bool'
+          }
+        ]
+      }
+    },
+    {
+      name: 'ClosePositionArgs',
+      type: {
+        kind: 'struct',
+        fields: [
+          {
+            name: 'amount',
+            type: 'u64'
+          },
+          {
+            name: 'isLong',
+            type: 'bool'
+          },
+          {
+            name: 'pubkey',
+            type: 'publicKey'
           }
         ]
       }
