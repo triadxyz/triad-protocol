@@ -2,16 +2,20 @@ use crate::constraints::{is_authority_for_user, is_token_mint_for_vault};
 use crate::cpi::TokenTransferCPI;
 use crate::errors::TriadProtocolError;
 use crate::state::Vault;
-use crate::{DepositVaultArgs, User};
+use crate::{OpenPositionArgs, User};
+use crate::{Position, Ticker};
 
 use anchor_lang::prelude::*;
 use anchor_spl::token::{self, Token, TokenAccount, Transfer};
 
 #[derive(Accounts)]
-#[instruction(args: DepositVaultArgs)]
-pub struct Deposit<'info> {
+#[instruction(args: OpenPositionArgs)]
+pub struct OpenPosition<'info> {
     #[account(mut)]
     pub signer: Signer<'info>,
+
+    #[account()]
+    pub ticker: Account<'info, Ticker>,
 
     #[account(mut)]
     pub vault: Account<'info, Vault>,
@@ -44,9 +48,9 @@ pub struct Deposit<'info> {
     pub token_program: Program<'info, Token>,
 }
 
-pub fn deposit<'info>(
-    ctx: Context<'_, '_, '_, 'info, Deposit<'info>>,
-    args: DepositVaultArgs,
+pub fn open_position<'info>(
+    ctx: Context<'_, '_, '_, 'info, OpenPosition<'info>>,
+    args: OpenPositionArgs,
 ) -> Result<()> {
     let mut user = ctx.accounts.user.clone();
     let mut vault = ctx.accounts.vault.clone();
@@ -55,18 +59,42 @@ pub fn deposit<'info>(
         return Err(TriadProtocolError::InvalidAccount.into());
     }
 
-    // if is_long {
-    //     user.long_positions = user.long_balance.saturating_add(amount);
-    // } else {
-    //     user.short_balance = user.short_balance.saturating_add(amount);
-    // }
-
     let transfer = ctx.token_transfer(args.amount);
 
     if transfer.is_err() {
-        msg!("Deposit failed");
+        msg!("Open position failed");
 
         return Err(TriadProtocolError::DepositFailed.into());
+    }
+
+    if args.is_long {
+        user.long_positions = vec![Position {
+            pubkey: Pubkey::new_unique(),
+            ticker: ctx.accounts.ticker.to_account_info().key.clone(),
+            amount: args.amount,
+            leverage: 0,
+            entry_price: ctx.accounts.ticker.price,
+            ts: Clock::get()?.unix_timestamp,
+            is_long: true,
+            is_open: true,
+            pnl: 0,
+        }];
+        vault.long_positions_opened = vault.long_positions_opened.saturating_add(1);
+        vault.long_balance = vault.long_balance.saturating_add(args.amount);
+    } else {
+        user.short_positions = vec![Position {
+            pubkey: Pubkey::new_unique(),
+            ticker: ctx.accounts.ticker.to_account_info().key.clone(),
+            amount: args.amount,
+            leverage: 0,
+            entry_price: ctx.accounts.ticker.price,
+            ts: Clock::get()?.unix_timestamp,
+            is_long: false,
+            is_open: true,
+            pnl: 0,
+        }];
+        vault.short_positions_opened = vault.short_positions_opened.saturating_add(1);
+        vault.short_balance = vault.short_balance.saturating_add(args.amount);
     }
 
     user.total_deposits = user.total_deposits.saturating_add(args.amount);
@@ -81,7 +109,7 @@ pub fn deposit<'info>(
     Ok(())
 }
 
-impl<'info> TokenTransferCPI for Context<'_, '_, '_, 'info, Deposit<'info>> {
+impl<'info> TokenTransferCPI for Context<'_, '_, '_, 'info, OpenPosition<'info>> {
     fn token_transfer(&self, amount: u64) -> Result<()> {
         let cpi_accounts = Transfer {
             from: self.accounts.user_token_account.to_account_info().clone(),

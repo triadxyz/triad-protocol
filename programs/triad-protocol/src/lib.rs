@@ -3,12 +3,12 @@ use anchor_lang::prelude::*;
 use instructions::*;
 use state::*;
 
+mod constants;
 mod cpi;
 mod errors;
 mod instructions;
 mod macros;
 mod state;
-mod constants;
 
 declare_id!("TRDwq3BN4mP3m9KsuNUWSN6QDff93VKGSwE95Jbr9Ss");
 
@@ -35,17 +35,17 @@ pub mod triad_protocol {
         instructions::create_vault(ctx)
     }
 
-    pub fn deposit<'info>(
-        ctx: Context<'_, '_, '_, 'info, Deposit<'info>>,
-        args: DepositVaultArgs,
+    pub fn open_position<'info>(
+        ctx: Context<'_, '_, '_, 'info, OpenPosition<'info>>,
+        args: OpenPositionArgs,
     ) -> Result<()> {
-        instructions::deposit(ctx, args)
+        instructions::open_position(ctx, args)
     }
 
-    pub fn withdraw<'info>(
-        ctx: Context<'_, '_, '_, 'info, Withdraw<'info>>,
-        amount: u64,
+    pub fn close_position<'info>(
+        ctx: Context<'_, '_, '_, 'info, ClosePosition<'info>>,
+        args: ClosePositionArgs,
     ) -> Result<()> {
-        instructions::withdraw(ctx, amount)
+        instructions::close_position(ctx, args)
     }
 }

@@ -2,14 +2,14 @@ pub mod constraints;
 
 mod create_ticker;
 mod create_user;
-mod deposit;
-mod vault_create;
-mod withdraw;
+mod open_position;
+mod create_vault;
+mod close_position;
 mod update_ticker_price;
 
 pub use update_ticker_price::*;
 pub use create_ticker::*;
 pub use create_user::*;
-pub use deposit::*;
-pub use vault_create::*;
-pub use withdraw::*;
+pub use open_position::*;
+pub use create_vault::*;
+pub use close_position::*;

@@ -2,14 +2,14 @@ use crate::constraints::{is_authority_for_user, is_token_mint_for_vault};
 use crate::cpi::TokenTransferCPI;
 use crate::errors::TriadProtocolError;
 use crate::state::Vault;
-use crate::{declare_vault_seeds, User};
+use crate::{declare_vault_seeds, ClosePositionArgs, Position, User};
 
 use anchor_lang::prelude::*;
 use anchor_spl::token::{self, Token, TokenAccount, Transfer};
 
 #[derive(Accounts)]
-#[instruction(amount: u64)]
-pub struct Withdraw<'info> {
+#[instruction(args: ClosePositionArgs)]
+pub struct ClosePosition<'info> {
     #[account(mut)]
     pub signer: Signer<'info>,
 
@@ -44,34 +44,78 @@ pub struct Withdraw<'info> {
     pub token_program: Program<'info, Token>,
 }
 
-pub fn withdraw<'info>(
-    ctx: Context<'_, '_, '_, 'info, Withdraw<'info>>,
-    amount: u64,
+pub fn close_position<'info>(
+    ctx: Context<'_, '_, '_, 'info, ClosePosition<'info>>,
+    args: ClosePositionArgs,
 ) -> Result<()> {
-    let user = &mut ctx.accounts.user;
-    let vault = &mut ctx.accounts.vault;
+    let mut user = ctx.accounts.user.clone();
+    let mut vault = ctx.accounts.vault.clone();
 
     if user.authority != *ctx.accounts.signer.key {
         return Err(TriadProtocolError::InvalidAccount.into());
     }
 
-    if amount > user.lp_shares {
+    if args.amount > user.lp_shares {
         return Err(TriadProtocolError::InvalidWithdrawAmount.into());
     }
 
-    user.total_withdraws = user.total_withdraws.saturating_add(amount);
-    user.net_withdraws = user.net_withdraws.saturating_add(1);
-    user.lp_shares = user.lp_shares.saturating_sub(amount);
+    let transfer = ctx.token_transfer(args.amount);
 
-    vault.total_withdraws = vault.total_withdraws.saturating_add(amount);
+    if transfer.is_err() {
+        msg!("Close Position failed");
+
+        return Err(TriadProtocolError::InvalidWithdrawAmount.into());
+    }
+
+    user.total_withdraws = user.total_withdraws.saturating_add(args.amount);
+    user.net_withdraws = user.net_withdraws.saturating_add(1);
+    user.lp_shares = user.lp_shares.saturating_sub(args.amount);
+
+    vault.total_withdraws = vault.total_withdraws.saturating_add(args.amount);
     vault.net_withdraws = vault.net_withdraws.saturating_add(1);
 
-    ctx.token_transfer(amount)?;
+    if args.is_long {
+        vault.long_balance = vault.long_balance.saturating_sub(args.amount);
+
+        user.long_positions = user
+            .long_positions
+            .iter()
+            .map(|position| {
+                if position.pubkey == args.pubkey {
+                    Position {
+                        is_open: false,
+                        pnl: 1,
+                        ..position.clone()
+                    }
+                } else {
+                    position.clone()
+                }
+            })
+            .collect();
+    } else {
+        vault.short_balance = vault.short_balance.saturating_sub(args.amount);
+
+        user.short_positions = user
+            .short_positions
+            .iter()
+            .map(|position| {
+                if position.pubkey == args.pubkey {
+                    Position {
+                        is_open: false,
+                        pnl: 1,
+                        ..position.clone()
+                    }
+                } else {
+                    position.clone()
+                }
+            })
+            .collect();
+    }
 
     Ok(())
 }
 
-impl<'info> TokenTransferCPI for Context<'_, '_, '_, 'info, Withdraw<'info>> {
+impl<'info> TokenTransferCPI for Context<'_, '_, '_, 'info, ClosePosition<'info>> {
     fn token_transfer(&self, amount: u64) -> Result<()> {
         declare_vault_seeds!(&self.accounts.vault, seeds);
 

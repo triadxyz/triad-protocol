@@ -19,21 +19,32 @@ pub struct Vault {
     /// timestamp vault initialized
     pub init_ts: i64,
     /// lifetime net deposits
-    pub net_deposits: i64,
+    pub net_deposits: u64,
     /// lifetime net withdraws
-    pub net_withdraws: i64,
+    pub net_withdraws: u64,
     /// Long bet balance
     pub long_balance: u64,
     /// Short bet balance
     pub short_balance: u64,
+    /// Opened long positions
+    pub long_positions_opened: u64,
+    /// Opened short positions
+    pub short_positions_opened: u64,
     /// Ticker PDA
     pub ticker: Pubkey,
 }
 
 #[derive(AnchorSerialize, AnchorDeserialize)]
-pub struct DepositVaultArgs {
+pub struct OpenPositionArgs {
     pub amount: u64,
     pub is_long: bool,
+}
+
+#[derive(AnchorSerialize, AnchorDeserialize)]
+pub struct ClosePositionArgs {
+    pub amount: u64,
+    pub is_long: bool,
+    pub pubkey: Pubkey,
 }
 
 impl Vault {

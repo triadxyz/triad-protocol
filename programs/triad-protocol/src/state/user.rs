@@ -32,10 +32,11 @@ pub struct User {
 
 #[derive(AnchorSerialize, AnchorDeserialize, Clone)]
 pub struct Position {
+    pub pubkey: Pubkey,
     pub ticker: Pubkey,
-    pub amount: i64,
-    pub leverage: i64,
-    pub entry_price: i64,
+    pub amount: u64,
+    pub leverage: u64,
+    pub entry_price: u64,
     pub ts: i64,
     pub is_long: bool,
     pub is_open: bool,
