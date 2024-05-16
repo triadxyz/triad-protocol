@@ -24,13 +24,13 @@ pub struct User {
     pub total_withdraws: u64,
     /// total available balance
     pub lp_shares: u64,
-    /// long positions
-    pub long_positions: Vec<Position>,
-    /// short positions
-    pub short_positions: Vec<Position>,
+    // /// long positions
+    // pub long_positions: Vec<Position>,
+    // /// short positions
+    // pub short_positions: Vec<Position>,
 }
 
-#[derive(AnchorSerialize, AnchorDeserialize, Clone)]
+#[derive(AnchorSerialize, AnchorDeserialize, Clone, Copy)]
 pub struct Position {
     pub pubkey: Pubkey,
     pub ticker: Pubkey,

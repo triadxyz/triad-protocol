@@ -27,8 +27,8 @@ pub fn create_user(ctx: Context<CreateUser>, args: CreateUserArgs) -> Result<()>
     user.net_deposits = 0;
     user.net_withdraws = 0;
     user.lp_shares = 0;
-    user.long_positions = Vec::new();
-    user.short_positions = Vec::new();
+    // user.long_positions = Vec::new();
+    // user.short_positions = Vec::new();
 
     let clock: Clock = Clock::get().unwrap();
     user.ts = clock.unix_timestamp;

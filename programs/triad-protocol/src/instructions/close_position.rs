@@ -2,7 +2,7 @@ use crate::constraints::{is_authority_for_user, is_token_mint_for_vault};
 use crate::cpi::TokenTransferCPI;
 use crate::errors::TriadProtocolError;
 use crate::state::Vault;
-use crate::{declare_vault_seeds, ClosePositionArgs, Position, User};
+use crate::{declare_vault_seeds, ClosePositionArgs, User};
 
 use anchor_lang::prelude::*;
 use anchor_spl::token::{self, Token, TokenAccount, Transfer};
@@ -76,40 +76,38 @@ pub fn close_position<'info>(
 
     if args.is_long {
         vault.long_balance = vault.long_balance.saturating_sub(args.amount);
+        vault.long_positions_opened = vault.long_positions_opened.saturating_add(1);
 
-        user.long_positions = user
-            .long_positions
-            .iter()
-            .map(|position| {
-                if position.pubkey == args.pubkey {
-                    Position {
-                        is_open: false,
-                        pnl: 1,
-                        ..position.clone()
-                    }
-                } else {
-                    position.clone()
-                }
-            })
-            .collect();
+        // let mut new_long_positions = user.long_positions.clone();
+
+        // for position in &mut new_long_positions {
+        //     if position.pubkey == args.pubkey {
+        //         *position = Position {
+        //             is_open: false,
+        //             pnl: 1,
+        //             ..position.clone()
+        //         };
+        //     }
+        // }
+
+        // user.long_positions = new_long_positions;
     } else {
         vault.short_balance = vault.short_balance.saturating_sub(args.amount);
+        vault.short_positions_opened = vault.short_positions_opened.saturating_add(1);
 
-        user.short_positions = user
-            .short_positions
-            .iter()
-            .map(|position| {
-                if position.pubkey == args.pubkey {
-                    Position {
-                        is_open: false,
-                        pnl: 1,
-                        ..position.clone()
-                    }
-                } else {
-                    position.clone()
-                }
-            })
-            .collect();
+        // let mut new_short_positions = user.short_positions.clone();
+
+        // for position in &mut new_short_positions {
+        //     if position.pubkey == args.pubkey {
+        //         *position = Position {
+        //             is_open: false,
+        //             pnl: 1,
+        //             ..position.clone()
+        //         };
+        //     }
+        // }
+
+        // user.short_positions = new_short_positions;
     }
 
     Ok(())

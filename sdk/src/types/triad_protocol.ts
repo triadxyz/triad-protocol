@@ -142,7 +142,7 @@ export type TriadProtocol = {
         },
         {
           name: 'ticker'
-          isMut: false
+          isMut: true
           isSigner: false
         },
         {
@@ -344,24 +344,6 @@ export type TriadProtocol = {
             name: 'lpShares'
             docs: ['total available balance']
             type: 'u64'
-          },
-          {
-            name: 'longPositions'
-            docs: ['long positions']
-            type: {
-              vec: {
-                defined: 'Position'
-              }
-            }
-          },
-          {
-            name: 'shortPositions'
-            docs: ['short positions']
-            type: {
-              vec: {
-                defined: 'Position'
-              }
-            }
           }
         ]
       }
@@ -789,7 +771,7 @@ export const IDL: TriadProtocol = {
         },
         {
           name: 'ticker',
-          isMut: false,
+          isMut: true,
           isSigner: false
         },
         {
@@ -991,24 +973,6 @@ export const IDL: TriadProtocol = {
             name: 'lpShares',
             docs: ['total available balance'],
             type: 'u64'
-          },
-          {
-            name: 'longPositions',
-            docs: ['long positions'],
-            type: {
-              vec: {
-                defined: 'Position'
-              }
-            }
-          },
-          {
-            name: 'shortPositions',
-            docs: ['short positions'],
-            type: {
-              vec: {
-                defined: 'Position'
-              }
-            }
           }
         ]
       }
