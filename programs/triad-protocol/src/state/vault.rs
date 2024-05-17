@@ -56,8 +56,8 @@ impl Vault {
         // anchor descriminator + all static variables
         8 + std::mem::size_of::<Self>();
 
-    pub fn get_vault_signer_seeds<'a>(name: &'a [u8], bump: &'a u8) -> [&'a [u8]; 3] {
-        [b"vault".as_ref(), name, bytemuck::bytes_of(bump)]
+    pub fn get_vault_signer_seeds<'a>(ticker: &'a Pubkey, bump: &'a u8) -> [&'a [u8]; 3] {
+        [b"vault".as_ref(), ticker.as_ref(), bytemuck::bytes_of(bump)]
     }
 
     pub const PREFIX_SEED_VAULT_TOKEN_ACCOUNT: &'static [u8] = b"vault_token_account";

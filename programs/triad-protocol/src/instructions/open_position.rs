@@ -78,7 +78,7 @@ pub fn open_position<'info>(
     //     is_open: true,
     //     pnl: 0,
     // };
-    // Todo add validation for the position
+
     // let long_len = user.long_positions.len();
     // let short_len = user.short_positions.len();
 
@@ -87,8 +87,9 @@ pub fn open_position<'info>(
 
         vault.long_positions_opened = vault.long_positions_opened.saturating_add(1);
         vault.long_balance = vault.long_balance.saturating_add(args.amount);
-        // } else {
-        //     user.short_positions[short_len - 1] = position;
+    } else {
+        // user.short_positions[short_len - 1] = position;
+
         vault.short_positions_opened = vault.short_positions_opened.saturating_add(1);
         vault.short_balance = vault.short_balance.saturating_add(args.amount);
     }
