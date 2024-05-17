@@ -4,11 +4,13 @@ import { IDL, TriadProtocol } from './types/triad_protocol'
 import { TRIAD_PROTOCOL_PROGRAM_ID } from './utils/constants'
 import Ticker from './ticker'
 import { getUserAddressSync } from './utils/helpers'
+import Vault from './vault'
 
 export default class TriadProtocolClient {
   program: Program<TriadProtocol>
   provider: AnchorProvider
   ticker: Ticker
+  vault: Vault
 
   constructor(connection: Connection, wallet: Wallet) {
     this.provider = new AnchorProvider(
@@ -23,6 +25,7 @@ export default class TriadProtocolClient {
       this.provider
     )
     this.ticker = new Ticker(this.program, this.provider)
+    this.vault = new Vault(this.program, this.provider)
   }
 
   /**
