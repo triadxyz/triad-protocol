@@ -1,7 +1,11 @@
 import { AnchorProvider, Program } from '@coral-xyz/anchor'
 import { PublicKey } from '@solana/web3.js'
 import { TriadProtocol } from './types/triad_protocol'
-import { getTickerAddressSync, getVaultAddressSync } from './utils/helpers'
+import {
+  getTickerAddressSync,
+  getTokenVaultAddressSync,
+  getVaultAddressSync
+} from './utils/helpers'
 
 export default class Ticker {
   program: Program<TriadProtocol>
@@ -13,30 +17,46 @@ export default class Ticker {
   }
 
   /**
+   * Get all tickers
+   */
+  async getTickers() {
+    return this.program.account.ticker.all()
+  }
+
+  /**
    * Create a new ticker
    *  @param name - The ticker's name
    *  @param protocolProgramId - The program ID of the protocol
+   *  @param token mint - Token mint for the ticker (e.g. USDC)
    *
    */
   public async createTicker({
     name,
-    protocolProgramId
+    protocolProgramId,
+    tokenMint
   }: {
     name: string
     protocolProgramId: PublicKey
+    tokenMint: PublicKey
   }) {
     const TickerPDA = getTickerAddressSync(
       this.program.programId,
       protocolProgramId
     )
     const VaultPDA = getVaultAddressSync(this.program.programId, TickerPDA)
+    const TokenAccountPDA = getTokenVaultAddressSync(
+      this.program.programId,
+      VaultPDA
+    )
 
     return this.program.methods
       .createTicker({ name, protocolProgramId })
       .accounts({
         signer: this.provider.wallet.publicKey,
         ticker: TickerPDA,
-        vault: VaultPDA
+        vault: VaultPDA,
+        tokenAccount: TokenAccountPDA,
+        payerTokenMint: tokenMint
       })
       .rpc()
   }

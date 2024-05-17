@@ -26,41 +26,6 @@ export default class Vault {
   }
 
   /**
-   * Create a new vault
-   *  @param protocolProgramId - The program ID of the protocol
-   *  @param mint - Token mint for the vault (e.g. USDC)
-   *
-   */
-  public async createVault({
-    protocolProgramId,
-    mint
-  }: {
-    protocolProgramId: PublicKey
-    mint: PublicKey
-  }) {
-    const TickerPDA = getTickerAddressSync(
-      this.program.programId,
-      protocolProgramId
-    )
-    const VaultPDA = getVaultAddressSync(this.program.programId, TickerPDA)
-    const TokenAccountPDA = getTokenVaultAddressSync(
-      this.program.programId,
-      VaultPDA
-    )
-
-    return this.program.methods
-      .createVault()
-      .accounts({
-        signer: this.provider.wallet.publicKey,
-        vault: VaultPDA,
-        ticker: TickerPDA,
-        tokenAccount: TokenAccountPDA,
-        payerTokenMint: mint
-      })
-      .rpc()
-  }
-
-  /**
    * Get all vaults
    */
   async getVaults() {

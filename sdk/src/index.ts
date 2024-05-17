@@ -29,6 +29,13 @@ export default class TriadProtocolClient {
   }
 
   /**
+   * Get all users
+   */
+  async getUsers() {
+    return this.program.account.user.all()
+  }
+
+  /**
    * Create a new user
    *  @param name - The ticker's name
    *  @param referrer - The referrer's public key

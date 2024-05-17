@@ -23,7 +23,7 @@ export type TriadProtocol = {
       ]
       args: [
         {
-          name: 'arg'
+          name: 'args'
           type: {
             defined: 'CreateUserArgs'
           }
@@ -32,67 +32,6 @@ export type TriadProtocol = {
     },
     {
       name: 'createTicker'
-      accounts: [
-        {
-          name: 'signer'
-          isMut: true
-          isSigner: true
-        },
-        {
-          name: 'vault'
-          isMut: true
-          isSigner: false
-        },
-        {
-          name: 'ticker'
-          isMut: true
-          isSigner: false
-        },
-        {
-          name: 'systemProgram'
-          isMut: false
-          isSigner: false
-        }
-      ]
-      args: [
-        {
-          name: 'arg'
-          type: {
-            defined: 'CreateTickerArgs'
-          }
-        }
-      ]
-    },
-    {
-      name: 'updateTickerPrice'
-      accounts: [
-        {
-          name: 'signer'
-          isMut: true
-          isSigner: true
-        },
-        {
-          name: 'ticker'
-          isMut: true
-          isSigner: false
-        },
-        {
-          name: 'systemProgram'
-          isMut: false
-          isSigner: false
-        }
-      ]
-      args: [
-        {
-          name: 'args'
-          type: {
-            defined: 'UpdateTickerPriceArgs'
-          }
-        }
-      ]
-    },
-    {
-      name: 'createVault'
       accounts: [
         {
           name: 'signer'
@@ -130,7 +69,42 @@ export type TriadProtocol = {
           isSigner: false
         }
       ]
-      args: []
+      args: [
+        {
+          name: 'args'
+          type: {
+            defined: 'CreateTickerArgs'
+          }
+        }
+      ]
+    },
+    {
+      name: 'updateTickerPrice'
+      accounts: [
+        {
+          name: 'signer'
+          isMut: true
+          isSigner: true
+        },
+        {
+          name: 'ticker'
+          isMut: true
+          isSigner: false
+        },
+        {
+          name: 'systemProgram'
+          isMut: false
+          isSigner: false
+        }
+      ]
+      args: [
+        {
+          name: 'args'
+          type: {
+            defined: 'UpdateTickerPriceArgs'
+          }
+        }
+      ]
     },
     {
       name: 'openPosition'
@@ -652,7 +626,7 @@ export const IDL: TriadProtocol = {
       ],
       args: [
         {
-          name: 'arg',
+          name: 'args',
           type: {
             defined: 'CreateUserArgs'
           }
@@ -661,67 +635,6 @@ export const IDL: TriadProtocol = {
     },
     {
       name: 'createTicker',
-      accounts: [
-        {
-          name: 'signer',
-          isMut: true,
-          isSigner: true
-        },
-        {
-          name: 'vault',
-          isMut: true,
-          isSigner: false
-        },
-        {
-          name: 'ticker',
-          isMut: true,
-          isSigner: false
-        },
-        {
-          name: 'systemProgram',
-          isMut: false,
-          isSigner: false
-        }
-      ],
-      args: [
-        {
-          name: 'arg',
-          type: {
-            defined: 'CreateTickerArgs'
-          }
-        }
-      ]
-    },
-    {
-      name: 'updateTickerPrice',
-      accounts: [
-        {
-          name: 'signer',
-          isMut: true,
-          isSigner: true
-        },
-        {
-          name: 'ticker',
-          isMut: true,
-          isSigner: false
-        },
-        {
-          name: 'systemProgram',
-          isMut: false,
-          isSigner: false
-        }
-      ],
-      args: [
-        {
-          name: 'args',
-          type: {
-            defined: 'UpdateTickerPriceArgs'
-          }
-        }
-      ]
-    },
-    {
-      name: 'createVault',
       accounts: [
         {
           name: 'signer',
@@ -759,7 +672,42 @@ export const IDL: TriadProtocol = {
           isSigner: false
         }
       ],
-      args: []
+      args: [
+        {
+          name: 'args',
+          type: {
+            defined: 'CreateTickerArgs'
+          }
+        }
+      ]
+    },
+    {
+      name: 'updateTickerPrice',
+      accounts: [
+        {
+          name: 'signer',
+          isMut: true,
+          isSigner: true
+        },
+        {
+          name: 'ticker',
+          isMut: true,
+          isSigner: false
+        },
+        {
+          name: 'systemProgram',
+          isMut: false,
+          isSigner: false
+        }
+      ],
+      args: [
+        {
+          name: 'args',
+          type: {
+            defined: 'UpdateTickerPriceArgs'
+          }
+        }
+      ]
     },
     {
       name: 'openPosition',
