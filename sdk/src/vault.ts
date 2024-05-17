@@ -122,18 +122,56 @@ export default class Vault {
       this.provider.wallet.publicKey
     )
 
-    return this.program.methods
-      .openPosition({
-        amount: new BN(amount),
-        isLong: position === 'Long'
-      })
-      .accounts({
-        user: UserPDA,
-        vault: VaultPDA,
-        vaultTokenAccount: VaultTokenAccountPDA,
-        userTokenAccount
-      })
-      .rpc()
+    let hasUser = false
+
+    try {
+      this.program.account.user.fetch(this.provider.wallet.publicKey)
+
+      hasUser = true
+    } catch {}
+
+    const instructions: TransactionInstruction[] = []
+
+    if (!hasUser) {
+      instructions.push(
+        await this.program.methods
+          .createUser({
+            name: `User ${Math.floor(Math.random() * 100)}`,
+            referrer: '',
+            community: ''
+          })
+          .accounts({
+            signer: this.provider.wallet.publicKey,
+            user: UserPDA
+          })
+          .instruction()
+      )
+    }
+
+    instructions.push(
+      await this.program.methods
+        .openPosition({
+          amount: new BN(amount),
+          isLong: position === 'Long'
+        })
+        .accounts({
+          user: UserPDA,
+          vault: VaultPDA,
+          vaultTokenAccount: VaultTokenAccountPDA,
+          userTokenAccount
+        })
+        .instruction()
+    )
+
+    const { blockhash } = await this.provider.connection.getLatestBlockhash()
+
+    const message = new TransactionMessage({
+      payerKey: this.provider.wallet.publicKey,
+      recentBlockhash: blockhash,
+      instructions
+    }).compileToV0Message()
+
+    return this.provider.sendAndConfirm(new VersionedTransaction(message))
   }
 
   /**
@@ -145,7 +183,7 @@ export default class Vault {
    *  @param positionPubkey - The position public key
    *
    */
-  public async withdraw({
+  public async closePosition({
     tickerPDA,
     amount,
     position,
@@ -172,18 +210,56 @@ export default class Vault {
       this.provider.wallet.publicKey
     )
 
-    return this.program.methods
-      .closePosition({
-        amount: new BN(amount),
-        isLong: position === 'Long',
-        pubkey: positionPubkey
-      })
-      .accounts({
-        user: UserPDA,
-        vault: VaultPDA,
-        vaultTokenAccount: VaultTokenAccountPDA,
-        userTokenAccount
-      })
-      .rpc()
+    let hasUser = false
+
+    try {
+      this.program.account.user.fetch(this.provider.wallet.publicKey)
+
+      hasUser = true
+    } catch {}
+
+    const instructions: TransactionInstruction[] = []
+
+    if (!hasUser) {
+      instructions.push(
+        await this.program.methods
+          .createUser({
+            name: `User ${Math.floor(Math.random() * 100)}`,
+            referrer: '',
+            community: ''
+          })
+          .accounts({
+            signer: this.provider.wallet.publicKey,
+            user: UserPDA
+          })
+          .instruction()
+      )
+    }
+
+    instructions.push(
+      await this.program.methods
+        .closePosition({
+          amount: new BN(amount),
+          isLong: position === 'Long',
+          pubkey: positionPubkey
+        })
+        .accounts({
+          user: UserPDA,
+          vault: VaultPDA,
+          vaultTokenAccount: VaultTokenAccountPDA,
+          userTokenAccount
+        })
+        .instruction()
+    )
+
+    const { blockhash } = await this.provider.connection.getLatestBlockhash()
+
+    const message = new TransactionMessage({
+      payerKey: this.provider.wallet.publicKey,
+      recentBlockhash: blockhash,
+      instructions
+    }).compileToV0Message()
+
+    return this.provider.sendAndConfirm(new VersionedTransaction(message))
   }
 }

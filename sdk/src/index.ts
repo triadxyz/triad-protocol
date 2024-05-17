@@ -1,4 +1,4 @@
-import { AnchorProvider, Program, Wallet } from '@coral-xyz/anchor'
+import { Address, AnchorProvider, Program, Wallet } from '@coral-xyz/anchor'
 import { Connection } from '@solana/web3.js'
 import { IDL, TriadProtocol } from './types/triad_protocol'
 import { TRIAD_PROTOCOL_PROGRAM_ID } from './utils/constants'
@@ -67,7 +67,7 @@ export default class TriadProtocolClient {
    *  @param user - The user's public key
    *
    */
-  public async getUserData(user: string) {
+  public async getUserData(user: Address) {
     try {
       return this.program.account.user.fetch(user)
     } catch (error) {
