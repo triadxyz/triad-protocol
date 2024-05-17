@@ -61,4 +61,17 @@ export default class TriadProtocolClient {
       })
       .rpc()
   }
+
+  /**
+   * Get user data
+   *  @param user - The user's public key
+   *
+   */
+  public async getUserData(user: string) {
+    try {
+      return this.program.account.user.fetch(user)
+    } catch (error) {
+      throw new Error('User not found')
+    }
+  }
 }
