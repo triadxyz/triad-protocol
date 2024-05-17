@@ -18,17 +18,11 @@ pub struct ClosePosition<'info> {
 
     #[account(
         mut,
-        seeds = [User::PREFIX_SEED.as_ref(), signer.key.as_ref()],
-        bump,
         constraint = is_authority_for_user(&user, &signer)?,
     )]
     pub user: Account<'info, User>,
 
-    #[account(
-        mut,
-        seeds = [Vault::PREFIX_SEED_VAULT_TOKEN_ACCOUNT.as_ref(), vault.key().as_ref()],
-        bump,
-    )]
+    #[account(mut)]
     pub vault_token_account: Account<'info, TokenAccount>,
 
     #[account(

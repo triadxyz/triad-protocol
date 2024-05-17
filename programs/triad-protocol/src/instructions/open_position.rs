@@ -22,8 +22,6 @@ pub struct OpenPosition<'info> {
 
     #[account(
         mut,
-        seeds = [User::PREFIX_SEED.as_ref(), signer.key.as_ref()],
-        bump,
         constraint = is_authority_for_user(&user, &signer)?,
     )]
     pub user: Account<'info, User>,
