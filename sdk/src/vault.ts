@@ -121,6 +121,7 @@ export default class Vault {
         })
         .accounts({
           user: UserPDA,
+          ticker: tickerPDA,
           vault: VaultPDA,
           vaultTokenAccount: VaultTokenAccountPDA,
           userTokenAccount
