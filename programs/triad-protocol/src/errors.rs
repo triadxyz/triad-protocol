@@ -23,6 +23,15 @@ pub enum TriadProtocolError {
     #[msg("Invalid Owner authority")]
     InvalidOwnerAuthority,
 
+    #[msg("Invalid Position")]
+    InvalidPosition,
+
+    #[msg("Invalid Ticker position")]
+    InvalidTickerPosition,
+
+    #[msg("No free position slot")]
+    NoFreePositionSlot,
+
     #[msg("Invalid Mint address")]
     InvalidMintAddress,
 

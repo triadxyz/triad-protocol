@@ -1,8 +1,8 @@
-use crate::constraints::{is_authority_for_user, is_token_mint_for_vault};
+use crate::constraints::{is_authority_for_user_position, is_token_mint_for_vault};
 use crate::cpi::TokenTransferCPI;
 use crate::errors::TriadProtocolError;
 use crate::state::Vault;
-use crate::{declare_vault_seeds, ClosePositionArgs, User};
+use crate::{ClosePositionArgs, Position, UserPosition};
 
 use anchor_lang::prelude::*;
 use anchor_spl::token::{self, Token, TokenAccount, Transfer};
@@ -18,16 +18,16 @@ pub struct ClosePosition<'info> {
 
     #[account(
         mut,
-        constraint = is_authority_for_user(&user, &signer)?,
+        constraint = is_authority_for_user_position(&user_position, &signer)?,
     )]
-    pub user: Account<'info, User>,
+    pub user_position: Account<'info, UserPosition>,
 
     #[account(mut)]
     pub vault_token_account: Account<'info, TokenAccount>,
 
     #[account(
         mut,
-        token::authority = user.authority,
+        token::authority = user_position.authority,
         token::mint = vault_token_account.mint,
         constraint = is_token_mint_for_vault(&vault_token_account.mint, &user_token_account.mint)?,
     )]
@@ -42,18 +42,23 @@ pub fn close_position<'info>(
     ctx: Context<'_, '_, '_, 'info, ClosePosition<'info>>,
     args: ClosePositionArgs,
 ) -> Result<()> {
-    let mut user = ctx.accounts.user.clone();
-    let mut vault = ctx.accounts.vault.clone();
-
-    if user.authority != *ctx.accounts.signer.key {
+    if ctx.accounts.user_position.authority != *ctx.accounts.signer.key {
         return Err(TriadProtocolError::InvalidAccount.into());
     }
 
-    if args.amount > user.lp_shares {
-        return Err(TriadProtocolError::InvalidWithdrawAmount.into());
+    let user_position_cloned = ctx.accounts.user_position.clone();
+
+    let current_pubkey_position = user_position_cloned.positions[args.position_index as usize];
+
+    if current_pubkey_position.is_open == false {
+        return Err(TriadProtocolError::InvalidPosition.into());
     }
 
-    let transfer = ctx.token_transfer(args.amount);
+    if current_pubkey_position.ticker.as_ref() != ctx.accounts.vault.ticker_address.as_ref() {
+        return Err(TriadProtocolError::InvalidTickerPosition.into());
+    }
+
+    let transfer = ctx.token_transfer(current_pubkey_position.amount);
 
     if transfer.is_err() {
         msg!("Close Position failed");
@@ -61,55 +66,48 @@ pub fn close_position<'info>(
         return Err(TriadProtocolError::InvalidWithdrawAmount.into());
     }
 
-    user.total_withdraws = user.total_withdraws.saturating_add(args.amount);
-    user.net_withdraws = user.net_withdraws.saturating_add(1);
-    user.lp_shares = user.lp_shares.saturating_sub(args.amount);
+    let vault: &mut Account<'info, Vault> = &mut ctx.accounts.vault;
 
-    vault.total_withdraws = vault.total_withdraws.saturating_add(args.amount);
-    vault.net_withdraws = vault.net_withdraws.saturating_add(1);
-
-    if args.is_long {
-        vault.long_balance = vault.long_balance.saturating_sub(args.amount);
-        vault.long_positions_opened = vault.long_positions_opened.saturating_add(1);
-
-        // let mut new_long_positions = user.long_positions.clone();
-
-        // for position in &mut new_long_positions {
-        //     if position.pubkey == args.pubkey {
-        //         *position = Position {
-        //             is_open: false,
-        //             pnl: 1,
-        //             ..position.clone()
-        //         };
-        //     }
-        // }
-
-        // user.long_positions = new_long_positions;
+    if current_pubkey_position.is_long {
+        vault.long_balance = vault
+            .long_balance
+            .saturating_sub(current_pubkey_position.amount);
+        vault.long_positions_opened = vault.long_positions_opened.saturating_sub(1);
     } else {
-        vault.short_balance = vault.short_balance.saturating_sub(args.amount);
-        vault.short_positions_opened = vault.short_positions_opened.saturating_add(1);
-
-        // let mut new_short_positions = user.short_positions.clone();
-
-        // for position in &mut new_short_positions {
-        //     if position.pubkey == args.pubkey {
-        //         *position = Position {
-        //             is_open: false,
-        //             pnl: 1,
-        //             ..position.clone()
-        //         };
-        //     }
-        // }
-
-        // user.short_positions = new_short_positions;
+        vault.short_balance = vault
+            .short_balance
+            .saturating_sub(current_pubkey_position.amount);
+        vault.short_positions_opened = vault.short_positions_opened.saturating_sub(1);
     }
+
+    let user_position = &mut ctx.accounts.user_position;
+
+    user_position.total_withdrawn = user_position
+        .total_withdrawn
+        .saturating_add(current_pubkey_position.amount);
+    user_position.lp_share = user_position
+        .lp_share
+        .saturating_sub(current_pubkey_position.amount);
+
+    user_position.positions[args.position_index as usize] = Position {
+        amount: 0,
+        ticker: Pubkey::default(),
+        entry_price: 0,
+        ts: 0,
+        is_long: false,
+        is_open: false,
+        pnl: 0,
+    };
 
     Ok(())
 }
 
 impl<'info> TokenTransferCPI for Context<'_, '_, '_, 'info, ClosePosition<'info>> {
     fn token_transfer(&self, amount: u64) -> Result<()> {
-        declare_vault_seeds!(&self.accounts.vault, seeds);
+        let ticker_key = self.accounts.vault.ticker_address.as_ref();
+        let bump_bytes = &[self.accounts.vault.bump];
+
+        let seeds: &[&[&[u8]]] = &[&[b"vault", ticker_key, bump_bytes]];
 
         let cpi_accounts = Transfer {
             from: self.accounts.vault_token_account.to_account_info().clone(),

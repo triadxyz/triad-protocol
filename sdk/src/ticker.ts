@@ -39,10 +39,7 @@ export default class Ticker {
     protocolProgramId: PublicKey
     tokenMint: PublicKey
   }) {
-    const TickerPDA = getTickerAddressSync(
-      this.program.programId,
-      protocolProgramId
-    )
+    const TickerPDA = getTickerAddressSync(this.program.programId, name)
     const VaultPDA = getVaultAddressSync(this.program.programId, TickerPDA)
     const TokenAccountPDA = getTokenVaultAddressSync(
       this.program.programId,

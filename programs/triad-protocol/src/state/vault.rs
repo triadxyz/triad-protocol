@@ -12,16 +12,16 @@ pub struct Vault {
     pub token_account: Pubkey,
     /// ticker address
     pub ticker_address: Pubkey,
-    /// lifetime total deposits
-    pub total_deposits: u64,
-    /// lifetime total withdraws
-    pub total_withdraws: u64,
+    /// lifetime total deposited
+    pub total_deposited: u64,
+    /// lifetime total withdrawn
+    pub total_withdrawn: u64,
     /// timestamp vault initialized
     pub init_ts: i64,
     /// lifetime net deposits
-    pub net_deposits: u64,
+    pub net_deposits: u128,
     /// lifetime net withdraws
-    pub net_withdraws: u64,
+    pub net_withdraws: u128,
     /// Long bet balance
     pub long_balance: u64,
     /// Short bet balance
@@ -30,11 +30,9 @@ pub struct Vault {
     pub long_positions_opened: u64,
     /// Opened short positions
     pub short_positions_opened: u64,
-    /// Ticker PDA
-    pub ticker: Pubkey,
 }
 
-#[derive(AnchorSerialize, AnchorDeserialize)]
+#[derive(AnchorSerialize, AnchorDeserialize, Clone)]
 pub struct OpenPositionArgs {
     pub amount: u64,
     pub is_long: bool,
@@ -42,9 +40,7 @@ pub struct OpenPositionArgs {
 
 #[derive(AnchorSerialize, AnchorDeserialize)]
 pub struct ClosePositionArgs {
-    pub amount: u64,
-    pub is_long: bool,
-    pub pubkey: Pubkey,
+    pub position_index: u8,
 }
 
 impl Vault {

@@ -14,7 +14,7 @@ pub struct CreateTicker<'info> {
     #[account(mut)]
     pub signer: Signer<'info>,
 
-    #[account(init, payer = signer, space = Ticker::SPACE, seeds = [Ticker::PREFIX_SEED.as_ref(), args.protocol_program_id.as_ref()], bump)]
+    #[account(init, payer = signer, space = Ticker::SPACE, seeds = [Ticker::PREFIX_SEED.as_ref(), args.name.as_ref()], bump)]
     pub ticker: Account<'info, Ticker>,
 
     #[account(init, payer = signer, space = Vault::SPACE, seeds = [Vault::PREFIX_SEED.as_ref(), ticker.to_account_info().key.as_ref()], bump)]
@@ -42,17 +42,22 @@ pub fn create_ticker(ctx: Context<CreateTicker>, args: CreateTickerArgs) -> Resu
         return Err(TriadProtocolError::Unauthorized.into());
     }
 
-    let ticker: &mut Account<Ticker> = &mut ctx.accounts.ticker.clone();
-    let vault: &mut Account<Vault> = &mut ctx.accounts.vault.clone();
+    let ticker_key = *ctx.accounts.ticker.to_account_info().key;
+    let token_account_key = *ctx.accounts.token_account.to_account_info().key;
+    let signer_key = *ctx.accounts.signer.key;
+    let current_timestamp = Clock::get()?.unix_timestamp;
+
+    let ticker: &mut Account<Ticker> = &mut ctx.accounts.ticker;
+    let vault: &mut Account<Vault> = &mut ctx.accounts.vault;
 
     vault.bump = *ctx.bumps.get("vault").unwrap();
-    vault.authority = *ctx.accounts.signer.key;
+    vault.authority = signer_key;
     vault.name = args.name.clone();
-    vault.ticker_address = *ctx.accounts.ticker.to_account_info().key;
-    vault.token_account = *ctx.accounts.token_account.to_account_info().key;
-    vault.total_deposits = 0;
-    vault.total_withdraws = 0;
-    vault.init_ts = Clock::get()?.unix_timestamp;
+    vault.ticker_address = ticker_key;
+    vault.token_account = token_account_key;
+    vault.total_deposited = 0;
+    vault.total_withdrawn = 0;
+    vault.init_ts = current_timestamp;
     vault.net_deposits = 0;
 
     msg!(
@@ -61,13 +66,13 @@ pub fn create_ticker(ctx: Context<CreateTicker>, args: CreateTickerArgs) -> Resu
     );
 
     ticker.bump = *ctx.bumps.get("ticker").unwrap();
-    ticker.authority = *ctx.accounts.signer.key;
+    ticker.authority = signer_key;
     ticker.name = args.name;
     ticker.vault = *ctx.accounts.vault.to_account_info().key;
     ticker.price = 0;
     ticker.protocol_program_id = args.protocol_program_id;
-    ticker.init_ts = Clock::get()?.unix_timestamp;
-    ticker.updated_ts = Clock::get()?.unix_timestamp;
+    ticker.init_ts = current_timestamp;
+    ticker.updated_ts = current_timestamp;
 
     msg!("Ticker {:?} Created", ticker.name);
 

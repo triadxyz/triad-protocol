@@ -9,9 +9,7 @@ import { TriadProtocol } from './types/triad_protocol'
 import {
   getVaultAddressSync,
   getTokenVaultAddressSync,
-  encodeString,
   formatNumber,
-  getTickerAddressSync,
   getUserAddressSync
 } from './utils/helpers'
 import { getAccount, getAssociatedTokenAddress } from '@solana/spl-token'
@@ -73,71 +71,75 @@ export default class Vault {
     position: 'Long' | 'Short'
     mint: PublicKey
   }) {
-    const UserPDA = getUserAddressSync(
-      this.program.programId,
-      this.provider.wallet.publicKey
-    )
-    const VaultPDA = getVaultAddressSync(this.program.programId, tickerPDA)
-    const VaultTokenAccountPDA = getTokenVaultAddressSync(
-      this.program.programId,
-      VaultPDA
-    )
-    const userTokenAccount = await getAssociatedTokenAddress(
-      mint,
-      this.provider.wallet.publicKey
-    )
-
-    let hasUser = false
-
     try {
-      this.program.account.user.fetch(this.provider.wallet.publicKey)
+      const UserPDA = getUserAddressSync(
+        this.program.programId,
+        this.provider.wallet.publicKey
+      )
+      const VaultPDA = getVaultAddressSync(this.program.programId, tickerPDA)
+      const VaultTokenAccountPDA = getTokenVaultAddressSync(
+        this.program.programId,
+        VaultPDA
+      )
+      const userTokenAccount = await getAssociatedTokenAddress(
+        mint,
+        this.provider.wallet.publicKey
+      )
 
-      hasUser = true
-    } catch {}
+      let hasUser = false
 
-    const instructions: TransactionInstruction[] = []
+      try {
+        await this.program.account.user.fetch(UserPDA)
 
-    if (!hasUser) {
+        hasUser = true
+      } catch {}
+
+      const instructions: TransactionInstruction[] = []
+
+      if (!hasUser) {
+        instructions.push(
+          await this.program.methods
+            .createUser({
+              name: `User ${Math.floor(Math.random() * 100)}`,
+              referrer: '',
+              community: ''
+            })
+            .accounts({
+              signer: this.provider.wallet.publicKey,
+              user: UserPDA
+            })
+            .instruction()
+        )
+      }
+
       instructions.push(
         await this.program.methods
-          .createUser({
-            name: `User ${Math.floor(Math.random() * 100)}`,
-            referrer: '',
-            community: ''
+          .openPosition({
+            amount: new BN(amount),
+            isLong: position === 'Long'
           })
           .accounts({
-            signer: this.provider.wallet.publicKey,
-            user: UserPDA
+            user: UserPDA,
+            ticker: tickerPDA,
+            vault: VaultPDA,
+            vaultTokenAccount: VaultTokenAccountPDA,
+            userTokenAccount
           })
           .instruction()
       )
+
+      const { blockhash } = await this.provider.connection.getLatestBlockhash()
+
+      const message = new TransactionMessage({
+        payerKey: this.provider.wallet.publicKey,
+        recentBlockhash: blockhash,
+        instructions
+      }).compileToV0Message()
+
+      return this.provider.sendAndConfirm(new VersionedTransaction(message))
+    } catch (error) {
+      console.error(error)
     }
-
-    instructions.push(
-      await this.program.methods
-        .openPosition({
-          amount: new BN(amount),
-          isLong: position === 'Long'
-        })
-        .accounts({
-          user: UserPDA,
-          ticker: tickerPDA,
-          vault: VaultPDA,
-          vaultTokenAccount: VaultTokenAccountPDA,
-          userTokenAccount
-        })
-        .instruction()
-    )
-
-    const { blockhash } = await this.provider.connection.getLatestBlockhash()
-
-    const message = new TransactionMessage({
-      payerKey: this.provider.wallet.publicKey,
-      recentBlockhash: blockhash,
-      instructions
-    }).compileToV0Message()
-
-    return this.provider.sendAndConfirm(new VersionedTransaction(message))
   }
 
   /**
@@ -162,70 +164,79 @@ export default class Vault {
     mint: PublicKey
     positionPubkey: PublicKey
   }) {
-    const UserPDA = getUserAddressSync(
-      this.program.programId,
-      this.provider.wallet.publicKey
-    )
-    const VaultPDA = getVaultAddressSync(this.program.programId, tickerPDA)
-    const VaultTokenAccountPDA = getTokenVaultAddressSync(
-      this.program.programId,
-      VaultPDA
-    )
-    const userTokenAccount = await getAssociatedTokenAddress(
-      mint,
-      this.provider.wallet.publicKey
-    )
-
-    let hasUser = false
-
     try {
-      this.program.account.user.fetch(this.provider.wallet.publicKey)
+      const UserPDA = getUserAddressSync(
+        this.program.programId,
+        this.provider.wallet.publicKey
+      )
+      const VaultPDA = getVaultAddressSync(this.program.programId, tickerPDA)
+      const VaultTokenAccountPDA = getTokenVaultAddressSync(
+        this.program.programId,
+        VaultPDA
+      )
+      const userTokenAccount = await getAssociatedTokenAddress(
+        mint,
+        this.provider.wallet.publicKey
+      )
 
-      hasUser = true
-    } catch {}
+      let hasUser = false
 
-    const instructions: TransactionInstruction[] = []
+      try {
+        await this.program.account.user.fetch(UserPDA)
 
-    if (!hasUser) {
+        console.log('User exists')
+
+        hasUser = true
+      } catch (e) {
+        console.log('User does not exist')
+        console.log(e)
+      }
+
+      const instructions: TransactionInstruction[] = []
+
+      if (!hasUser) {
+        instructions.push(
+          await this.program.methods
+            .createUser({
+              name: `User ${Math.floor(Math.random() * 100)}`,
+              referrer: '',
+              community: ''
+            })
+            .accounts({
+              signer: this.provider.wallet.publicKey,
+              user: UserPDA
+            })
+            .instruction()
+        )
+      }
+
       instructions.push(
         await this.program.methods
-          .createUser({
-            name: `User ${Math.floor(Math.random() * 100)}`,
-            referrer: '',
-            community: ''
+          .closePosition({
+            amount: new BN(amount),
+            isLong: position === 'Long',
+            pubkey: positionPubkey
           })
           .accounts({
-            signer: this.provider.wallet.publicKey,
-            user: UserPDA
+            user: UserPDA,
+            vault: VaultPDA,
+            vaultTokenAccount: VaultTokenAccountPDA,
+            userTokenAccount
           })
           .instruction()
       )
+
+      const { blockhash } = await this.provider.connection.getLatestBlockhash()
+
+      const message = new TransactionMessage({
+        payerKey: this.provider.wallet.publicKey,
+        recentBlockhash: blockhash,
+        instructions
+      }).compileToV0Message()
+
+      return this.provider.sendAndConfirm(new VersionedTransaction(message))
+    } catch (error) {
+      console.error(error)
     }
-
-    instructions.push(
-      await this.program.methods
-        .closePosition({
-          amount: new BN(amount),
-          isLong: position === 'Long',
-          pubkey: positionPubkey
-        })
-        .accounts({
-          user: UserPDA,
-          vault: VaultPDA,
-          vaultTokenAccount: VaultTokenAccountPDA,
-          userTokenAccount
-        })
-        .instruction()
-    )
-
-    const { blockhash } = await this.provider.connection.getLatestBlockhash()
-
-    const message = new TransactionMessage({
-      payerKey: this.provider.wallet.publicKey,
-      recentBlockhash: blockhash,
-      instructions
-    }).compileToV0Message()
-
-    return this.provider.sendAndConfirm(new VersionedTransaction(message))
   }
 }

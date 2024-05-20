@@ -1,7 +1,7 @@
 mod ticker;
-mod user;
+mod position;
 mod vault;
 
 pub use ticker::*;
-pub use user::*;
+pub use position::*;
 pub use vault::*;

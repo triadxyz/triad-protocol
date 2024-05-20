@@ -1,9 +1,12 @@
-use crate::{Ticker, User};
+use crate::{Ticker, UserPosition};
 
 use anchor_lang::prelude::*;
 
-pub fn is_authority_for_user(user: &Account<User>, signer: &Signer) -> anchor_lang::Result<bool> {
-    Ok(user.authority.eq(signer.key))
+pub fn is_authority_for_user_position(
+    user_position: &Account<UserPosition>,
+    signer: &Signer,
+) -> anchor_lang::Result<bool> {
+    Ok(user_position.authority.eq(signer.key))
 }
 
 pub fn is_authority_for_ticker(

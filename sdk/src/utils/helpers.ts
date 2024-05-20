@@ -4,10 +4,10 @@ import BN from 'bn.js'
 
 export const getTickerAddressSync = (
   programId: PublicKey,
-  protocolProgramId: PublicKey
+  tickerName: string
 ) => {
   const [TickerPDA] = PublicKey.findProgramAddressSync(
-    [Buffer.from('ticker'), protocolProgramId.toBuffer()],
+    [Buffer.from('ticker'), Buffer.from(tickerName)],
     programId
   )
 
