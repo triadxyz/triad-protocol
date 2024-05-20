@@ -6,6 +6,7 @@ import {
   getTokenVaultAddressSync,
   getVaultAddressSync
 } from './utils/helpers'
+import { BN } from 'bn.js'
 
 export default class Ticker {
   program: Program<TriadProtocol>
@@ -54,6 +55,30 @@ export default class Ticker {
         vault: VaultPDA,
         tokenAccount: TokenAccountPDA,
         payerTokenMint: tokenMint
+      })
+      .rpc()
+  }
+
+  /**
+   * Update a ticker's price
+   *  @param name - The ticker's name
+   *  @param price - The ticker's price
+   *
+   */
+  public async updateTickerPrice({
+    name,
+    price
+  }: {
+    name: string
+    price: string
+  }) {
+    const TickerPDA = getTickerAddressSync(this.program.programId, name)
+
+    return this.program.methods
+      .updateTickerPrice({ price: new BN(price) })
+      .accounts({
+        signer: this.provider.wallet.publicKey,
+        ticker: TickerPDA
       })
       .rpc()
   }
