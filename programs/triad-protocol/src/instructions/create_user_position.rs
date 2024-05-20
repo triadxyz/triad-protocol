@@ -22,7 +22,7 @@ pub fn create_user_position(ctx: Context<CreateUserPosition>) -> Result<()> {
     user_position.bump = *ctx.bumps.get("user_position").unwrap();
     user_position.authority = *ctx.accounts.signer.key;
     user_position.ticker = *ctx.accounts.ticker.to_account_info().key;
-    user_position.positions = [Position::default(); 6];
+    user_position.positions = [Position::default(); 8];
 
     Ok(())
 }

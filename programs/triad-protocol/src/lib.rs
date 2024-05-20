@@ -10,7 +10,7 @@ mod instructions;
 mod macros;
 mod state;
 
-declare_id!("TRDwq3BN4mP3m9KsuNUWSN6QDff93VKGSwE95Jbr9Ss");
+declare_id!("TRD6TX2818HE3V6DSyyVYLciVubbfLchYK67kZ9nzMm");
 
 #[program]
 pub mod triad_protocol {

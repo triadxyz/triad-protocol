@@ -1,8 +1,9 @@
 use crate::constraints::{is_authority_for_user_position, is_token_mint_for_vault};
 use crate::cpi::TokenTransferCPI;
+use crate::emit;
 use crate::errors::TriadProtocolError;
 use crate::state::Vault;
-use crate::{OpenPositionArgs, UserPosition};
+use crate::{OpenPositionArgs, OpenPositionRecord, UserPosition};
 use crate::{Position, Ticker};
 
 use anchor_lang::prelude::*;
@@ -53,7 +54,7 @@ pub fn open_position<'info>(
     let mut user_position = ctx.accounts.user_position.clone();
     let mut vault = ctx.accounts.vault.clone();
 
-    let transfer = ctx.token_transfer(args.amount);
+    let transfer = ctx.token_transfer(args.amount, 0);
 
     if transfer.is_err() {
         msg!("Open position failed");
@@ -61,17 +62,19 @@ pub fn open_position<'info>(
         return Err(TriadProtocolError::DepositFailed.into());
     }
 
+    let position = Position {
+        amount: args.amount,
+        entry_price: ctx.accounts.ticker.price,
+        ts: Clock::get()?.unix_timestamp,
+        is_long: args.is_long,
+        ticker: *ctx.accounts.ticker.to_account_info().key,
+        is_open: true,
+        pnl: 0,
+    };
+
     for i in 0..user_position.positions.len() {
         if !user_position.positions[i].is_open {
-            user_position.positions[i] = Position {
-                amount: args.amount,
-                entry_price: ctx.accounts.ticker.price,
-                ts: Clock::get()?.unix_timestamp,
-                is_long: args.is_long,
-                ticker: *ctx.accounts.ticker.to_account_info().key,
-                is_open: true,
-                pnl: 0,
-            };
+            user_position.positions[i] = position;
             break;
         }
     }
@@ -93,13 +96,22 @@ pub fn open_position<'info>(
     vault.total_deposited = vault.total_deposited.saturating_add(args.amount);
     vault.net_deposits = vault.net_deposits.saturating_add(1);
 
+    emit!(OpenPositionRecord {
+        ticker: position.ticker,
+        entry_price: position.entry_price,
+        ts: position.ts,
+        user: *ctx.accounts.user_position.to_account_info().key,
+        amount: args.amount,
+        is_long: args.is_long,
+    });
+
     msg!("Deposit successful");
 
     Ok(())
 }
 
 impl<'info> TokenTransferCPI for Context<'_, '_, '_, 'info, OpenPosition<'info>> {
-    fn token_transfer(&self, amount: u64) -> Result<()> {
+    fn token_transfer(&self, amount: u64, _pnl: i64) -> Result<()> {
         let cpi_accounts = Transfer {
             from: self.accounts.user_token_account.to_account_info().clone(),
             to: self.accounts.vault_token_account.to_account_info().clone(),

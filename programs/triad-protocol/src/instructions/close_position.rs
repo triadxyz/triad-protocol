@@ -2,7 +2,7 @@ use crate::constraints::{is_authority_for_user_position, is_token_mint_for_vault
 use crate::cpi::TokenTransferCPI;
 use crate::errors::TriadProtocolError;
 use crate::state::Vault;
-use crate::{ClosePositionArgs, Position, UserPosition};
+use crate::{ClosePositionArgs, ClosePositionRecord, Position, Ticker, UserPosition};
 
 use anchor_lang::prelude::*;
 use anchor_spl::token::{self, Token, TokenAccount, Transfer};
@@ -12,6 +12,9 @@ use anchor_spl::token::{self, Token, TokenAccount, Transfer};
 pub struct ClosePosition<'info> {
     #[account(mut)]
     pub signer: Signer<'info>,
+
+    #[account(mut)]
+    pub ticker: Account<'info, Ticker>,
 
     #[account(mut)]
     pub vault: Account<'info, Vault>,
@@ -58,7 +61,9 @@ pub fn close_position<'info>(
         return Err(TriadProtocolError::InvalidTickerPosition.into());
     }
 
-    let transfer = ctx.token_transfer(current_pubkey_position.amount);
+    let pnl = ctx.accounts.ticker.price as i64 - current_pubkey_position.entry_price as i64;
+
+    let transfer = ctx.token_transfer(current_pubkey_position.amount, pnl);
 
     if transfer.is_err() {
         msg!("Close Position failed");
@@ -99,11 +104,21 @@ pub fn close_position<'info>(
         pnl: 0,
     };
 
+    emit!(ClosePositionRecord {
+        ticker: current_pubkey_position.ticker,
+        close_price: ctx.accounts.ticker.price,
+        ts: Clock::get()?.unix_timestamp,
+        pnl: ctx.accounts.ticker.price as i64 - current_pubkey_position.entry_price as i64,
+        user: *ctx.accounts.user_position.to_account_info().key,
+        amount: current_pubkey_position.amount,
+        is_long: current_pubkey_position.is_long,
+    });
+
     Ok(())
 }
 
 impl<'info> TokenTransferCPI for Context<'_, '_, '_, 'info, ClosePosition<'info>> {
-    fn token_transfer(&self, amount: u64) -> Result<()> {
+    fn token_transfer(&self, amount: u64, pnl: i64) -> Result<()> {
         let ticker_key = self.accounts.vault.ticker_address.as_ref();
         let bump_bytes = &[self.accounts.vault.bump];
 
@@ -117,7 +132,9 @@ impl<'info> TokenTransferCPI for Context<'_, '_, '_, 'info, ClosePosition<'info>
         let token_program = self.accounts.token_program.to_account_info().clone();
         let cpi_context = CpiContext::new_with_signer(token_program, cpi_accounts, seeds);
 
-        token::transfer(cpi_context, amount)?;
+        let new_amount = amount + pnl.abs() as u64;
+
+        token::transfer(cpi_context, (new_amount as f64 * 0.05).to_bits())?;
 
         Ok(())
     }

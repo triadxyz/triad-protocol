@@ -1,4 +1,6 @@
 pub const ADMIN: &str = "369tqmTPBWArMkU4RUVYfCkDoXE6PkjUaDvckATTK5HA";
-// pub const TRIAD_FEE: u64 = 15; // Fee for Triad Plataform (Each Triad holder will receive 0.15% fee of trade transaction)
-// pub const PROGRAM_FEE: u64 = 150; // Fee for ticker program (Each Protocol i'll receive 0.015% fee of trade transaction)
-// pub const NFT_HOLDERS_FEE: u64 = 100; // Fee for NFT Holders Pool (will receive 0.01% fee of trade transaction)
+// pub const MAIN_FEE: u64 = 500; // Fee for Main Protocol (will receive 0.5% fee of trade transaction)
+// pub const TRIAD_FEE: u64 = 3690; // Fee for Triad Protocol (will receive 0.369% fee of trade transaction)
+// pub const TICKER_PROJECT_FEE: u64 = 31; // Fee for Ticker Project (will receive 0.031% fee of trade transaction)
+// pub const NFT_HOLDERS_FEE: u64 = 100; // Fee for NFT Holders (will receive 0.1% fee of trade transaction)
+// pub const FEE_WALLET: &str = "85sRx4rNAEUdPcSsa9zHb4MKyGHcn1Y4kP38HFUmUXSn"; // Fee Wallet Address (Squads)
