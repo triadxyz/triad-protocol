@@ -1,4 +1,4 @@
-pub const ADMIN: &str = "369tqmTPBWArMkU4RUVYfCkDoXE6PkjUaDvckATTK5HA";
+pub const ADMIN: &str = "82ppCojm3yrEKgdpH8B5AmBJTU1r1uAWXFWhxvPs9UCR";
 // pub const MAIN_FEE: u64 = 500; // Fee for Main Protocol (will receive 0.5% fee of trade transaction)
 // pub const TRIAD_FEE: u64 = 3690; // Fee for Triad Protocol (will receive 0.369% fee of trade transaction)
 // pub const TICKER_PROJECT_FEE: u64 = 31; // Fee for Ticker Project (will receive 0.031% fee of trade transaction)

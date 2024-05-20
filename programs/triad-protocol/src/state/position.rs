@@ -19,7 +19,7 @@ pub struct UserPosition {
     /// user's authority
     pub authority: Pubkey,
     /// user's position
-    pub positions: [Position; 8],
+    pub positions: [Position; 6],
 }
 
 #[derive(AnchorSerialize, AnchorDeserialize, Clone, Copy, Default)]
