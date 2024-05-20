@@ -54,7 +54,7 @@ pub fn open_position<'info>(
     let mut user_position = ctx.accounts.user_position.clone();
     let mut vault = ctx.accounts.vault.clone();
 
-    let transfer = ctx.token_transfer(args.amount, 0);
+    let transfer = ctx.token_transfer(args.amount);
 
     if transfer.is_err() {
         msg!("Open position failed");
@@ -67,10 +67,13 @@ pub fn open_position<'info>(
         entry_price: ctx.accounts.ticker.price,
         ts: Clock::get()?.unix_timestamp,
         is_long: args.is_long,
-        ticker: *ctx.accounts.ticker.to_account_info().key,
         is_open: true,
         pnl: 0,
     };
+
+    if user_position.positions[2].is_open == true {
+        return Err(TriadProtocolError::NoFreePositionSlot.into());
+    }
 
     for i in 0..user_position.positions.len() {
         if !user_position.positions[i].is_open {
@@ -97,7 +100,7 @@ pub fn open_position<'info>(
     vault.net_deposits = vault.net_deposits.saturating_add(1);
 
     emit!(OpenPositionRecord {
-        ticker: position.ticker,
+        ticker: vault.ticker_address,
         entry_price: position.entry_price,
         ts: position.ts,
         user: *ctx.accounts.user_position.to_account_info().key,
@@ -111,7 +114,7 @@ pub fn open_position<'info>(
 }
 
 impl<'info> TokenTransferCPI for Context<'_, '_, '_, 'info, OpenPosition<'info>> {
-    fn token_transfer(&self, amount: u64, _pnl: i64) -> Result<()> {
+    fn token_transfer(&self, amount: u64) -> Result<()> {
         let cpi_accounts = Transfer {
             from: self.accounts.user_token_account.to_account_info().clone(),
             to: self.accounts.vault_token_account.to_account_info().clone(),

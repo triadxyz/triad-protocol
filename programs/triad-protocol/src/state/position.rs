@@ -19,13 +19,12 @@ pub struct UserPosition {
     /// user's authority
     pub authority: Pubkey,
     /// user's position
-    pub positions: [Position; 6],
+    pub positions: [Position; 3],
 }
 
 #[derive(AnchorSerialize, AnchorDeserialize, Clone, Copy, Default)]
 pub struct Position {
     pub amount: u64,
-    pub ticker: Pubkey,
     pub entry_price: u64,
     pub ts: i64,
     pub is_long: bool,

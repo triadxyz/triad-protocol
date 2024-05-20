@@ -1,11 +1,10 @@
-import { Address, AnchorProvider, Program, Wallet } from '@coral-xyz/anchor'
+import { AnchorProvider, Program, Wallet } from '@coral-xyz/anchor'
 import { Connection, PublicKey } from '@solana/web3.js'
 import { IDL, TriadProtocol } from './types/triad_protocol'
 import { TRIAD_PROTOCOL_PROGRAM_ID } from './utils/constants'
 import Ticker from './ticker'
-import { getUserAddressSync } from './utils/helpers'
 import Vault from './vault'
-import { convertSecretKeyToKeypair } from './utils/convertSecretKeyToKeypair'
+import { getUserPositionAddressSync } from './utils/helpers'
 
 export default class TriadProtocolClient {
   program: Program<TriadProtocol>
@@ -29,23 +28,26 @@ export default class TriadProtocolClient {
     this.vault = new Vault(this.program, this.provider)
   }
 
-  /**
-   * Get all users
-   */
-  // async getUsers() {
-  //   return this.program.account.userPosition.fetch()
-  // }
+  getUserPositions = async (userWallet: PublicKey) => {
+    const tickers = await this.ticker.getTickers()
 
-  /**
-   * Get user data
-   *  @param user - The user's public key
-   *
-   */
-  public async getUserData(user: Address) {
-    try {
-      return this.program.account.user.fetch(user)
-    } catch (error) {
-      throw new Error('User not found')
-    }
+    const positions = await Promise.all(
+      tickers.map(async (ticker) => {
+        const UserPositionPDA = getUserPositionAddressSync(
+          this.program.programId,
+          userWallet,
+          ticker.publicKey
+        )
+        const position =
+          await this.program.account.userPosition.fetch(UserPositionPDA)
+
+        return {
+          ticker,
+          position
+        }
+      })
+    )
+
+    return positions
   }
 }

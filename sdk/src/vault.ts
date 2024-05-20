@@ -10,7 +10,7 @@ import {
   getVaultAddressSync,
   getTokenVaultAddressSync,
   formatNumber,
-  getUserAddressSync
+  getUserPositionAddressSync
 } from './utils/helpers'
 import { getAccount, getAssociatedTokenAddress } from '@solana/spl-token'
 
@@ -72,9 +72,10 @@ export default class Vault {
     mint: PublicKey
   }) {
     try {
-      const UserPDA = getUserAddressSync(
+      const UserPositionPDA = getUserPositionAddressSync(
         this.program.programId,
-        this.provider.wallet.publicKey
+        this.provider.wallet.publicKey,
+        tickerPDA
       )
       const VaultPDA = getVaultAddressSync(this.program.programId, tickerPDA)
       const VaultTokenAccountPDA = getTokenVaultAddressSync(
@@ -86,27 +87,24 @@ export default class Vault {
         this.provider.wallet.publicKey
       )
 
-      let hasUser = false
+      let hasUserPosition = false
 
       try {
-        await this.program.account.user.fetch(UserPDA)
+        await this.program.account.userPosition.fetch(UserPositionPDA)
 
-        hasUser = true
+        hasUserPosition = true
       } catch {}
 
       const instructions: TransactionInstruction[] = []
 
-      if (!hasUser) {
+      if (!hasUserPosition) {
         instructions.push(
           await this.program.methods
-            .createUser({
-              name: `User ${Math.floor(Math.random() * 100)}`,
-              referrer: '',
-              community: ''
-            })
+            .createUserPosition()
             .accounts({
               signer: this.provider.wallet.publicKey,
-              user: UserPDA
+              userPosition: UserPositionPDA,
+              ticker: tickerPDA
             })
             .instruction()
         )
@@ -119,7 +117,7 @@ export default class Vault {
             isLong: position === 'Long'
           })
           .accounts({
-            user: UserPDA,
+            userPosition: UserPositionPDA,
             ticker: tickerPDA,
             vault: VaultPDA,
             vaultTokenAccount: VaultTokenAccountPDA,
@@ -153,21 +151,18 @@ export default class Vault {
    */
   public async closePosition({
     tickerPDA,
-    amount,
-    position,
     mint,
-    positionPubkey
+    positionIndex
   }: {
     tickerPDA: PublicKey
-    amount: string
-    position: 'Long' | 'Short'
     mint: PublicKey
-    positionPubkey: PublicKey
+    positionIndex: number
   }) {
     try {
-      const UserPDA = getUserAddressSync(
+      const UserPositionPDA = getUserPositionAddressSync(
         this.program.programId,
-        this.provider.wallet.publicKey
+        this.provider.wallet.publicKey,
+        tickerPDA
       )
       const VaultPDA = getVaultAddressSync(this.program.programId, tickerPDA)
       const VaultTokenAccountPDA = getTokenVaultAddressSync(
@@ -182,13 +177,10 @@ export default class Vault {
       let hasUser = false
 
       try {
-        await this.program.account.user.fetch(UserPDA)
-
-        console.log('User exists')
+        await this.program.account.userPosition.fetch(UserPositionPDA)
 
         hasUser = true
       } catch (e) {
-        console.log('User does not exist')
         console.log(e)
       }
 
@@ -197,14 +189,11 @@ export default class Vault {
       if (!hasUser) {
         instructions.push(
           await this.program.methods
-            .createUser({
-              name: `User ${Math.floor(Math.random() * 100)}`,
-              referrer: '',
-              community: ''
-            })
+            .createUserPosition()
             .accounts({
               signer: this.provider.wallet.publicKey,
-              user: UserPDA
+              userPosition: UserPositionPDA,
+              ticker: tickerPDA
             })
             .instruction()
         )
@@ -212,13 +201,10 @@ export default class Vault {
 
       instructions.push(
         await this.program.methods
-          .closePosition({
-            amount: new BN(amount),
-            isLong: position === 'Long',
-            pubkey: positionPubkey
-          })
+          .closePosition({ positionIndex })
           .accounts({
-            user: UserPDA,
+            userPosition: UserPositionPDA,
+            ticker: tickerPDA,
             vault: VaultPDA,
             vaultTokenAccount: VaultTokenAccountPDA,
             userTokenAccount

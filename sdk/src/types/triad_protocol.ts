@@ -265,7 +265,7 @@ export type TriadProtocol = {
                 {
                   defined: 'Position'
                 },
-                6
+                3
               ]
             }
           }
@@ -410,10 +410,6 @@ export type TriadProtocol = {
           {
             name: 'amount'
             type: 'u64'
-          },
-          {
-            name: 'ticker'
-            type: 'publicKey'
           },
           {
             name: 'entryPrice'
@@ -933,7 +929,7 @@ export const IDL: TriadProtocol = {
                 {
                   defined: 'Position'
                 },
-                6
+                3
               ]
             }
           }
@@ -1078,10 +1074,6 @@ export const IDL: TriadProtocol = {
           {
             name: 'amount',
             type: 'u64'
-          },
-          {
-            name: 'ticker',
-            type: 'publicKey'
           },
           {
             name: 'entryPrice',
