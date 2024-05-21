@@ -51,10 +51,10 @@ pub fn open_position<'info>(
     ctx: Context<'_, '_, '_, 'info, OpenPosition<'info>>,
     args: OpenPositionArgs,
 ) -> Result<()> {
-    let mut user_position = ctx.accounts.user_position.clone();
-    let mut vault = ctx.accounts.vault.clone();
-
     let transfer = ctx.token_transfer(args.amount);
+
+    let user_position = &mut ctx.accounts.user_position;
+    let vault = &mut ctx.accounts.vault;
 
     if transfer.is_err() {
         msg!("Open position failed");

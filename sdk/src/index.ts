@@ -32,27 +32,30 @@ export default class TriadProtocolClient {
     const tickers = await this.ticker.getTickers()
 
     const positions = await Promise.all(
-      tickers.map(async (ticker) => {
-        let data = {}
+      tickers
+        .map(async (ticker) => {
+          let data = {}
 
-        try {
-          const UserPositionPDA = getUserPositionAddressSync(
-            this.program.programId,
-            userWallet,
-            ticker.publicKey
-          )
-          const position = await this.program.account.userPosition.fetch(
-            UserPositionPDA
-          )
+          try {
+            const UserPositionPDA = getUserPositionAddressSync(
+              this.program.programId,
+              userWallet,
+              ticker.publicKey
+            )
+            const position =
+              await this.program.account.userPosition.fetch(UserPositionPDA)
 
-          data = {
-            ticker,
-            position
+            data = {
+              ticker,
+              position
+            }
+          } catch {
+            return
           }
-        } catch {}
 
-        return data
-      })
+          return data
+        })
+        .filter(Boolean)
     )
 
     return positions

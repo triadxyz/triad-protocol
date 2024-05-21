@@ -5,7 +5,6 @@ use crate::state::Vault;
 use crate::{ClosePositionArgs, ClosePositionRecord, Position, Ticker, UserPosition};
 
 use anchor_lang::prelude::*;
-use anchor_lang::solana_program::message;
 use anchor_spl::token::{self, Token, TokenAccount, Transfer};
 
 #[derive(Accounts)]
@@ -63,7 +62,7 @@ pub fn close_position<'info>(
     msg!("new_amount: {}", new_amount);
     msg!("Amount sub fee: {}", amount_sub_fee);
 
-    let transfer = ctx.token_transfer(current_pubkey_position.amount);
+    let transfer = ctx.token_transfer(amount_sub_fee);
 
     if transfer.is_err() {
         msg!("Close Position failed");
