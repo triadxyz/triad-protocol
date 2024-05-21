@@ -53,7 +53,8 @@ pub fn close_position<'info>(
 
     let current_pubkey_position = user_position_cloned.positions[args.position_index as usize];
 
-    let pnl = ctx.accounts.ticker.price as i64 - current_pubkey_position.entry_price as i64;
+    let pnl = (ctx.accounts.ticker.price as i64 - current_pubkey_position.entry_price as i64)
+        * current_pubkey_position.amount as i64;
 
     let new_amount = current_pubkey_position.amount + pnl.abs() as u64;
 
