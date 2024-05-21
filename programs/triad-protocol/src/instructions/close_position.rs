@@ -53,10 +53,14 @@ pub fn close_position<'info>(
 
     let current_pubkey_position = user_position_cloned.positions[args.position_index as usize];
 
-    let pnl = (ctx.accounts.ticker.price as i64 - current_pubkey_position.entry_price as i64)
-        * current_pubkey_position.amount as i64;
+    if current_pubkey_position.amount == 0 {
+        return Err(TriadProtocolError::InvalidPosition.into());
+    }
 
-    let new_amount = current_pubkey_position.amount + pnl.abs() as u64;
+    let pnl = (ctx.accounts.ticker.price - current_pubkey_position.entry_price)
+        * current_pubkey_position.amount;
+
+    let new_amount = current_pubkey_position.amount + pnl;
 
     let amount_sub_fee = new_amount - (new_amount * 5 / 100);
 
