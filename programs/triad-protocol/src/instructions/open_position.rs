@@ -89,9 +89,7 @@ pub fn open_position<'info>(
     if args.is_long {
         vault.long_positions_opened = vault.long_positions_opened.saturating_add(1);
         vault.long_balance = vault.long_balance.saturating_add(args.amount);
-    }
-
-    if !args.is_long {
+    } else {
         vault.short_positions_opened = vault.short_positions_opened.saturating_add(1);
         vault.short_balance = vault.short_balance.saturating_add(args.amount);
     }
@@ -103,6 +101,7 @@ pub fn open_position<'info>(
         ticker: vault.ticker_address,
         entry_price: position.entry_price,
         ts: position.ts,
+        ticker_amount: args.amount / position.entry_price,
         user: *ctx.accounts.user_position.to_account_info().key,
         amount: args.amount,
         is_long: args.is_long,
