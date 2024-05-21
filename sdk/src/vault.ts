@@ -1,5 +1,6 @@
 import { AnchorProvider, BN, Program } from '@coral-xyz/anchor'
 import {
+  ComputeBudgetProgram,
   PublicKey,
   TransactionInstruction,
   TransactionMessage,
@@ -95,7 +96,11 @@ export default class Vault {
         hasUserPosition = true
       } catch {}
 
-      const instructions: TransactionInstruction[] = []
+      const instructions: TransactionInstruction[] = [
+        ComputeBudgetProgram.setComputeUnitPrice({
+          microLamports: 10000
+        })
+      ]
 
       if (!hasUserPosition) {
         instructions.push(
