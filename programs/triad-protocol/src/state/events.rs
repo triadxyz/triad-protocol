@@ -4,7 +4,6 @@ use anchor_lang::prelude::*;
 pub struct OpenPositionRecord {
     pub amount: u64,
     pub ticker: Pubkey,
-    pub ticker_amount: u64,
     pub entry_price: u64,
     pub ts: i64,
     pub is_long: bool,
@@ -16,7 +15,6 @@ pub struct ClosePositionRecord {
     pub amount: u64,
     pub ticker: Pubkey,
     pub close_price: u64,
-    pub ticker_amount: u64,
     pub ts: i64,
     pub is_long: bool,
     pub pnl: i64,

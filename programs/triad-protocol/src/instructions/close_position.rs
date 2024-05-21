@@ -110,7 +110,6 @@ pub fn close_position<'info>(
     emit!(ClosePositionRecord {
         ticker: ctx.accounts.vault.ticker_address,
         close_price: ctx.accounts.ticker.price,
-        ticker_amount: current_pubkey_position.amount / ctx.accounts.ticker.price,
         ts: Clock::get()?.unix_timestamp,
         pnl: ctx.accounts.ticker.price as i64 - current_pubkey_position.entry_price as i64,
         user: *ctx.accounts.user_position.to_account_info().key,
