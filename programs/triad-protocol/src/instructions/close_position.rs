@@ -112,7 +112,7 @@ pub fn close_position<'info>(
         close_price: ctx.accounts.ticker.price,
         ts: Clock::get()?.unix_timestamp,
         pnl: ctx.accounts.ticker.price as i64 - current_pubkey_position.entry_price as i64,
-        user: *ctx.accounts.user_position.to_account_info().key,
+        user: user_position.authority,
         amount: current_pubkey_position.amount,
         is_long: current_pubkey_position.is_long,
     });

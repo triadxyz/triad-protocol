@@ -101,7 +101,7 @@ pub fn open_position<'info>(
         ticker: vault.ticker_address,
         entry_price: position.entry_price,
         ts: position.ts,
-        user: *ctx.accounts.user_position.to_account_info().key,
+        user: user_position.authority,
         amount: args.amount,
         is_long: args.is_long,
     });
