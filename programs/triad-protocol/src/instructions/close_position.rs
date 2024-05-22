@@ -91,6 +91,11 @@ pub fn close_position<'info>(
 
     let user_position = &mut ctx.accounts.user_position;
 
+    vault.total_withdrawn = vault
+        .total_withdrawn
+        .saturating_add(current_pubkey_position.amount);
+    vault.net_withdraws = vault.net_withdraws.saturating_add(1);
+
     user_position.total_withdrawn = user_position
         .total_withdrawn
         .saturating_add(current_pubkey_position.amount);
