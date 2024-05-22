@@ -71,15 +71,18 @@ pub fn open_position<'info>(
         pnl: 0,
     };
 
-    if user_position.positions[2].is_open == true {
-        return Err(TriadProtocolError::NoFreePositionSlot.into());
-    }
+    let added_new_position = &mut false;
 
     for i in 0..user_position.positions.len() {
         if !user_position.positions[i].is_open {
+            *added_new_position = true;
             user_position.positions[i] = position;
             break;
         }
+    }
+
+    if !*added_new_position {
+        return Err(TriadProtocolError::InvalidTickerPosition.into());
     }
 
     user_position.total_deposited = user_position.total_deposited.saturating_add(args.amount);
