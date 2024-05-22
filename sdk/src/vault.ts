@@ -98,7 +98,7 @@ export default class Vault {
 
       const instructions: TransactionInstruction[] = [
         ComputeBudgetProgram.setComputeUnitPrice({
-          microLamports: 12000
+          microLamports: 25000
         })
       ]
 
@@ -191,7 +191,7 @@ export default class Vault {
 
       const instructions: TransactionInstruction[] = [
         ComputeBudgetProgram.setComputeUnitPrice({
-          microLamports: 12000
+          microLamports: 25000
         })
       ]
 
