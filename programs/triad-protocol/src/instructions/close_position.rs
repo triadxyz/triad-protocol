@@ -62,7 +62,7 @@ pub fn close_position<'info>(
 
     let new_amount = current_pubkey_position.amount + pnl;
 
-    let amount_sub_fee = new_amount - (new_amount * 5 / 100);
+    let amount_sub_fee = new_amount - (new_amount * 5 / 1000);
 
     msg!("new_amount: {}", new_amount);
     msg!("Amount sub fee: {}", amount_sub_fee);
