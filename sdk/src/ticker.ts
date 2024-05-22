@@ -82,17 +82,19 @@ export default class Ticker {
 
     const instructions: TransactionInstruction[] = [
       ComputeBudgetProgram.setComputeUnitPrice({
-        microLamports: 15000
+        microLamports: 12000
       })
     ]
 
-    const ticker = await this.program.methods
-      .updateTickerPrice({ price: new BN(price) })
-      .accounts({
-        signer: this.provider.wallet.publicKey,
-        ticker: TickerPDA
-      })
-      .instruction()
+    instructions.push(
+      await this.program.methods
+        .updateTickerPrice({ price: new BN(price) })
+        .accounts({
+          signer: this.provider.wallet.publicKey,
+          ticker: TickerPDA
+        })
+        .instruction()
+    )
 
     const { blockhash } = await this.provider.connection.getLatestBlockhash()
 
