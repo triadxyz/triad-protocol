@@ -98,7 +98,7 @@ export default class Vault {
 
       const instructions: TransactionInstruction[] = [
         ComputeBudgetProgram.setComputeUnitPrice({
-          microLamports: 10000
+          microLamports: 15000
         })
       ]
 
@@ -189,7 +189,11 @@ export default class Vault {
         console.log(e)
       }
 
-      const instructions: TransactionInstruction[] = []
+      const instructions: TransactionInstruction[] = [
+        ComputeBudgetProgram.setComputeUnitPrice({
+          microLamports: 15000
+        })
+      ]
 
       if (!hasUser) {
         instructions.push(

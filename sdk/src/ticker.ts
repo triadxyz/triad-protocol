@@ -1,5 +1,11 @@
 import { AnchorProvider, Program } from '@coral-xyz/anchor'
-import { PublicKey } from '@solana/web3.js'
+import {
+  ComputeBudgetProgram,
+  PublicKey,
+  TransactionInstruction,
+  TransactionMessage,
+  VersionedTransaction
+} from '@solana/web3.js'
 import { TriadProtocol } from './types/triad_protocol'
 import {
   getTickerAddressSync,
@@ -74,12 +80,28 @@ export default class Ticker {
   }) {
     const TickerPDA = getTickerAddressSync(this.program.programId, name)
 
-    return this.program.methods
+    const instructions: TransactionInstruction[] = [
+      ComputeBudgetProgram.setComputeUnitPrice({
+        microLamports: 15000
+      })
+    ]
+
+    const ticker = await this.program.methods
       .updateTickerPrice({ price: new BN(price) })
       .accounts({
         signer: this.provider.wallet.publicKey,
         ticker: TickerPDA
       })
-      .rpc()
+      .instruction()
+
+    const { blockhash } = await this.provider.connection.getLatestBlockhash()
+
+    const message = new TransactionMessage({
+      payerKey: this.provider.wallet.publicKey,
+      recentBlockhash: blockhash,
+      instructions
+    }).compileToV0Message()
+
+    return this.provider.sendAndConfirm(new VersionedTransaction(message))
   }
 }
