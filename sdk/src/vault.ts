@@ -2,7 +2,6 @@ import { AnchorProvider, BN, Program } from '@coral-xyz/anchor'
 import {
   ComputeBudgetProgram,
   PublicKey,
-  Transaction,
   TransactionInstruction,
   TransactionMessage,
   VersionedTransaction
@@ -15,7 +14,6 @@ import {
   getUserPositionAddressSync
 } from './utils/helpers'
 import { getAccount, getAssociatedTokenAddress } from '@solana/spl-token'
-import { getPriorityFeeEstimate } from './utils/priorityFee'
 
 export default class Vault {
   program: Program<TriadProtocol>
@@ -67,14 +65,12 @@ export default class Vault {
     tickerPDA,
     amount,
     position,
-    mint,
-    RPCURL
+    mint
   }: {
     tickerPDA: PublicKey
     amount: string
     position: 'Long' | 'Short'
     mint: PublicKey
-    RPCURL: string
   }) {
     try {
       const UserPositionPDA = getUserPositionAddressSync(
@@ -100,7 +96,11 @@ export default class Vault {
         hasUserPosition = true
       } catch {}
 
-      const instructions: TransactionInstruction[] = []
+      const instructions: TransactionInstruction[] = [
+        ComputeBudgetProgram.setComputeUnitPrice({
+          microLamports: 85000
+        })
+      ]
 
       if (!hasUserPosition) {
         instructions.push(
@@ -138,16 +138,6 @@ export default class Vault {
         recentBlockhash: blockhash,
         instructions
       }).compileToV0Message()
-
-      let feeEstimate = { priorityFeeEstimate: 65000 }
-
-      feeEstimate = await getPriorityFeeEstimate('HIGH', message, RPCURL)
-
-      instructions.push(
-        ComputeBudgetProgram.setComputeUnitPrice({
-          microLamports: feeEstimate.priorityFeeEstimate
-        })
-      )
 
       return this.provider.sendAndConfirm(new VersionedTransaction(message))
     } catch (error) {
@@ -201,7 +191,7 @@ export default class Vault {
 
       const instructions: TransactionInstruction[] = [
         ComputeBudgetProgram.setComputeUnitPrice({
-          microLamports: 65000
+          microLamports: 85000
         })
       ]
 
