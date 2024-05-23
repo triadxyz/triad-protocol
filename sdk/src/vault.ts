@@ -61,17 +61,20 @@ export default class Vault {
    *  @param amount - The amount to deposit
    *  @param position - Long or Short
    *  @param mint - Token mint for the vault (e.g. USDC)
+   *  @param RPCURL - RPC URL
    */
   public async openPosition({
     tickerPDA,
     amount,
     position,
-    mint
+    mint,
+    RPCURL
   }: {
     tickerPDA: PublicKey
     amount: string
     position: 'Long' | 'Short'
     mint: PublicKey
+    RPCURL: string
   }) {
     try {
       const UserPositionPDA = getUserPositionAddressSync(
@@ -133,15 +136,20 @@ export default class Vault {
       const priorityLevel = 'HIGH'
       let feeEstimate = { priorityFeeEstimate: 0 }
 
-      feeEstimate = await getPriorityFeeEstimate(
-        priorityLevel,
-        new TransactionMessage({
-          payerKey: this.provider.wallet.publicKey,
-          recentBlockhash: blockhash,
-          instructions
-        }).compileToV0Message(),
-        this.provider.connection
-      )
+      try {
+        feeEstimate = await getPriorityFeeEstimate(
+          priorityLevel,
+          new TransactionMessage({
+            payerKey: this.provider.wallet.publicKey,
+            recentBlockhash: blockhash,
+            instructions
+          }).compileToV0Message(),
+          RPCURL
+        )
+      } catch (error) {
+        console.error('Error estimating priority fee:', error)
+      }
+
       const computePriceIx = ComputeBudgetProgram.setComputeUnitPrice({
         microLamports: feeEstimate.priorityFeeEstimate
       })
@@ -153,7 +161,16 @@ export default class Vault {
         instructions
       }).compileToV0Message()
 
-      return this.provider.sendAndConfirm(new VersionedTransaction(message))
+      const transaction = new VersionedTransaction(message)
+      const signedTransaction =
+        await this.provider.wallet.signTransaction(transaction)
+      if (!signedTransaction) {
+        throw new Error('Transaction was not signed')
+      }
+
+      const txid = await this.provider.sendAndConfirm(signedTransaction)
+
+      return txid
     } catch (error) {
       console.error(error)
     }

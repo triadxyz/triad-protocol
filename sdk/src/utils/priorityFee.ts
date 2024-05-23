@@ -1,6 +1,6 @@
 import { bs58 } from "@coral-xyz/anchor/dist/cjs/utils/bytes";
 
-export async function getPriorityFeeEstimate(priorityLevel, transaction, RPC_URL) {
+export async function getPriorityFeeEstimate(priorityLevel, transaction, RPC_URL: string) {
  const response = await fetch(RPC_URL, {
    method: "POST",
    headers: { "Content-Type": "application/json" },
