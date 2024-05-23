@@ -2,6 +2,7 @@ import { AnchorProvider, BN, Program } from '@coral-xyz/anchor'
 import {
   ComputeBudgetProgram,
   PublicKey,
+  Transaction,
   TransactionInstruction,
   TransactionMessage,
   VersionedTransaction
@@ -61,7 +62,6 @@ export default class Vault {
    *  @param amount - The amount to deposit
    *  @param position - Long or Short
    *  @param mint - Token mint for the vault (e.g. USDC)
-   *  @param RPCURL - RPC URL
    */
   public async openPosition({
     tickerPDA,
@@ -133,44 +133,23 @@ export default class Vault {
 
       const { blockhash } = await this.provider.connection.getLatestBlockhash()
 
-      const priorityLevel = 'HIGH'
-      let feeEstimate = { priorityFeeEstimate: 0 }
-
-      try {
-        feeEstimate = await getPriorityFeeEstimate(
-          priorityLevel,
-          new TransactionMessage({
-            payerKey: this.provider.wallet.publicKey,
-            recentBlockhash: blockhash,
-            instructions
-          }).compileToV0Message(),
-          RPCURL
-        )
-      } catch (error) {
-        console.error('Error estimating priority fee:', error)
-      }
-
-      const computePriceIx = ComputeBudgetProgram.setComputeUnitPrice({
-        microLamports: feeEstimate.priorityFeeEstimate
-      })
-      instructions.unshift(computePriceIx)
-
       const message = new TransactionMessage({
         payerKey: this.provider.wallet.publicKey,
         recentBlockhash: blockhash,
         instructions
       }).compileToV0Message()
 
-      const transaction = new VersionedTransaction(message)
-      const signedTransaction =
-        await this.provider.wallet.signTransaction(transaction)
-      if (!signedTransaction) {
-        throw new Error('Transaction was not signed')
-      }
+      let feeEstimate = { priorityFeeEstimate: 65000 }
 
-      const txid = await this.provider.sendAndConfirm(signedTransaction)
+      feeEstimate = await getPriorityFeeEstimate('HIGH', message, RPCURL)
 
-      return txid
+      instructions.push(
+        ComputeBudgetProgram.setComputeUnitPrice({
+          microLamports: feeEstimate.priorityFeeEstimate
+        })
+      )
+
+      return this.provider.sendAndConfirm(new VersionedTransaction(message))
     } catch (error) {
       console.error(error)
     }
@@ -222,7 +201,7 @@ export default class Vault {
 
       const instructions: TransactionInstruction[] = [
         ComputeBudgetProgram.setComputeUnitPrice({
-          microLamports: 160000
+          microLamports: 65000
         })
       ]
 
