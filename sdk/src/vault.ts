@@ -14,6 +14,7 @@ import {
   getUserPositionAddressSync
 } from './utils/helpers'
 import { getAccount, getAssociatedTokenAddress } from '@solana/spl-token'
+import { getPriorityFeeEstimate } from './utils/priorityFee'
 
 export default class Vault {
   program: Program<TriadProtocol>
@@ -96,11 +97,7 @@ export default class Vault {
         hasUserPosition = true
       } catch {}
 
-      const instructions: TransactionInstruction[] = [
-        ComputeBudgetProgram.setComputeUnitPrice({
-          microLamports: 160000
-        })
-      ]
+      const instructions: TransactionInstruction[] = []
 
       if (!hasUserPosition) {
         instructions.push(
@@ -132,6 +129,23 @@ export default class Vault {
       )
 
       const { blockhash } = await this.provider.connection.getLatestBlockhash()
+
+      const priorityLevel = 'HIGH'
+      let feeEstimate = { priorityFeeEstimate: 0 }
+
+      feeEstimate = await getPriorityFeeEstimate(
+        priorityLevel,
+        new TransactionMessage({
+          payerKey: this.provider.wallet.publicKey,
+          recentBlockhash: blockhash,
+          instructions
+        }).compileToV0Message(),
+        this.provider.connection
+      )
+      const computePriceIx = ComputeBudgetProgram.setComputeUnitPrice({
+        microLamports: feeEstimate.priorityFeeEstimate
+      })
+      instructions.unshift(computePriceIx)
 
       const message = new TransactionMessage({
         payerKey: this.provider.wallet.publicKey,
