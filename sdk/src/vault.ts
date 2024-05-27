@@ -61,17 +61,20 @@ export default class Vault {
    *  @param position - Long or Short
    *  @param mint - Token mint for the vault (e.g. USDC)
    */
-  public async openPosition({
-    tickerPDA,
-    amount,
-    position,
-    mint
-  }: {
-    tickerPDA: PublicKey
-    amount: string
-    position: 'Long' | 'Short'
-    mint: PublicKey
-  }) {
+  public async openPosition(
+    {
+      tickerPDA,
+      amount,
+      position,
+      mint
+    }: {
+      tickerPDA: PublicKey
+      amount: string
+      position: 'Long' | 'Short'
+      mint: PublicKey
+    },
+    options?: { priorityFee: number }
+  ) {
     try {
       const UserPositionPDA = getUserPositionAddressSync(
         this.program.programId,
@@ -96,11 +99,15 @@ export default class Vault {
         hasUserPosition = true
       } catch {}
 
-      const instructions: TransactionInstruction[] = [
-        ComputeBudgetProgram.setComputeUnitPrice({
-          microLamports: 85000
-        })
-      ]
+      const instructions: TransactionInstruction[] = []
+
+      if (options?.priorityFee) {
+        instructions.push(
+          ComputeBudgetProgram.setComputeUnitPrice({
+            microLamports: options.priorityFee
+          })
+        )
+      }
 
       if (!hasUserPosition) {
         instructions.push(
@@ -154,15 +161,18 @@ export default class Vault {
    *  @param positionPubkey - The position public key
    *
    */
-  public async closePosition({
-    tickerPDA,
-    mint,
-    positionIndex
-  }: {
-    tickerPDA: PublicKey
-    mint: PublicKey
-    positionIndex: number
-  }) {
+  public async closePosition(
+    {
+      tickerPDA,
+      mint,
+      positionIndex
+    }: {
+      tickerPDA: PublicKey
+      mint: PublicKey
+      positionIndex: number
+    },
+    options?: { priorityFee: number }
+  ) {
     try {
       const UserPositionPDA = getUserPositionAddressSync(
         this.program.programId,
@@ -189,11 +199,15 @@ export default class Vault {
         console.log(e)
       }
 
-      const instructions: TransactionInstruction[] = [
-        ComputeBudgetProgram.setComputeUnitPrice({
-          microLamports: 85000
-        })
-      ]
+      const instructions: TransactionInstruction[] = []
+
+      if (options?.priorityFee) {
+        instructions.push(
+          ComputeBudgetProgram.setComputeUnitPrice({
+            microLamports: options.priorityFee
+          })
+        )
+      }
 
       if (!hasUser) {
         instructions.push(
