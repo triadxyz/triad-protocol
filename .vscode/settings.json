@@ -1,4 +1,0 @@
-{
-  "rust-analyzer.linkedProjects": ["./programs/triad-protocol/Cargo.toml"],
-  "rust-analyzer.showUnlinkedFileNotification": false
-}
