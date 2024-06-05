@@ -146,7 +146,27 @@ export default class Vault {
         instructions
       }).compileToV0Message()
 
-      return this.provider.sendAndConfirm(new VersionedTransaction(message))
+      const hash = await this.provider.sendAndConfirm(
+        new VersionedTransaction(message)
+      )
+
+      const { blockhash: blockhash2, lastValidBlockHeight } =
+        await this.provider.connection.getLatestBlockhash()
+
+      const confirmTx = await this.provider.connection.confirmTransaction(
+        {
+          signature: hash,
+          blockhash: blockhash2,
+          lastValidBlockHeight
+        },
+        'finalized'
+      )
+
+      if (confirmTx.value.err) {
+        throw new Error('Failed to open position')
+      }
+
+      return hash
     } catch (error) {
       console.error(error)
     }
@@ -243,7 +263,27 @@ export default class Vault {
         instructions
       }).compileToV0Message()
 
-      return this.provider.sendAndConfirm(new VersionedTransaction(message))
+      const hash = await this.provider.sendAndConfirm(
+        new VersionedTransaction(message)
+      )
+
+      const { blockhash: blockhash2, lastValidBlockHeight } =
+        await this.provider.connection.getLatestBlockhash()
+
+      const confirmTx = await this.provider.connection.confirmTransaction(
+        {
+          signature: hash,
+          blockhash: blockhash2,
+          lastValidBlockHeight
+        },
+        'finalized'
+      )
+
+      if (confirmTx.value.err) {
+        throw new Error('Failed to open position')
+      }
+
+      return hash
     } catch (error) {
       console.error(error)
     }
