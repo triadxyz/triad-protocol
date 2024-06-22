@@ -29,11 +29,8 @@
   "author": "Triad Labs",
   "license": "ISC",
   "dependencies": {
-    "@coral-xyz/anchor": "0.28.0",
-    "@firethreexyz/firethree-protocol": "^0.19.1",
-    "@pythnetwork/client": "^2.19.0",
-    "@shadow-drive/sdk": "5.0.0",
-    "@solana/spl-token": "^0.3.11",
+    "@coral-xyz/anchor": "0.30.0",
+    "@solana/spl-token": "0.4.6",
     "@solana/web3.js": "1.89.1",
     "axios": "^1.5.1",
     "bs58": "5.0.0",

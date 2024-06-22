@@ -1,6 +1,7 @@
-import { AnchorProvider, Program, Wallet } from '@coral-xyz/anchor'
+import { AnchorProvider, Idl, Program, Wallet } from '@coral-xyz/anchor'
 import { Connection, PublicKey } from '@solana/web3.js'
-import { IDL, TriadProtocol } from './types/triad_protocol'
+import { TriadProtocol } from './types/triad_protocol'
+import IDL from './types/idl_triad_protocol.json'
 import { TRIAD_PROTOCOL_PROGRAM_ID } from './utils/constants'
 import Ticker from './ticker'
 import Vault from './vault'
@@ -19,11 +20,7 @@ export default class TriadProtocolClient {
       AnchorProvider.defaultOptions()
     )
 
-    this.program = new Program<any>(
-      IDL,
-      TRIAD_PROTOCOL_PROGRAM_ID,
-      this.provider
-    )
+    this.program = new Program(IDL as TriadProtocol, this.provider)
     this.ticker = new Ticker(this.program, this.provider)
     this.vault = new Vault(this.program, this.provider)
   }

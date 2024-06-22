@@ -1,12 +1,13 @@
 [features]
 seeds = false
 skip-lint = false
+resolution = true
 
-[programs.mainnet]
+[programs.localnet]
 triad_protocol = "TRDwq3BN4mP3m9KsuNUWSN6QDff93VKGSwE95Jbr9Ss"
 
 [provider]
-cluster = "https://mainnet.helius-rpc.com/?api-key=3fb2333b-4396-4db0-94c5-663cca63697e"
+cluster = "localnet"
 wallet = "/Users/dannpl/.config/solana/id.json"
 
 [scripts]

@@ -5,7 +5,9 @@ mod create_ticker;
 mod create_user_position;
 mod open_position;
 mod update_ticker_price;
+mod stake_nft;
 
+pub use stake_nft::*;
 pub use close_position::*;
 pub use create_ticker::*;
 pub use create_user_position::*;
