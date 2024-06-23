@@ -52,7 +52,8 @@ pub fn initialize_stake_vault(
     stake_vault.amount_paid = 0;
     stake_vault.apr = 0;
     stake_vault.amount_users = 0;
-    stake_vault.available = args.available;
+    stake_vault.slots = args.slots;
+    stake_vault.is_locked = true;
 
     let cpi_accounts = TransferChecked {
         from: ctx.accounts.from.to_account_info().clone(),

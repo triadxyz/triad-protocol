@@ -15,7 +15,7 @@ pub struct WithdrawNFT<'info> {
     #[account(mut, seeds = [StakeVault::PREFIX_SEED, args.stake_vault.as_bytes()], bump)]
     pub stake_vault: Box<Account<'info, StakeVault>>,
 
-    #[account(init, payer = signer, space = Stake::SPACE, seeds = [Stake::PREFIX_SEED, signer.key.as_ref(), mint.key().as_ref()], bump)]
+    #[account(mut, close = signer, seeds = [Stake::PREFIX_SEED, signer.key.as_ref(), mint.key().as_ref()], bump)]
     pub stake: Box<Account<'info, Stake>>,
 
     #[account(
@@ -40,12 +40,17 @@ pub fn withdraw_nft(ctx: Context<WithdrawNFT>, _args: WithdrawNFTArgs) -> Result
         return Err(TriadProtocolError::Unauthorized.into());
     }
 
+    if ctx.accounts.stake_vault.is_locked {
+        return Err(TriadProtocolError::StakeVaultLocked.into());
+    }
+
     if ctx.accounts.stake.authority != *ctx.accounts.signer.key {
         return Err(TriadProtocolError::Unauthorized.into());
     }
 
     let mint = &ctx.accounts.mint.to_account_info();
     let stake = &mut ctx.accounts.stake;
+    let stake_vault = &mut ctx.accounts.stake_vault;
 
     if stake.mint != *mint.key {
         return Err(TriadProtocolError::Unauthorized.into());
@@ -54,6 +59,8 @@ pub fn withdraw_nft(ctx: Context<WithdrawNFT>, _args: WithdrawNFTArgs) -> Result
     if stake.withdraw_ts > Clock::get()?.unix_timestamp {
         return Err(TriadProtocolError::StakeLocked.into());
     }
+
+    stake_vault.amount_users -= 1;
 
     let cpi_accounts = TransferChecked {
         from: ctx.accounts.from_ata.to_account_info().clone(),

@@ -1,5 +1,4 @@
 use std::str::FromStr;
-
 use crate::{
     constants::{MYSTERY_BOX_PROGRAM, TRIAD_MYSTERY_BOX}, errors::TriadProtocolError, state::{Stake, StakeNFTArgs}, StakeVault
 };
@@ -74,6 +73,7 @@ pub fn stake_nft(ctx: Context<StakeNFT>, args: StakeNFTArgs) -> Result<()> {
     }
 
     let stake = &mut ctx.accounts.stake;
+    let stake_vault = &mut ctx.accounts.stake_vault;
 
     stake.authority = *ctx.accounts.signer.key;
     stake.init_ts = Clock::get()?.unix_timestamp;
@@ -84,7 +84,9 @@ pub fn stake_nft(ctx: Context<StakeNFT>, args: StakeNFTArgs) -> Result<()> {
     stake.rarity = args.rarity;
     stake.mint = *mint.key;
     stake.name = token_metadata.name;
-    stake.stake_vault = *ctx.accounts.stake_vault.to_account_info().key;
+    stake.stake_vault = stake_vault.key();
+
+    stake_vault.amount_users += 1;
 
     let cpi_accounts = TransferChecked {
         from: ctx.accounts.from_ata.to_account_info().clone(),
