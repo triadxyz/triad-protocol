@@ -86,7 +86,7 @@ pub fn stake_nft(ctx: Context<StakeNFT>, args: StakeNFTArgs) -> Result<()> {
     stake.stake_vault = *ctx.accounts.stake_vault.to_account_info().key;
 
     let cpi_accounts = TransferChecked {
-        from: ctx.accounts.signer.to_account_info().clone(),
+        from: ctx.accounts.from_ata.to_account_info().clone(),
         mint: ctx.accounts.mint.to_account_info().clone(),
         to: ctx.accounts.to_ata.to_account_info().clone(),
         authority: ctx.accounts.signer.to_account_info(),

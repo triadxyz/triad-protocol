@@ -22,9 +22,13 @@ pub struct StakeVault {
     pub init_ts: i64,
     pub end_ts: i64,
     pub amount: u64,
+    pub amount_paid: u64,
+    pub apr: u8,
+    pub amount_users: u64,
+    pub available: u64,
     pub name: String,
     pub users_paid: Pubkey,
-    pub padding: [u8; 20],
+    pub padding: [u8; 64],
 }
 
 #[derive(Clone, AnchorSerialize, AnchorDeserialize)]
@@ -54,6 +58,8 @@ pub struct StakeNFTArgs {
 #[derive(AnchorSerialize, AnchorDeserialize, Clone)]
 pub struct InitializeStakeVaultArgs {
     pub name: String,
+    pub amount: u64,
+    pub available: u64,
 }
 
 impl Stake {
