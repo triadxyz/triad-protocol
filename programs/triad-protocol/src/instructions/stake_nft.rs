@@ -1,7 +1,7 @@
 use std::str::FromStr;
 
 use crate::{
-    constants::{TRIAD_MYSTERY_BOX, MYSTERY_BOX_PROGRAM}, errors::TriadProtocolError, state::{Stake, StakeNFTArgs}
+    constants::{MYSTERY_BOX_PROGRAM, TRIAD_MYSTERY_BOX}, errors::TriadProtocolError, state::{Stake, StakeNFTArgs}, StakeVault
 };
 use anchor_lang::prelude::*;
 use anchor_spl::token_2022::spl_token_2022::extension::BaseStateWithExtensions;
@@ -20,6 +20,9 @@ use spl_token_metadata_interface::state::TokenMetadata;
 pub struct StakeNFT<'info> {
     #[account(mut)]
     pub signer: Signer<'info>,
+
+    #[account(mut, seeds = [StakeVault::PREFIX_SEED, args.name.as_bytes()], bump)]
+    pub stake_vault: Box<Account<'info, StakeVault>>,
 
     #[account(init, payer = signer, space = Stake::SPACE, seeds = [Stake::PREFIX_SEED, mint.key().as_ref()], bump)]
     pub stake: Box<Account<'info, Stake>>,
@@ -80,6 +83,7 @@ pub fn stake_nft(ctx: Context<StakeNFT>, args: StakeNFTArgs) -> Result<()> {
     stake.rarity = args.rarity;
     stake.from_ata = *ctx.accounts.from_ata.to_account_info().key;
     stake.name = token_metadata.name;
+    stake.stake_vault = *ctx.accounts.stake_vault.to_account_info().key;
 
     let cpi_accounts = TransferChecked {
         from: ctx.accounts.signer.to_account_info().clone(),

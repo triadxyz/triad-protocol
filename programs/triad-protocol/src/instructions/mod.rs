@@ -6,7 +6,9 @@ mod create_user_position;
 mod open_position;
 mod update_ticker_price;
 mod stake_nft;
+mod initialize_stake_vault;
 
+pub use initialize_stake_vault::*;
 pub use stake_nft::*;
 pub use close_position::*;
 pub use create_ticker::*;

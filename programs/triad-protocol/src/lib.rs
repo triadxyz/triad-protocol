@@ -47,4 +47,11 @@ pub mod triad_protocol {
     pub fn stake<'info>(ctx: Context<StakeNFT>, args: StakeNFTArgs) -> Result<()> {
         instructions::stake_nft(ctx, args)
     }
+
+    pub fn initialize_stake_vault<'info>(
+        ctx: Context<InitializeStakeVault<'info>>,
+        args: InitializeStakeVaultArgs,
+    ) -> Result<()> {
+        instructions::initialize_stake_vault(ctx, args)
+    }
 }
