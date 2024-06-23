@@ -10,8 +10,7 @@ pub struct Stake {
     pub name: String,
     pub collections: Vec<Collection>,
     pub rarity: Rarity,
-    pub from_ata: Pubkey,
-    pub to_ata: Pubkey,
+    pub mint: Pubkey,
     pub stake_vault: Pubkey,
 }
 
@@ -60,6 +59,18 @@ pub struct InitializeStakeVaultArgs {
     pub name: String,
     pub amount: u64,
     pub available: u64,
+}
+
+#[derive(AnchorSerialize, AnchorDeserialize, Clone)]
+pub struct WithdrawNFTArgs {
+    pub stake_vault: String,
+    pub nft_name: String,
+}
+
+#[derive(AnchorSerialize, AnchorDeserialize, Clone)]
+pub struct RequestWithdrawNFTArgs {
+    pub stake_vault: String,
+    pub nft_name: String,
 }
 
 impl Stake {

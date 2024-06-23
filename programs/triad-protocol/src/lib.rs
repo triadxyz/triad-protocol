@@ -54,4 +54,18 @@ pub mod triad_protocol {
     ) -> Result<()> {
         instructions::initialize_stake_vault(ctx, args)
     }
+
+    pub fn withdraw_nft<'info>(
+        ctx: Context<WithdrawNFT<'info>>,
+        args: WithdrawNFTArgs,
+    ) -> Result<()> {
+        instructions::withdraw_nft(ctx, args)
+    }
+
+    pub fn request_withdraw_nft<'info>(
+        ctx: Context<RequestWithdrawNFT<'info>>,
+        args: RequestWithdrawNFTArgs,
+    ) -> Result<()> {
+        instructions::request_withdraw_nft(ctx, args)
+    }
 }

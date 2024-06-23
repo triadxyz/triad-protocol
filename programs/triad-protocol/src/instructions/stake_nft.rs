@@ -24,7 +24,7 @@ pub struct StakeNFT<'info> {
     #[account(mut, seeds = [StakeVault::PREFIX_SEED, args.name.as_bytes()], bump)]
     pub stake_vault: Box<Account<'info, StakeVault>>,
 
-    #[account(init, payer = signer, space = Stake::SPACE, seeds = [Stake::PREFIX_SEED, mint.key().as_ref()], bump)]
+    #[account(init, payer = signer, space = Stake::SPACE, seeds = [Stake::PREFIX_SEED, signer.key.as_ref(), mint.key().as_ref()], bump)]
     pub stake: Box<Account<'info, Stake>>,
 
     #[account(
@@ -44,9 +44,9 @@ pub struct StakeNFT<'info> {
         init,
         associated_token::mint = mint,
         payer = signer,
-        associated_token::authority = stake
+        associated_token::authority = stake_vault
     )]
-    pub to_ata: InterfaceAccount<'info, TokenAccount>,
+    pub to_ata: Box<InterfaceAccount<'info, TokenAccount>>,
 
     pub token_program: Program<'info, Token2022>,
     pub associated_token_program: Program<'info, AssociatedToken>,
@@ -77,11 +77,12 @@ pub fn stake_nft(ctx: Context<StakeNFT>, args: StakeNFTArgs) -> Result<()> {
 
     stake.authority = *ctx.accounts.signer.key;
     stake.init_ts = Clock::get()?.unix_timestamp;
+    stake.withdraw_ts = 0;
     stake.is_locked = true;
     stake.collections = args.collections;
     stake.bump = ctx.bumps.stake;
     stake.rarity = args.rarity;
-    stake.from_ata = *ctx.accounts.from_ata.to_account_info().key;
+    stake.mint = *mint.key;
     stake.name = token_metadata.name;
     stake.stake_vault = *ctx.accounts.stake_vault.to_account_info().key;
 
