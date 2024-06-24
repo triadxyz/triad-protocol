@@ -24,6 +24,12 @@ export default class Test {
     console.log('Stake Vaults:', response)
   }
 
+  getStakes = async () => {
+    const response = await this.triadProtocol.stake.getStakes()
+
+    console.log('Stakes:', response)
+  }
+
   initializeStakeVault = async () => {
     const reponse = await this.triadProtocol.stake.initializeStakeVault(
       {
@@ -50,7 +56,3 @@ export default class Test {
     console.log('Initialize Stake Vault:', reponse)
   }
 }
-
-const test = new Test()
-
-test.getStakeVaults()
