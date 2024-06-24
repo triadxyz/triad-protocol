@@ -1,0 +1,1340 @@
+{
+  "address": "TRDwq3BN4mP3m9KsuNUWSN6QDff93VKGSwE95Jbr9Ss",
+  "metadata": {
+    "name": "triad_protocol",
+    "version": "0.1.0",
+    "spec": "0.1.0"
+  },
+  "instructions": [
+    {
+      "name": "close_position",
+      "discriminator": [123, 134, 81, 0, 49, 68, 98, 98],
+      "accounts": [
+        {
+          "name": "signer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "ticker",
+          "writable": true
+        },
+        {
+          "name": "vault",
+          "writable": true
+        },
+        {
+          "name": "user_position",
+          "writable": true
+        },
+        {
+          "name": "vault_token_account",
+          "writable": true
+        },
+        {
+          "name": "user_token_account",
+          "writable": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        },
+        {
+          "name": "token_program",
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+        }
+      ],
+      "args": [
+        {
+          "name": "args",
+          "type": {
+            "defined": {
+              "name": "ClosePositionArgs"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "create_ticker",
+      "discriminator": [32, 213, 147, 234, 14, 160, 57, 17],
+      "accounts": [
+        {
+          "name": "signer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "ticker",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [116, 105, 99, 107, 101, 114]
+              },
+              {
+                "kind": "arg",
+                "path": "args.name"
+              }
+            ]
+          }
+        },
+        {
+          "name": "vault",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [118, 97, 117, 108, 116]
+              },
+              {
+                "kind": "account",
+                "path": "ticker"
+              }
+            ]
+          }
+        },
+        {
+          "name": "payer_token_mint"
+        },
+        {
+          "name": "token_account",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  118, 97, 117, 108, 116, 95, 116, 111, 107, 101, 110, 95, 97,
+                  99, 99, 111, 117, 110, 116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "vault"
+              }
+            ]
+          }
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        },
+        {
+          "name": "token_program",
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+        }
+      ],
+      "args": [
+        {
+          "name": "args",
+          "type": {
+            "defined": {
+              "name": "CreateTickerArgs"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "create_user_position",
+      "discriminator": [6, 137, 127, 227, 135, 241, 14, 109],
+      "accounts": [
+        {
+          "name": "signer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "ticker",
+          "writable": true
+        },
+        {
+          "name": "user_position",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  117, 115, 101, 114, 95, 112, 111, 115, 105, 116, 105, 111, 110
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "signer"
+              },
+              {
+                "kind": "account",
+                "path": "ticker"
+              }
+            ]
+          }
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "initialize_stake_vault",
+      "discriminator": [125, 55, 104, 34, 35, 179, 67, 3],
+      "accounts": [
+        {
+          "name": "signer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "stake_vault",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [115, 116, 97, 107, 101, 95, 118, 97, 117, 108, 116]
+              },
+              {
+                "kind": "arg",
+                "path": "args.name"
+              }
+            ]
+          }
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        },
+        {
+          "name": "token_program",
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+        }
+      ],
+      "args": [
+        {
+          "name": "args",
+          "type": {
+            "defined": {
+              "name": "InitializeStakeVaultArgs"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "open_position",
+      "discriminator": [135, 128, 47, 77, 15, 152, 240, 49],
+      "accounts": [
+        {
+          "name": "signer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "ticker",
+          "writable": true
+        },
+        {
+          "name": "vault",
+          "writable": true
+        },
+        {
+          "name": "user_position",
+          "writable": true
+        },
+        {
+          "name": "vault_token_account",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  118, 97, 117, 108, 116, 95, 116, 111, 107, 101, 110, 95, 97,
+                  99, 99, 111, 117, 110, 116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "vault"
+              }
+            ]
+          }
+        },
+        {
+          "name": "user_token_account",
+          "writable": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        },
+        {
+          "name": "token_program",
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+        }
+      ],
+      "args": [
+        {
+          "name": "args",
+          "type": {
+            "defined": {
+              "name": "OpenPositionArgs"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "request_withdraw_nft",
+      "discriminator": [132, 52, 242, 121, 178, 147, 240, 223],
+      "accounts": [
+        {
+          "name": "signer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "stake_vault",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [115, 116, 97, 107, 101, 95, 118, 97, 117, 108, 116]
+              },
+              {
+                "kind": "arg",
+                "path": "args.stake_vault"
+              }
+            ]
+          }
+        },
+        {
+          "name": "stake",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [115, 116, 97, 107, 101]
+              },
+              {
+                "kind": "account",
+                "path": "signer"
+              },
+              {
+                "kind": "account",
+                "path": "mint"
+              }
+            ]
+          }
+        },
+        {
+          "name": "mint",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [109, 105, 110, 116]
+              },
+              {
+                "kind": "arg",
+                "path": "args.nft_name"
+              }
+            ]
+          }
+        },
+        {
+          "name": "token_program",
+          "address": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb"
+        },
+        {
+          "name": "associated_token_program",
+          "address": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "args",
+          "type": {
+            "defined": {
+              "name": "RequestWithdrawNFTArgs"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "stake",
+      "discriminator": [206, 176, 202, 18, 200, 209, 179, 108],
+      "accounts": [
+        {
+          "name": "signer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "stake_vault",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [115, 116, 97, 107, 101, 95, 118, 97, 117, 108, 116]
+              },
+              {
+                "kind": "arg",
+                "path": "args.stake_vault"
+              }
+            ]
+          }
+        },
+        {
+          "name": "stake",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [115, 116, 97, 107, 101]
+              },
+              {
+                "kind": "arg",
+                "path": "args.name"
+              }
+            ]
+          }
+        },
+        {
+          "name": "mint",
+          "writable": true
+        },
+        {
+          "name": "from_ata",
+          "writable": true
+        },
+        {
+          "name": "to_ata",
+          "writable": true
+        },
+        {
+          "name": "token_program",
+          "address": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb"
+        },
+        {
+          "name": "associated_token_program",
+          "address": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "args",
+          "type": {
+            "defined": {
+              "name": "StakeNFTArgs"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "update_ticker_price",
+      "discriminator": [203, 166, 139, 83, 76, 144, 250, 29],
+      "accounts": [
+        {
+          "name": "signer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "ticker",
+          "writable": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "args",
+          "type": {
+            "defined": {
+              "name": "UpdateTickerPriceArgs"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "withdraw_nft",
+      "discriminator": [142, 181, 191, 149, 82, 175, 216, 100],
+      "accounts": [
+        {
+          "name": "signer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "stake_vault",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [115, 116, 97, 107, 101, 95, 118, 97, 117, 108, 116]
+              },
+              {
+                "kind": "arg",
+                "path": "args.stake_vault"
+              }
+            ]
+          }
+        },
+        {
+          "name": "stake",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [115, 116, 97, 107, 101]
+              },
+              {
+                "kind": "account",
+                "path": "signer"
+              },
+              {
+                "kind": "account",
+                "path": "mint"
+              }
+            ]
+          }
+        },
+        {
+          "name": "mint",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [109, 105, 110, 116]
+              },
+              {
+                "kind": "arg",
+                "path": "args.nft_name"
+              }
+            ]
+          }
+        },
+        {
+          "name": "from_ata",
+          "writable": true
+        },
+        {
+          "name": "to_ata",
+          "writable": true
+        },
+        {
+          "name": "token_program",
+          "address": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb"
+        },
+        {
+          "name": "associated_token_program",
+          "address": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "args",
+          "type": {
+            "defined": {
+              "name": "WithdrawNFTArgs"
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "accounts": [
+    {
+      "name": "Stake",
+      "discriminator": [150, 197, 176, 29, 55, 132, 112, 149]
+    },
+    {
+      "name": "StakeVault",
+      "discriminator": [192, 112, 65, 125, 129, 151, 173, 226]
+    },
+    {
+      "name": "Ticker",
+      "discriminator": [214, 74, 184, 188, 214, 64, 251, 53]
+    },
+    {
+      "name": "UserPosition",
+      "discriminator": [251, 248, 209, 245, 83, 234, 17, 27]
+    },
+    {
+      "name": "Vault",
+      "discriminator": [211, 8, 232, 43, 2, 152, 117, 119]
+    }
+  ],
+  "events": [
+    {
+      "name": "ClosePositionRecord",
+      "discriminator": [202, 208, 157, 166, 193, 229, 76, 5]
+    },
+    {
+      "name": "OpenPositionRecord",
+      "discriminator": [118, 71, 105, 89, 222, 111, 56, 63]
+    },
+    {
+      "name": "TickerPriceUpdateRecord",
+      "discriminator": [11, 38, 250, 234, 149, 218, 144, 15]
+    }
+  ],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "UnauthorizedToDeleteProject",
+      "msg": "Unauthorized to delete the project"
+    },
+    {
+      "code": 6001,
+      "name": "InvalidShadowAccount",
+      "msg": "Invalid shadow account"
+    },
+    {
+      "code": 6002,
+      "name": "InvalidAccount",
+      "msg": "Invalid account"
+    },
+    {
+      "code": 6003,
+      "name": "Unauthorized",
+      "msg": "Unauthorized access"
+    },
+    {
+      "code": 6004,
+      "name": "AlphaVantageApiError",
+      "msg": "Failed to get data from Vybe Network"
+    },
+    {
+      "code": 6005,
+      "name": "DepositFailed",
+      "msg": "Failed to deposit"
+    },
+    {
+      "code": 6006,
+      "name": "InvalidOwnerAuthority",
+      "msg": "Invalid Owner authority"
+    },
+    {
+      "code": 6007,
+      "name": "InvalidPosition",
+      "msg": "Invalid Position"
+    },
+    {
+      "code": 6008,
+      "name": "InvalidTickerPosition",
+      "msg": "Invalid Ticker position"
+    },
+    {
+      "code": 6009,
+      "name": "NoFreePositionSlot",
+      "msg": "No free position slot"
+    },
+    {
+      "code": 6010,
+      "name": "InvalidMintAddress",
+      "msg": "Invalid Mint address"
+    },
+    {
+      "code": 6011,
+      "name": "InvalidProfitShare",
+      "msg": "Invalid Profit Share"
+    },
+    {
+      "code": 6012,
+      "name": "InvalidDepositAmount",
+      "msg": "Invalid Deposit Amount"
+    },
+    {
+      "code": 6013,
+      "name": "InvalidWithdrawAmount",
+      "msg": "Invalid Withdraw Amount"
+    },
+    {
+      "code": 6014,
+      "name": "InvalidStakeVault",
+      "msg": "Invalid Stake Vault"
+    },
+    {
+      "code": 6015,
+      "name": "InvalidStakeVaultAuthority",
+      "msg": "Invalid Stake Vault Authority"
+    },
+    {
+      "code": 6016,
+      "name": "InvalidStakeVaultAmount",
+      "msg": "Invalid Stake Vault Amount"
+    },
+    {
+      "code": 6017,
+      "name": "StakeVaultLocked",
+      "msg": "Stake Vault Available"
+    },
+    {
+      "code": 6018,
+      "name": "StakeLocked",
+      "msg": "Stake is locked"
+    },
+    {
+      "code": 6019,
+      "name": "StakeVaultFull",
+      "msg": "Stake Vault Full"
+    }
+  ],
+  "types": [
+    {
+      "name": "ClosePositionArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "position_index",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "ClosePositionRecord",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "amount",
+            "type": "u64"
+          },
+          {
+            "name": "ticker",
+            "type": "pubkey"
+          },
+          {
+            "name": "close_price",
+            "type": "u64"
+          },
+          {
+            "name": "ts",
+            "type": "i64"
+          },
+          {
+            "name": "is_long",
+            "type": "bool"
+          },
+          {
+            "name": "pnl",
+            "type": "i64"
+          },
+          {
+            "name": "user",
+            "type": "pubkey"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Collection",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "COLETA"
+          },
+          {
+            "name": "UNDEAD"
+          },
+          {
+            "name": "ALLIGATORS"
+          },
+          {
+            "name": "PYTH"
+          }
+        ]
+      }
+    },
+    {
+      "name": "CreateTickerArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "name": "protocol_program_id",
+            "type": "pubkey"
+          }
+        ]
+      }
+    },
+    {
+      "name": "InitializeStakeVaultArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "name": "amount",
+            "type": "u64"
+          },
+          {
+            "name": "slots",
+            "type": "u64"
+          },
+          {
+            "name": "collection",
+            "type": "string"
+          }
+        ]
+      }
+    },
+    {
+      "name": "OpenPositionArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "amount",
+            "type": "u64"
+          },
+          {
+            "name": "is_long",
+            "type": "bool"
+          }
+        ]
+      }
+    },
+    {
+      "name": "OpenPositionRecord",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "amount",
+            "type": "u64"
+          },
+          {
+            "name": "ticker",
+            "type": "pubkey"
+          },
+          {
+            "name": "entry_price",
+            "type": "u64"
+          },
+          {
+            "name": "ts",
+            "type": "i64"
+          },
+          {
+            "name": "is_long",
+            "type": "bool"
+          },
+          {
+            "name": "user",
+            "type": "pubkey"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Position",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "amount",
+            "type": "u64"
+          },
+          {
+            "name": "entry_price",
+            "type": "u64"
+          },
+          {
+            "name": "ts",
+            "type": "i64"
+          },
+          {
+            "name": "is_long",
+            "type": "bool"
+          },
+          {
+            "name": "is_open",
+            "type": "bool"
+          },
+          {
+            "name": "pnl",
+            "type": "i64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Rarity",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "COMMON"
+          },
+          {
+            "name": "UNCOMMON"
+          },
+          {
+            "name": "RARE"
+          },
+          {
+            "name": "EPIC"
+          },
+          {
+            "name": "LEGENDARY"
+          }
+        ]
+      }
+    },
+    {
+      "name": "RequestWithdrawNFTArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "stake_vault",
+            "type": "string"
+          },
+          {
+            "name": "nft_name",
+            "type": "string"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Stake",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "bump",
+            "type": "u8"
+          },
+          {
+            "name": "authority",
+            "type": "pubkey"
+          },
+          {
+            "name": "init_ts",
+            "type": "i64"
+          },
+          {
+            "name": "is_locked",
+            "type": "bool"
+          },
+          {
+            "name": "withdraw_ts",
+            "type": "i64"
+          },
+          {
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "name": "collections",
+            "type": {
+              "vec": {
+                "defined": {
+                  "name": "Collection"
+                }
+              }
+            }
+          },
+          {
+            "name": "rarity",
+            "type": {
+              "defined": {
+                "name": "Rarity"
+              }
+            }
+          },
+          {
+            "name": "mint",
+            "type": "pubkey"
+          },
+          {
+            "name": "stake_vault",
+            "type": "pubkey"
+          }
+        ]
+      }
+    },
+    {
+      "name": "StakeNFTArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "name": "rarity",
+            "type": {
+              "defined": {
+                "name": "Rarity"
+              }
+            }
+          },
+          {
+            "name": "stake_vault",
+            "type": "string"
+          },
+          {
+            "name": "collections",
+            "type": {
+              "vec": {
+                "defined": {
+                  "name": "Collection"
+                }
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "StakeVault",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "bump",
+            "type": "u8"
+          },
+          {
+            "name": "authority",
+            "type": "pubkey"
+          },
+          {
+            "name": "init_ts",
+            "type": "i64"
+          },
+          {
+            "name": "end_ts",
+            "type": "i64"
+          },
+          {
+            "name": "amount",
+            "type": "u64"
+          },
+          {
+            "name": "amount_paid",
+            "type": "u64"
+          },
+          {
+            "name": "apr",
+            "type": "u8"
+          },
+          {
+            "name": "amount_users",
+            "type": "u64"
+          },
+          {
+            "name": "slots",
+            "type": "u64"
+          },
+          {
+            "name": "is_locked",
+            "type": "bool"
+          },
+          {
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "name": "collection",
+            "type": "string"
+          },
+          {
+            "name": "users_paid",
+            "type": "pubkey"
+          },
+          {
+            "name": "padding",
+            "type": {
+              "array": ["u8", 64]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "Ticker",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "init_ts",
+            "docs": ["timestamp of the creation of the ticker"],
+            "type": "i64"
+          },
+          {
+            "name": "updated_ts",
+            "docs": ["timestamp of the last update of the ticker"],
+            "type": "i64"
+          },
+          {
+            "name": "bump",
+            "docs": ["The bump for the ticker pda"],
+            "type": "u8"
+          },
+          {
+            "name": "authority",
+            "docs": ["authority for the ticker"],
+            "type": "pubkey"
+          },
+          {
+            "name": "name",
+            "docs": ["name of the ticekt"],
+            "type": "string"
+          },
+          {
+            "name": "protocol_program_id",
+            "docs": [
+              "protocol program id like dRiftyHA39MWEi3m9aunc5MzRF1JYuBsbn6VPcn33UH to get data info"
+            ],
+            "type": "pubkey"
+          },
+          {
+            "name": "price",
+            "docs": ["ticker price"],
+            "type": "u64"
+          },
+          {
+            "name": "vault",
+            "docs": ["Vault PDA"],
+            "type": "pubkey"
+          }
+        ]
+      }
+    },
+    {
+      "name": "TickerPriceUpdateRecord",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "price",
+            "type": "u64"
+          },
+          {
+            "name": "ts",
+            "type": "i64"
+          },
+          {
+            "name": "ticker",
+            "type": "pubkey"
+          }
+        ]
+      }
+    },
+    {
+      "name": "UpdateTickerPriceArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "price",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "UserPosition",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "ts",
+            "docs": ["timestamp"],
+            "type": "i64"
+          },
+          {
+            "name": "bump",
+            "docs": ["bump seed"],
+            "type": "u8"
+          },
+          {
+            "name": "total_deposited",
+            "docs": ["total deposited"],
+            "type": "u64"
+          },
+          {
+            "name": "total_withdrawn",
+            "docs": ["total withdrawn"],
+            "type": "u64"
+          },
+          {
+            "name": "lp_share",
+            "docs": ["total liquidity provided"],
+            "type": "u64"
+          },
+          {
+            "name": "total_positions",
+            "docs": ["total positions"],
+            "type": "u16"
+          },
+          {
+            "name": "ticker",
+            "docs": ["ticker account"],
+            "type": "pubkey"
+          },
+          {
+            "name": "authority",
+            "docs": ["user's authority"],
+            "type": "pubkey"
+          },
+          {
+            "name": "positions",
+            "docs": ["user's position"],
+            "type": {
+              "array": [
+                {
+                  "defined": {
+                    "name": "Position"
+                  }
+                },
+                3
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "Vault",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "bump",
+            "docs": ["The bump for the vault pda"],
+            "type": "u8"
+          },
+          {
+            "name": "authority",
+            "docs": ["authority for the vault"],
+            "type": "pubkey"
+          },
+          {
+            "name": "name",
+            "docs": ["name of the vault"],
+            "type": "string"
+          },
+          {
+            "name": "token_account",
+            "docs": ["token account for the vault e.g. tDRIFT"],
+            "type": "pubkey"
+          },
+          {
+            "name": "ticker_address",
+            "docs": ["ticker address"],
+            "type": "pubkey"
+          },
+          {
+            "name": "total_deposited",
+            "docs": ["lifetime total deposited"],
+            "type": "u64"
+          },
+          {
+            "name": "total_withdrawn",
+            "docs": ["lifetime total withdrawn"],
+            "type": "u64"
+          },
+          {
+            "name": "init_ts",
+            "docs": ["timestamp vault initialized"],
+            "type": "i64"
+          },
+          {
+            "name": "net_deposits",
+            "docs": ["lifetime net deposits"],
+            "type": "u128"
+          },
+          {
+            "name": "net_withdraws",
+            "docs": ["lifetime net withdraws"],
+            "type": "u128"
+          },
+          {
+            "name": "long_balance",
+            "docs": ["Long bet balance"],
+            "type": "u64"
+          },
+          {
+            "name": "short_balance",
+            "docs": ["Short bet balance"],
+            "type": "u64"
+          },
+          {
+            "name": "long_positions_opened",
+            "docs": ["Opened long positions"],
+            "type": "u64"
+          },
+          {
+            "name": "short_positions_opened",
+            "docs": ["Opened short positions"],
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "WithdrawNFTArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "stake_vault",
+            "type": "string"
+          },
+          {
+            "name": "nft_name",
+            "type": "string"
+          }
+        ]
+      }
+    }
+  ]
+}

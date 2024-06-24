@@ -2,13 +2,11 @@
   "scripts": {
     "lint:fix": "prettier */*.js \"*/**/*{.js,.ts}\" -w",
     "lint": "prettier */*.js \"*/**/*{.js,.ts}\" --check",
-    "update-types": "cp target/types/triad_protocol.ts sdk/src/types/triad_protocol.ts && prettier --write sdk/src/types/triad_protocol.ts",
-    "build": "anchor build && yarn update-types"
+    "update-types": "cp target/types/triad_protocol.ts sdk/src/types/triad_protocol.ts && prettier --write sdk/src/types/triad_protocol.ts && cp target/idl/triad_protocol.json sdk/src/types/idl_triad_protocol.json && prettier --write sdk/src/types/idl_triad_protocol.json",
+    "build": "anchor build && yarn update-types",
+    "deploy": "yarn build && anchor deploy"
   },
-  "dependencies": {
-    "@coral-xyz/anchor": "^0.28.0",
-    "@solana/spl-token": "^0.4.3"
-  },
+  "dependencies": {},
   "license": "ISC",
   "devDependencies": {
     "@types/bn.js": "^5.1.0",

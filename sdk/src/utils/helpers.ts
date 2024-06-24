@@ -1,6 +1,8 @@
 import { PublicKey } from '@solana/web3.js'
 import * as anchor from '@coral-xyz/anchor'
 import BN from 'bn.js'
+import { TOKEN_2022_PROGRAM_ID } from '@solana/spl-token'
+import { ATA_PROGRAM_ID } from './constants'
 
 export const getTickerAddressSync = (
   programId: PublicKey,
@@ -72,6 +74,27 @@ export function getUserPositionAddressSync(
   )
 
   return UserPositionPDA
+}
+
+export const getStakeVaultAddressSync = (
+  programId: PublicKey,
+  vaultName: string
+) => {
+  const [StakeVaultPDA] = PublicKey.findProgramAddressSync(
+    [Buffer.from('stake_vault'), Buffer.from(vaultName)],
+    programId
+  )
+
+  return StakeVaultPDA
+}
+
+export const getATASync = (address: PublicKey, Mint: PublicKey) => {
+  const [ATA] = PublicKey.findProgramAddressSync(
+    [address.toBytes(), TOKEN_2022_PROGRAM_ID.toBytes(), Mint.toBytes()],
+    ATA_PROGRAM_ID
+  )
+
+  return ATA
 }
 
 export const formatNumber = (number: bigint | BN, decimals = 6) => {

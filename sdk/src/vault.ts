@@ -82,10 +82,6 @@ export default class Vault {
         tickerPDA
       )
       const VaultPDA = getVaultAddressSync(this.program.programId, tickerPDA)
-      const VaultTokenAccountPDA = getTokenVaultAddressSync(
-        this.program.programId,
-        VaultPDA
-      )
       const userTokenAccount = await getAssociatedTokenAddress(
         mint,
         this.provider.wallet.publicKey
@@ -115,7 +111,6 @@ export default class Vault {
             .createUserPosition()
             .accounts({
               signer: this.provider.wallet.publicKey,
-              userPosition: UserPositionPDA,
               ticker: tickerPDA
             })
             .instruction()
@@ -132,7 +127,6 @@ export default class Vault {
             userPosition: UserPositionPDA,
             ticker: tickerPDA,
             vault: VaultPDA,
-            vaultTokenAccount: VaultTokenAccountPDA,
             userTokenAccount
           })
           .instruction()
@@ -235,7 +229,6 @@ export default class Vault {
             .createUserPosition()
             .accounts({
               signer: this.provider.wallet.publicKey,
-              userPosition: UserPositionPDA,
               ticker: tickerPDA
             })
             .instruction()

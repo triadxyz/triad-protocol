@@ -43,4 +43,22 @@ pub enum TriadProtocolError {
 
     #[msg("Invalid Withdraw Amount")]
     InvalidWithdrawAmount,
+
+    #[msg("Invalid Stake Vault")]
+    InvalidStakeVault,
+
+    #[msg("Invalid Stake Vault Authority")]
+    InvalidStakeVaultAuthority,
+
+    #[msg("Invalid Stake Vault Amount")]
+    InvalidStakeVaultAmount,
+
+    #[msg("Stake Vault Available")]
+    StakeVaultLocked,
+
+    #[msg("Stake is locked")]
+    StakeLocked,
+
+    #[msg("Stake Vault Full")]
+    StakeVaultFull,
 }

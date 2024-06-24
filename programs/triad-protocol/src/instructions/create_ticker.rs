@@ -14,26 +14,25 @@ pub struct CreateTicker<'info> {
     #[account(mut)]
     pub signer: Signer<'info>,
 
-    #[account(init, payer = signer, space = Ticker::SPACE, seeds = [Ticker::PREFIX_SEED.as_ref(), args.name.as_ref()], bump)]
-    pub ticker: Account<'info, Ticker>,
+    #[account(init, payer = signer, space = Ticker::SPACE, seeds = [Ticker::PREFIX_SEED, args.name.as_bytes()], bump)]
+    pub ticker: Box<Account<'info, Ticker>>,
 
-    #[account(init, payer = signer, space = Vault::SPACE, seeds = [Vault::PREFIX_SEED.as_ref(), ticker.to_account_info().key.as_ref()], bump)]
-    pub vault: Account<'info, Vault>,
+    #[account(init, payer = signer, space = Vault::SPACE, seeds = [Vault::PREFIX_SEED, ticker.to_account_info().key.as_ref()], bump)]
+    pub vault: Box<Account<'info, Vault>>,
 
-    pub payer_token_mint: Account<'info, Mint>,
+    pub payer_token_mint: Box<Account<'info, Mint>>,
 
     #[account(
         init,
-        seeds = [Vault::PREFIX_SEED_VAULT_TOKEN_ACCOUNT.as_ref(), vault.key().as_ref()],
+        seeds = [Vault::PREFIX_SEED_VAULT_TOKEN_ACCOUNT, vault.key().as_ref()],
         bump,
         payer = signer,
         token::mint = payer_token_mint,
         token::authority = vault,
     )]
-    pub token_account: Account<'info, TokenAccount>,
+    pub token_account: Box<Account<'info, TokenAccount>>,
 
     pub system_program: Program<'info, System>,
-
     pub token_program: Program<'info, Token>,
 }
 
@@ -50,7 +49,7 @@ pub fn create_ticker(ctx: Context<CreateTicker>, args: CreateTickerArgs) -> Resu
     let ticker: &mut Account<Ticker> = &mut ctx.accounts.ticker;
     let vault: &mut Account<Vault> = &mut ctx.accounts.vault;
 
-    vault.bump = *ctx.bumps.get("vault").unwrap();
+    vault.bump = ctx.bumps.vault;
     vault.authority = signer_key;
     vault.name = args.name.clone();
     vault.ticker_address = ticker_key;
@@ -60,12 +59,7 @@ pub fn create_ticker(ctx: Context<CreateTicker>, args: CreateTickerArgs) -> Resu
     vault.init_ts = current_timestamp;
     vault.net_deposits = 0;
 
-    msg!(
-        "Vault {:?} Created",
-        vault.to_account_info().key.to_string()
-    );
-
-    ticker.bump = *ctx.bumps.get("ticker").unwrap();
+    ticker.bump = ctx.bumps.ticker;
     ticker.authority = signer_key;
     ticker.name = args.name;
     ticker.vault = *ctx.accounts.vault.to_account_info().key;
@@ -73,8 +67,6 @@ pub fn create_ticker(ctx: Context<CreateTicker>, args: CreateTickerArgs) -> Resu
     ticker.protocol_program_id = args.protocol_program_id;
     ticker.init_ts = current_timestamp;
     ticker.updated_ts = current_timestamp;
-
-    msg!("Ticker {:?} Created", ticker.name);
 
     Ok(())
 }

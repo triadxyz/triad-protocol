@@ -1,5 +1,4 @@
 use anchor_lang::prelude::*;
-
 use instructions::*;
 use state::*;
 
@@ -43,5 +42,30 @@ pub mod triad_protocol {
         args: ClosePositionArgs,
     ) -> Result<()> {
         instructions::close_position(ctx, args)
+    }
+
+    pub fn stake<'info>(ctx: Context<StakeNFT>, args: StakeNFTArgs) -> Result<()> {
+        instructions::stake_nft(ctx, args)
+    }
+
+    pub fn initialize_stake_vault<'info>(
+        ctx: Context<InitializeStakeVault<'info>>,
+        args: InitializeStakeVaultArgs,
+    ) -> Result<()> {
+        instructions::initialize_stake_vault(ctx, args)
+    }
+
+    pub fn withdraw_nft<'info>(
+        ctx: Context<WithdrawNFT<'info>>,
+        args: WithdrawNFTArgs,
+    ) -> Result<()> {
+        instructions::withdraw_nft(ctx, args)
+    }
+
+    pub fn request_withdraw_nft<'info>(
+        ctx: Context<RequestWithdrawNFT<'info>>,
+        args: RequestWithdrawNFTArgs,
+    ) -> Result<()> {
+        instructions::request_withdraw_nft(ctx, args)
     }
 }

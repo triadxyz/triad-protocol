@@ -46,20 +46,10 @@ export default class Ticker {
     protocolProgramId: PublicKey
     tokenMint: PublicKey
   }) {
-    const TickerPDA = getTickerAddressSync(this.program.programId, name)
-    const VaultPDA = getVaultAddressSync(this.program.programId, TickerPDA)
-    const TokenAccountPDA = getTokenVaultAddressSync(
-      this.program.programId,
-      VaultPDA
-    )
-
     return this.program.methods
       .createTicker({ name, protocolProgramId })
       .accounts({
         signer: this.provider.wallet.publicKey,
-        ticker: TickerPDA,
-        vault: VaultPDA,
-        tokenAccount: TokenAccountPDA,
         payerTokenMint: tokenMint
       })
       .rpc()

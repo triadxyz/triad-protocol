@@ -29,7 +29,7 @@ pub struct OpenPosition<'info> {
 
     #[account(
         mut,
-        seeds = [Vault::PREFIX_SEED_VAULT_TOKEN_ACCOUNT.as_ref(), vault.key().as_ref()],
+        seeds = [Vault::PREFIX_SEED_VAULT_TOKEN_ACCOUNT, vault.key().as_ref()],
         bump,
     )]
     pub vault_token_account: Account<'info, TokenAccount>,
