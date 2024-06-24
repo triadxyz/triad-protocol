@@ -38,7 +38,7 @@ pub fn initialize_stake_vault(
     stake_vault.amount_users = 0;
     stake_vault.collection = args.collection;
     stake_vault.slots = args.slots;
-    stake_vault.is_locked = true;
+    stake_vault.is_locked = false;
 
     Ok(())
 }

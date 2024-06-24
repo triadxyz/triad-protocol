@@ -705,6 +705,11 @@
       "code": 6018,
       "name": "StakeLocked",
       "msg": "Stake is locked"
+    },
+    {
+      "code": 6019,
+      "name": "StakeVaultFull",
+      "msg": "Stake Vault Full"
     }
   ],
   "types": [

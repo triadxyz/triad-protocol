@@ -757,6 +757,11 @@ export type TriadProtocol = {
       code: 6018
       name: 'stakeLocked'
       msg: 'Stake is locked'
+    },
+    {
+      code: 6019
+      name: 'stakeVaultFull'
+      msg: 'Stake Vault Full'
     }
   ]
   types: [

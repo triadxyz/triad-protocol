@@ -58,4 +58,7 @@ pub enum TriadProtocolError {
 
     #[msg("Stake is locked")]
     StakeLocked,
+
+    #[msg("Stake Vault Full")]
+    StakeVaultFull,
 }

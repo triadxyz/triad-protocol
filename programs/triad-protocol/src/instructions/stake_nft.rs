@@ -79,6 +79,10 @@ pub fn stake_nft(ctx: Context<StakeNFT>, args: StakeNFTArgs) -> Result<()> {
     let stake = &mut ctx.accounts.stake;
     let stake_vault = &mut ctx.accounts.stake_vault;
 
+    if stake_vault.amount_users > stake_vault.slots {
+        return Err(TriadProtocolError::StakeVaultFull.into());
+    }
+
     stake.authority = *ctx.accounts.signer.key;
     stake.init_ts = Clock::get()?.unix_timestamp;
     stake.withdraw_ts = 0;

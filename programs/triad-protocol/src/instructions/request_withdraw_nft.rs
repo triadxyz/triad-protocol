@@ -49,9 +49,9 @@ pub fn request_withdraw_nft(
         return Err(TriadProtocolError::Unauthorized.into());
     }
 
-    stake.withdraw_ts = Clock::get()?.unix_timestamp + 86400;
+    stake.withdraw_ts = Clock::get()?.unix_timestamp + 7 * 24 * 60 * 60;
 
-    msg!("Stake Available in 24 hours");
+    msg!("Stake Available in 7 days");
 
     Ok(())
 }
