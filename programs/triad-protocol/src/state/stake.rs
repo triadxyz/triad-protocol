@@ -39,6 +39,7 @@ pub enum Rarity {
     RARE,
     EPIC,
     LEGENDARY,
+    MYTHIC,
 }
 
 #[derive(Clone, AnchorSerialize, AnchorDeserialize)]

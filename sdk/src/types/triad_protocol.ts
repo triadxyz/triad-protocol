@@ -972,6 +972,9 @@ export type TriadProtocol = {
           },
           {
             name: 'legendary'
+          },
+          {
+            name: 'mythic'
           }
         ]
       }

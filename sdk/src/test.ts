@@ -8,7 +8,9 @@ export default class Test {
   Keypair = Keypair.fromSecretKey(
     new Uint8Array(JSON.parse(this.file.toString()))
   )
-  connection = new Connection('http://127.0.0.1:8899')
+  connection = new Connection(
+    'https://mainnet.helius-rpc.com/?api-key=3fb2333b-4396-4db0-94c5-663cca63697e'
+  )
   wallet = new Wallet(this.Keypair)
   triadProtocol = new TriadProtocol(this.connection, this.wallet)
 
@@ -16,13 +18,28 @@ export default class Test {
 
   init = async () => {}
 
+  getStakeVaults = async () => {
+    const response = await this.triadProtocol.stake.getStakeVaults()
+
+    console.log('Stake Vaults:', response)
+  }
+
+  getStakes = async () => {
+    const response = await this.triadProtocol.stake.getStakes()
+
+    console.log('Stakes:', response)
+  }
+
   initializeStakeVault = async () => {
-    const reponse = await this.triadProtocol.stake.initializeStakeVault({
-      name: 'Rev 1',
-      collection: 'Triad',
-      slots: new BN(1939),
-      amount: new BN(1000000000)
-    })
+    const reponse = await this.triadProtocol.stake.initializeStakeVault(
+      {
+        name: 'Triad Share 1',
+        collection: 'Triad',
+        slots: new BN(1839),
+        amount: new BN(50000000000)
+      },
+      { skipPreflight: true, microLamports: 40000 }
+    )
 
     console.log('Initialize Stake Vault:', reponse)
   }
@@ -33,13 +50,9 @@ export default class Test {
       wallet: this.wallet.publicKey,
       collections: { alligators: true, coleta: true, undead: true, pyth: true },
       mint: new PublicKey('DQ3Uq6GDX6HA99jVBaErtZcvhm1AsCpkB421a2MEDJ7B'),
-      rarity: { common: {} }
+      rarity: { mythic: {} }
     })
 
     console.log('Initialize Stake Vault:', reponse)
   }
 }
-
-const test = new Test()
-
-test.stakeNFT()
