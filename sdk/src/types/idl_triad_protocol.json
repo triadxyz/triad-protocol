@@ -920,6 +920,9 @@
           },
           {
             "name": "LEGENDARY"
+          },
+          {
+            "name": "MYTHIC"
           }
         ]
       }

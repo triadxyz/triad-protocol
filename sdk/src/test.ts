@@ -50,7 +50,7 @@ export default class Test {
       wallet: this.wallet.publicKey,
       collections: { alligators: true, coleta: true, undead: true, pyth: true },
       mint: new PublicKey('DQ3Uq6GDX6HA99jVBaErtZcvhm1AsCpkB421a2MEDJ7B'),
-      rarity: { common: {} }
+      rarity: { mythic: {} }
     })
 
     console.log('Initialize Stake Vault:', reponse)

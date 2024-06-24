@@ -104,6 +104,7 @@ export default class Stake {
         | { rare: {} }
         | { epic: {} }
         | { legendary: {} }
+        | { mythic: {} }
     },
     options?: RpcOptions
   ) {
