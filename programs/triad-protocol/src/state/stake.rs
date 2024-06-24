@@ -27,6 +27,7 @@ pub struct StakeVault {
     pub slots: u64,
     pub is_locked: bool,
     pub name: String,
+    pub collection: String,
     pub users_paid: Pubkey,
     pub padding: [u8; 64],
 }
@@ -52,6 +53,7 @@ pub enum Collection {
 pub struct StakeNFTArgs {
     pub name: String,
     pub rarity: Rarity,
+    pub stake_vault: String,
     pub collections: Vec<Collection>,
 }
 
@@ -60,6 +62,7 @@ pub struct InitializeStakeVaultArgs {
     pub name: String,
     pub amount: u64,
     pub slots: u64,
+    pub collection: String,
 }
 
 #[derive(AnchorSerialize, AnchorDeserialize, Clone)]
@@ -82,8 +85,6 @@ impl Stake {
 
 impl StakeVault {
     pub const PREFIX_SEED: &'static [u8] = b"stake_vault";
-
-    pub const PREFIX_SEED_VAULT_TOKEN_ACCOUNT: &'static [u8] = b"stake_vault_token_account";
 
     pub const SPACE: usize = 8 + std::mem::size_of::<Self>();
 }

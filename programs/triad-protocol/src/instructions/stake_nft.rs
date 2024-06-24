@@ -1,6 +1,8 @@
 use std::str::FromStr;
 use crate::{
-    constants::{MYSTERY_BOX_PROGRAM, TRIAD_MYSTERY_BOX}, errors::TriadProtocolError, state::{Stake, StakeNFTArgs}, StakeVault
+    constants::{MYSTERY_BOX_PROGRAM, TRIAD_MYSTERY_BOX},
+    errors::TriadProtocolError,
+    state::{Stake, StakeNFTArgs, StakeVault},
 };
 use anchor_lang::prelude::*;
 use anchor_spl::token_2022::spl_token_2022::extension::BaseStateWithExtensions;
@@ -20,18 +22,17 @@ pub struct StakeNFT<'info> {
     #[account(mut)]
     pub signer: Signer<'info>,
 
-    #[account(mut, seeds = [StakeVault::PREFIX_SEED, args.name.as_bytes()], bump)]
+    #[account(mut, seeds = [StakeVault::PREFIX_SEED, args.stake_vault.as_bytes()], bump)]
     pub stake_vault: Box<Account<'info, StakeVault>>,
 
-    #[account(init, payer = signer, space = Stake::SPACE, seeds = [Stake::PREFIX_SEED, signer.key.as_ref(), mint.key().as_ref()], bump)]
+    #[account(init, payer = signer, space = Stake::SPACE, seeds = [Stake::PREFIX_SEED, args.name.as_ref()], bump)]
     pub stake: Box<Account<'info, Stake>>,
 
     #[account(
         mut,
-        extensions::metadata_pointer::metadata_address = mint,
-        seeds = [b"mint", args.name.as_bytes()], bump
+        extensions::metadata_pointer::metadata_address = mint
     )]
-    pub mint: InterfaceAccount<'info, Mint>,
+    pub mint: Box<InterfaceAccount<'info, Mint>>,
 
     #[account(
         mut, 
@@ -41,9 +42,9 @@ pub struct StakeNFT<'info> {
 
     #[account(
         init,
-        associated_token::mint = mint,
         payer = signer,
-        associated_token::authority = stake_vault
+        associated_token::mint = mint,
+        associated_token::authority = stake_vault,
     )]
     pub to_ata: Box<InterfaceAccount<'info, TokenAccount>>,
 
@@ -53,8 +54,8 @@ pub struct StakeNFT<'info> {
 }
 
 pub fn stake_nft(ctx: Context<StakeNFT>, args: StakeNFTArgs) -> Result<()> {
-    if ctx.accounts.signer.key() != ctx.accounts.from_ata.to_account_info().owner.key() {
-        return Err(TriadProtocolError::Unauthorized.into());
+    if ctx.accounts.signer.key() != ctx.accounts.from_ata.owner.key() {
+        return Err(TriadProtocolError::InvalidOwnerAuthority.into());
     }
 
     let mint = &ctx.accounts.mint.to_account_info();
@@ -66,9 +67,12 @@ pub fn stake_nft(ctx: Context<StakeNFT>, args: StakeNFTArgs) -> Result<()> {
         return Err(TriadProtocolError::Unauthorized.into());
     }
 
-    let (mint_seed, _bump) = Pubkey::find_program_address(&[b"mint", args.name.as_bytes()], &Pubkey::from_str(MYSTERY_BOX_PROGRAM).unwrap());
+    let (mint_seed, _bump) = Pubkey::find_program_address(
+        &[b"mint", args.name.as_bytes()],
+        &Pubkey::from_str(MYSTERY_BOX_PROGRAM).unwrap(),
+    );
 
-    if mint_seed != mint.key() {
+    if mint_seed != *mint.key {
         return Err(TriadProtocolError::Unauthorized.into());
     }
 
@@ -89,9 +93,9 @@ pub fn stake_nft(ctx: Context<StakeNFT>, args: StakeNFTArgs) -> Result<()> {
     stake_vault.amount_users += 1;
 
     let cpi_accounts = TransferChecked {
-        from: ctx.accounts.from_ata.to_account_info().clone(),
-        mint: ctx.accounts.mint.to_account_info().clone(),
-        to: ctx.accounts.to_ata.to_account_info().clone(),
+        from: ctx.accounts.from_ata.to_account_info(),
+        mint: ctx.accounts.mint.to_account_info(),
+        to: ctx.accounts.to_ata.to_account_info(),
         authority: ctx.accounts.signer.to_account_info(),
     };
     let cpi_program = ctx.accounts.token_program.to_account_info();

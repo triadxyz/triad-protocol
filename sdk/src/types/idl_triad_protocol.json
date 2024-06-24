@@ -181,6 +181,51 @@
       "args": []
     },
     {
+      "name": "initialize_stake_vault",
+      "discriminator": [125, 55, 104, 34, 35, 179, 67, 3],
+      "accounts": [
+        {
+          "name": "signer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "stake_vault",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [115, 116, 97, 107, 101, 95, 118, 97, 117, 108, 116]
+              },
+              {
+                "kind": "arg",
+                "path": "args.name"
+              }
+            ]
+          }
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        },
+        {
+          "name": "token_program",
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+        }
+      ],
+      "args": [
+        {
+          "name": "args",
+          "type": {
+            "defined": {
+              "name": "InitializeStakeVaultArgs"
+            }
+          }
+        }
+      ]
+    },
+    {
       "name": "open_position",
       "discriminator": [135, 128, 47, 77, 15, 152, 240, 49],
       "accounts": [
@@ -245,13 +290,29 @@
       ]
     },
     {
-      "name": "stake",
-      "discriminator": [206, 176, 202, 18, 200, 209, 179, 108],
+      "name": "request_withdraw_nft",
+      "discriminator": [132, 52, 242, 121, 178, 147, 240, 223],
       "accounts": [
         {
           "name": "signer",
           "writable": true,
           "signer": true
+        },
+        {
+          "name": "stake_vault",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [115, 116, 97, 107, 101, 95, 118, 97, 117, 108, 116]
+              },
+              {
+                "kind": "arg",
+                "path": "args.stake_vault"
+              }
+            ]
+          }
         },
         {
           "name": "stake",
@@ -264,17 +325,106 @@
               },
               {
                 "kind": "account",
-                "path": "payer_ata"
+                "path": "signer"
+              },
+              {
+                "kind": "account",
+                "path": "mint"
               }
             ]
           }
         },
         {
-          "name": "mint_account",
+          "name": "mint",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [109, 105, 110, 116]
+              },
+              {
+                "kind": "arg",
+                "path": "args.nft_name"
+              }
+            ]
+          }
+        },
+        {
+          "name": "token_program",
+          "address": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb"
+        },
+        {
+          "name": "associated_token_program",
+          "address": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "args",
+          "type": {
+            "defined": {
+              "name": "RequestWithdrawNFTArgs"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "stake",
+      "discriminator": [206, 176, 202, 18, 200, 209, 179, 108],
+      "accounts": [
+        {
+          "name": "signer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "stake_vault",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [115, 116, 97, 107, 101, 95, 118, 97, 117, 108, 116]
+              },
+              {
+                "kind": "arg",
+                "path": "args.stake_vault"
+              }
+            ]
+          }
+        },
+        {
+          "name": "stake",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [115, 116, 97, 107, 101]
+              },
+              {
+                "kind": "arg",
+                "path": "args.name"
+              }
+            ]
+          }
+        },
+        {
+          "name": "mint",
           "writable": true
         },
         {
-          "name": "payer_ata",
+          "name": "from_ata",
+          "writable": true
+        },
+        {
+          "name": "to_ata",
           "writable": true
         },
         {
@@ -329,12 +479,109 @@
           }
         }
       ]
+    },
+    {
+      "name": "withdraw_nft",
+      "discriminator": [142, 181, 191, 149, 82, 175, 216, 100],
+      "accounts": [
+        {
+          "name": "signer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "stake_vault",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [115, 116, 97, 107, 101, 95, 118, 97, 117, 108, 116]
+              },
+              {
+                "kind": "arg",
+                "path": "args.stake_vault"
+              }
+            ]
+          }
+        },
+        {
+          "name": "stake",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [115, 116, 97, 107, 101]
+              },
+              {
+                "kind": "account",
+                "path": "signer"
+              },
+              {
+                "kind": "account",
+                "path": "mint"
+              }
+            ]
+          }
+        },
+        {
+          "name": "mint",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [109, 105, 110, 116]
+              },
+              {
+                "kind": "arg",
+                "path": "args.nft_name"
+              }
+            ]
+          }
+        },
+        {
+          "name": "from_ata",
+          "writable": true
+        },
+        {
+          "name": "to_ata",
+          "writable": true
+        },
+        {
+          "name": "token_program",
+          "address": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb"
+        },
+        {
+          "name": "associated_token_program",
+          "address": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "args",
+          "type": {
+            "defined": {
+              "name": "WithdrawNFTArgs"
+            }
+          }
+        }
+      ]
     }
   ],
   "accounts": [
     {
       "name": "Stake",
       "discriminator": [150, 197, 176, 29, 55, 132, 112, 149]
+    },
+    {
+      "name": "StakeVault",
+      "discriminator": [192, 112, 65, 125, 129, 151, 173, 226]
     },
     {
       "name": "Ticker",
@@ -433,6 +680,31 @@
       "code": 6013,
       "name": "InvalidWithdrawAmount",
       "msg": "Invalid Withdraw Amount"
+    },
+    {
+      "code": 6014,
+      "name": "InvalidStakeVault",
+      "msg": "Invalid Stake Vault"
+    },
+    {
+      "code": 6015,
+      "name": "InvalidStakeVaultAuthority",
+      "msg": "Invalid Stake Vault Authority"
+    },
+    {
+      "code": 6016,
+      "name": "InvalidStakeVaultAmount",
+      "msg": "Invalid Stake Vault Amount"
+    },
+    {
+      "code": 6017,
+      "name": "StakeVaultLocked",
+      "msg": "Stake Vault Available"
+    },
+    {
+      "code": 6018,
+      "name": "StakeLocked",
+      "msg": "Stake is locked"
     }
   ],
   "types": [
@@ -485,6 +757,26 @@
       }
     },
     {
+      "name": "Collection",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "COLETA"
+          },
+          {
+            "name": "UNDEAD"
+          },
+          {
+            "name": "ALLIGATORS"
+          },
+          {
+            "name": "PYTH"
+          }
+        ]
+      }
+    },
+    {
       "name": "CreateTickerArgs",
       "type": {
         "kind": "struct",
@@ -496,6 +788,30 @@
           {
             "name": "protocol_program_id",
             "type": "pubkey"
+          }
+        ]
+      }
+    },
+    {
+      "name": "InitializeStakeVaultArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "name": "amount",
+            "type": "u64"
+          },
+          {
+            "name": "slots",
+            "type": "u64"
+          },
+          {
+            "name": "collection",
+            "type": "string"
           }
         ]
       }
@@ -581,6 +897,45 @@
       }
     },
     {
+      "name": "Rarity",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "COMMON"
+          },
+          {
+            "name": "UNCOMMON"
+          },
+          {
+            "name": "RARE"
+          },
+          {
+            "name": "EPIC"
+          },
+          {
+            "name": "LEGENDARY"
+          }
+        ]
+      }
+    },
+    {
+      "name": "RequestWithdrawNFTArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "stake_vault",
+            "type": "string"
+          },
+          {
+            "name": "nft_name",
+            "type": "string"
+          }
+        ]
+      }
+    },
+    {
       "name": "Stake",
       "type": {
         "kind": "struct",
@@ -596,6 +951,44 @@
           {
             "name": "init_ts",
             "type": "i64"
+          },
+          {
+            "name": "is_locked",
+            "type": "bool"
+          },
+          {
+            "name": "withdraw_ts",
+            "type": "i64"
+          },
+          {
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "name": "collections",
+            "type": {
+              "vec": {
+                "defined": {
+                  "name": "Collection"
+                }
+              }
+            }
+          },
+          {
+            "name": "rarity",
+            "type": {
+              "defined": {
+                "name": "Rarity"
+              }
+            }
+          },
+          {
+            "name": "mint",
+            "type": "pubkey"
+          },
+          {
+            "name": "stake_vault",
+            "type": "pubkey"
           }
         ]
       }
@@ -606,8 +999,96 @@
         "kind": "struct",
         "fields": [
           {
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "name": "rarity",
+            "type": {
+              "defined": {
+                "name": "Rarity"
+              }
+            }
+          },
+          {
+            "name": "stake_vault",
+            "type": "string"
+          },
+          {
+            "name": "collections",
+            "type": {
+              "vec": {
+                "defined": {
+                  "name": "Collection"
+                }
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "StakeVault",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "bump",
+            "type": "u8"
+          },
+          {
+            "name": "authority",
+            "type": "pubkey"
+          },
+          {
+            "name": "init_ts",
+            "type": "i64"
+          },
+          {
+            "name": "end_ts",
+            "type": "i64"
+          },
+          {
             "name": "amount",
             "type": "u64"
+          },
+          {
+            "name": "amount_paid",
+            "type": "u64"
+          },
+          {
+            "name": "apr",
+            "type": "u8"
+          },
+          {
+            "name": "amount_users",
+            "type": "u64"
+          },
+          {
+            "name": "slots",
+            "type": "u64"
+          },
+          {
+            "name": "is_locked",
+            "type": "bool"
+          },
+          {
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "name": "collection",
+            "type": "string"
+          },
+          {
+            "name": "users_paid",
+            "type": "pubkey"
+          },
+          {
+            "name": "padding",
+            "type": {
+              "array": ["u8", 64]
+            }
           }
         ]
       }
@@ -830,6 +1311,22 @@
             "name": "short_positions_opened",
             "docs": ["Opened short positions"],
             "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "WithdrawNFTArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "stake_vault",
+            "type": "string"
+          },
+          {
+            "name": "nft_name",
+            "type": "string"
           }
         ]
       }
