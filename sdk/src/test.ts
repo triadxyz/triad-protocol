@@ -8,9 +8,7 @@ export default class Test {
   Keypair = Keypair.fromSecretKey(
     new Uint8Array(JSON.parse(this.file.toString()))
   )
-  connection = new Connection(
-    'https://mainnet.helius-rpc.com/?api-key=3fb2333b-4396-4db0-94c5-663cca63697e'
-  )
+  connection = new Connection('http://127.0.0.1:8899')
   wallet = new Wallet(this.Keypair)
   triadProtocol = new TriadProtocol(this.connection, this.wallet)
 

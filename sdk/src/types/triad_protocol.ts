@@ -216,6 +216,67 @@ export type TriadProtocol = {
       args: []
     },
     {
+      name: 'depositStakeRewards'
+      discriminator: [59, 201, 204, 3, 44, 75, 231, 129]
+      accounts: [
+        {
+          name: 'signer'
+          writable: true
+          signer: true
+        },
+        {
+          name: 'stakeVault'
+          writable: true
+          pda: {
+            seeds: [
+              {
+                kind: 'const'
+                value: [115, 116, 97, 107, 101, 95, 118, 97, 117, 108, 116]
+              },
+              {
+                kind: 'arg'
+                path: 'args.stake_vault'
+              }
+            ]
+          }
+        },
+        {
+          name: 'mint'
+          writable: true
+        },
+        {
+          name: 'fromAta'
+          writable: true
+        },
+        {
+          name: 'toAta'
+          writable: true
+        },
+        {
+          name: 'tokenProgram'
+          address: 'TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb'
+        },
+        {
+          name: 'associatedTokenProgram'
+          address: 'ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL'
+        },
+        {
+          name: 'systemProgram'
+          address: '11111111111111111111111111111111'
+        }
+      ]
+      args: [
+        {
+          name: 'args'
+          type: {
+            defined: {
+              name: 'depositStakeRewardsArgs'
+            }
+          }
+        }
+      ]
+    },
+    {
       name: 'initializeStakeVault'
       discriminator: [125, 55, 104, 34, 35, 179, 67, 3]
       accounts: [
@@ -845,6 +906,22 @@ export type TriadProtocol = {
           {
             name: 'protocolProgramId'
             type: 'pubkey'
+          }
+        ]
+      }
+    },
+    {
+      name: 'depositStakeRewardsArgs'
+      type: {
+        kind: 'struct'
+        fields: [
+          {
+            name: 'amount'
+            type: 'u64'
+          },
+          {
+            name: 'stakeVault'
+            type: 'string'
           }
         ]
       }

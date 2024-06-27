@@ -68,4 +68,11 @@ pub mod triad_protocol {
     ) -> Result<()> {
         instructions::request_withdraw_nft(ctx, args)
     }
+
+    pub fn deposit_stake_rewards<'info>(
+        ctx: Context<DepositStakeRewards<'info>>,
+        args: DepositStakeRewardsArgs,
+    ) -> Result<()> {
+        instructions::deposit_stake_rewards(ctx, args)
+    }
 }

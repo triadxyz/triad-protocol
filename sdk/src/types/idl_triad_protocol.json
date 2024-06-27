@@ -181,6 +181,67 @@
       "args": []
     },
     {
+      "name": "deposit_stake_rewards",
+      "discriminator": [59, 201, 204, 3, 44, 75, 231, 129],
+      "accounts": [
+        {
+          "name": "signer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "stake_vault",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [115, 116, 97, 107, 101, 95, 118, 97, 117, 108, 116]
+              },
+              {
+                "kind": "arg",
+                "path": "args.stake_vault"
+              }
+            ]
+          }
+        },
+        {
+          "name": "mint",
+          "writable": true
+        },
+        {
+          "name": "from_ata",
+          "writable": true
+        },
+        {
+          "name": "to_ata",
+          "writable": true
+        },
+        {
+          "name": "token_program",
+          "address": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb"
+        },
+        {
+          "name": "associated_token_program",
+          "address": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "args",
+          "type": {
+            "defined": {
+              "name": "DepositStakeRewardsArgs"
+            }
+          }
+        }
+      ]
+    },
+    {
       "name": "initialize_stake_vault",
       "discriminator": [125, 55, 104, 34, 35, 179, 67, 3],
       "accounts": [
@@ -793,6 +854,22 @@
           {
             "name": "protocol_program_id",
             "type": "pubkey"
+          }
+        ]
+      }
+    },
+    {
+      "name": "DepositStakeRewardsArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "amount",
+            "type": "u64"
+          },
+          {
+            "name": "stake_vault",
+            "type": "string"
           }
         ]
       }

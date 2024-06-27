@@ -78,6 +78,12 @@ pub struct RequestWithdrawNFTArgs {
     pub nft_name: String,
 }
 
+#[derive(AnchorSerialize, AnchorDeserialize, Clone)]
+pub struct DepositStakeRewardsArgs {
+    pub amount: u64,
+    pub stake_vault: String,
+}
+
 impl Stake {
     pub const PREFIX_SEED: &'static [u8] = b"stake";
 
