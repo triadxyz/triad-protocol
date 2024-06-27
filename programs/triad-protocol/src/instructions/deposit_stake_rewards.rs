@@ -30,7 +30,7 @@ pub struct DepositStakeRewards<'info> {
     pub from_ata: Box<InterfaceAccount<'info, TokenAccount>>,
 
     #[account(
-        init,
+        init_if_needed,
         payer = signer,
         associated_token::mint = mint,
         associated_token::authority = stake_vault,
@@ -53,7 +53,7 @@ pub fn deposit_stake_rewards(ctx: Context<DepositStakeRewards>, args: DepositSta
         return Err(TriadProtocolError::InvalidOwnerAuthority.into());
     }
 
-    stake_vault.amount = args.amount;
+    stake_vault.amount += args.amount;
 
     let cpi_accounts = TransferChecked {
         from: ctx.accounts.from_ata.to_account_info(),

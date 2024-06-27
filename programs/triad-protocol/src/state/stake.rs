@@ -61,7 +61,6 @@ pub struct StakeNFTArgs {
 #[derive(AnchorSerialize, AnchorDeserialize, Clone)]
 pub struct InitializeStakeVaultArgs {
     pub name: String,
-    pub amount: u64,
     pub slots: u64,
     pub collection: String,
 }
