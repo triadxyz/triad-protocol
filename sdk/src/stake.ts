@@ -152,7 +152,6 @@ export default class Stake {
   /**
    *  Initialize Stake Vault
    *  @param name - The ticker's name
-   *  @param amount - Reward amount
    *  @param slots - Amount available to users joining the vault
    *  @param collection - The Collection name
    *
@@ -160,12 +159,10 @@ export default class Stake {
   public async initializeStakeVault(
     {
       name,
-      amount,
       slots,
       collection
     }: {
       name: string
-      amount: BN
       slots: BN
       collection: string
     },
@@ -174,12 +171,61 @@ export default class Stake {
     const method = this.program.methods
       .initializeStakeVault({
         name,
-        amount,
         slots,
         collection
       })
       .accounts({
         signer: this.provider.wallet.publicKey
+      })
+
+    if (options?.microLamports) {
+      method.postInstructions([
+        ComputeBudgetProgram.setComputeUnitPrice({
+          microLamports: options.microLamports
+        })
+      ])
+    }
+
+    return method.rpc({ skipPreflight: options?.skipPreflight })
+  }
+
+  /**
+   *  Deposit Stake Rewards
+   *  @param wallet - User wallet
+   *  @param mint - NFT mint
+   *  @param amount - Reward amount
+   *
+   */
+  public async depositStakeRewards(
+    {
+      wallet,
+      mint,
+      amount
+    }: {
+      wallet: PublicKey
+      mint: PublicKey
+      amount: BN
+    },
+    options?: RpcOptions
+  ) {
+    const stakeVaultName = 'Triad Share 1'
+    const FromAta = getATASync(wallet, mint)
+    const StakeVault = getStakeVaultAddressSync(
+      this.program.programId,
+      stakeVaultName
+    )
+    const ToAta = getATASync(StakeVault, mint)
+
+    const method = this.program.methods
+      .depositStakeRewards({
+        amount,
+        stakeVault: stakeVaultName
+      })
+      .accounts({
+        signer: wallet,
+        fromAta: FromAta,
+        toAta: ToAta,
+        mint: mint
       })
 
     if (options?.microLamports) {

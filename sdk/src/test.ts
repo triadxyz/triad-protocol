@@ -8,7 +8,9 @@ export default class Test {
   Keypair = Keypair.fromSecretKey(
     new Uint8Array(JSON.parse(this.file.toString()))
   )
-  connection = new Connection('http://127.0.0.1:8899')
+  connection = new Connection(
+    'https://mainnet.helius-rpc.com/?api-key=17c07b72-cbb1-4408-9069-8624f01ddc8f'
+  )
   wallet = new Wallet(this.Keypair)
   triadProtocol = new TriadProtocol(this.connection, this.wallet)
 
@@ -33,8 +35,7 @@ export default class Test {
       {
         name: 'Triad Share 1',
         collection: 'Triad',
-        slots: new BN(1839),
-        amount: new BN(50000000000)
+        slots: new BN(1839)
       },
       { skipPreflight: true, microLamports: 40000 }
     )
@@ -52,5 +53,18 @@ export default class Test {
     })
 
     console.log('Initialize Stake Vault:', reponse)
+  }
+
+  depositStakeRewards = async () => {
+    const reponse = await this.triadProtocol.stake.depositStakeRewards(
+      {
+        wallet: this.wallet.publicKey,
+        amount: new BN(0),
+        mint: new PublicKey('t3DohmswhKk94PPbPYwA6ZKACyY3y5kbcqeQerAJjmV')
+      },
+      { skipPreflight: true, microLamports: 40000 }
+    )
+
+    console.log('Deposit Stake Rewards:', reponse)
   }
 }

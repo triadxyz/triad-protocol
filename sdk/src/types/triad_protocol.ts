@@ -936,10 +936,6 @@ export type TriadProtocol = {
             type: 'string'
           },
           {
-            name: 'amount'
-            type: 'u64'
-          },
-          {
             name: 'slots'
             type: 'u64'
           },
