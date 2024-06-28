@@ -39,7 +39,5 @@ pub fn update_ticker_price(
         ts: ticker.updated_ts,
     });
 
-    msg!("Ticker {:?} Created", ticker.name);
-
     Ok(())
 }

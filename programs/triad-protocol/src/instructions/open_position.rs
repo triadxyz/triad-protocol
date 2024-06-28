@@ -57,8 +57,6 @@ pub fn open_position<'info>(
     let vault = &mut ctx.accounts.vault;
 
     if transfer.is_err() {
-        msg!("Open position failed");
-
         return Err(TriadProtocolError::DepositFailed.into());
     }
 
@@ -108,8 +106,6 @@ pub fn open_position<'info>(
         amount: args.amount,
         is_long: args.is_long,
     });
-
-    msg!("Deposit successful");
 
     Ok(())
 }

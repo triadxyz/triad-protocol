@@ -64,14 +64,9 @@ pub fn close_position<'info>(
 
     let amount_sub_fee = new_amount - (new_amount * 5 / 1000);
 
-    msg!("new_amount: {}", new_amount);
-    msg!("Amount sub fee: {}", amount_sub_fee);
-
     let transfer = ctx.token_transfer(amount_sub_fee);
 
     if transfer.is_err() {
-        msg!("Close Position failed");
-
         return Err(TriadProtocolError::InvalidWithdrawAmount.into());
     }
 

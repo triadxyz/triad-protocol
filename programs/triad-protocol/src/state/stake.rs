@@ -12,6 +12,17 @@ pub struct Stake {
     pub rarity: Rarity,
     pub mint: Pubkey,
     pub stake_vault: Pubkey,
+    pub stake_rewards: Pubkey,
+}
+
+#[account]
+pub struct StakeRewards {
+    pub bump: u8,
+    pub authority: Pubkey,
+    pub stake_vault: Pubkey,
+    pub stake: Pubkey,
+    pub daily_rewards: [u64; 30],
+    pub apr: u8,
 }
 
 #[account]
@@ -63,6 +74,7 @@ pub struct InitializeStakeVaultArgs {
     pub name: String,
     pub slots: u64,
     pub collection: String,
+    pub amount: u64,
 }
 
 #[derive(AnchorSerialize, AnchorDeserialize, Clone)]

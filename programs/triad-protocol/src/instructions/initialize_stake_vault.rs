@@ -31,7 +31,7 @@ pub fn initialize_stake_vault(
     stake_vault.authority = *ctx.accounts.signer.key;
     stake_vault.init_ts = Clock::get()?.unix_timestamp;
     stake_vault.end_ts = Clock::get()?.unix_timestamp + 30 * 24 * 60 * 60;
-    stake_vault.amount = 0;
+    stake_vault.amount = args.amount;
     stake_vault.name = args.name;
     stake_vault.amount_paid = 0;
     stake_vault.apr = 0;

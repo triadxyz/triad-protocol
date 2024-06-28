@@ -53,8 +53,6 @@ pub fn deposit_stake_rewards(ctx: Context<DepositStakeRewards>, args: DepositSta
         return Err(TriadProtocolError::InvalidOwnerAuthority.into());
     }
 
-    stake_vault.amount += args.amount;
-
     let cpi_accounts = TransferChecked {
         from: ctx.accounts.from_ata.to_account_info(),
         mint: ctx.accounts.mint.to_account_info(),

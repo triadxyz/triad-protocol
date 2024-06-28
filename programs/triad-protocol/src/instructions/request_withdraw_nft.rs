@@ -51,7 +51,5 @@ pub fn request_withdraw_nft(
 
     stake.withdraw_ts = Clock::get()?.unix_timestamp + 7 * 24 * 60 * 60;
 
-    msg!("Stake Available in 7 days");
-
     Ok(())
 }
