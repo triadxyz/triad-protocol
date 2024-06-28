@@ -37,6 +37,20 @@ export type DepositStakeRewardsArgs = {
   stakeVault: string
 }
 
+export type RequestWithdrawArgs = {
+  wallet: PublicKey
+  nftName: string
+  mint: PublicKey
+  stakeVault: string
+}
+
+export type WithdrawArgs = {
+  wallet: PublicKey
+  nftName: string
+  mint: PublicKey
+  stakeVault: string
+}
+
 export enum RARITY_WEIGHT {
   COMMON = 1,
   UNCOMMON = 2,

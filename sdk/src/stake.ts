@@ -6,7 +6,9 @@ import {
   DepositStakeRewardsArgs,
   InitializeStakeArgs,
   RpcOptions,
-  StakeArgs
+  StakeArgs,
+  RequestWithdrawArgs,
+  WithdrawArgs
 } from './types'
 import { TTRIAD_DECIMALS, TTRIAD_FEE } from './utils/constants'
 
@@ -299,6 +301,81 @@ export default class Stake {
     const method = this.program.methods
       .depositStakeRewards({
         amount,
+        stakeVault
+      })
+      .accounts({
+        signer: wallet,
+        fromAta: FromAta,
+        toAta: ToAta,
+        mint: mint
+      })
+
+    if (options?.microLamports) {
+      method.postInstructions([
+        ComputeBudgetProgram.setComputeUnitPrice({
+          microLamports: options.microLamports
+        })
+      ])
+    }
+
+    return method.rpc({ skipPreflight: options?.skipPreflight })
+  }
+
+  /**
+   *  Request Withdraw
+   *  @param wallet - User wallet
+   *  @param nftName - NFT name
+   *  @param stakeVault - Name of the stake vault
+   *
+   */
+  public async requestWithdraw(
+    { wallet, nftName, mint, stakeVault }: RequestWithdrawArgs,
+    options?: RpcOptions
+  ) {
+    const method = this.program.methods
+      .requestWithdrawNft({
+        nftName,
+        stakeVault
+      })
+      .accounts({
+        signer: wallet,
+        mint: mint
+      })
+
+    if (options?.microLamports) {
+      method.postInstructions([
+        ComputeBudgetProgram.setComputeUnitPrice({
+          microLamports: options.microLamports
+        })
+      ])
+    }
+
+    return method.rpc({ skipPreflight: options?.skipPreflight })
+  }
+
+  /**
+   *  Withdraw NFT
+   *  @param wallet - User wallet
+   *  @param nftName - NFT name
+   *  @param mint - NFT mint
+   *  @param stakeVault - Name of the stake vault
+   *
+   */
+  public async withdraw(
+    { wallet, nftName, mint, stakeVault }: WithdrawArgs,
+    options?: RpcOptions
+  ) {
+    const StakeVault = getStakeVaultAddressSync(
+      this.program.programId,
+      stakeVault
+    )
+
+    const FromAta = getATASync(StakeVault, mint)
+    const ToAta = getATASync(wallet, mint)
+
+    const method = this.program.methods
+      .withdrawNft({
+        nftName,
         stakeVault
       })
       .accounts({

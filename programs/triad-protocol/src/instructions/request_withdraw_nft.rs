@@ -12,14 +12,11 @@ pub struct RequestWithdrawNFT<'info> {
     #[account(mut, seeds = [StakeVault::PREFIX_SEED, args.stake_vault.as_bytes()], bump)]
     pub stake_vault: Box<Account<'info, StakeVault>>,
 
-    #[account(init, payer = signer, space = Stake::SPACE, seeds = [Stake::PREFIX_SEED, signer.key.as_ref(), mint.key().as_ref()], bump)]
+    #[account(mut, seeds = [Stake::PREFIX_SEED, args.nft_name.as_ref()], bump)]
     pub stake: Box<Account<'info, Stake>>,
 
-    #[account(
-        mut,
-        seeds = [b"mint", args.nft_name.as_bytes()], bump
-    )]
-    pub mint: InterfaceAccount<'info, Mint>,
+    #[account(mut)]
+    pub mint: Box<InterfaceAccount<'info, Mint>>,
 
     pub token_program: Program<'info, Token2022>,
     pub associated_token_program: Program<'info, AssociatedToken>,
@@ -49,7 +46,7 @@ pub fn request_withdraw_nft(
         return Err(TriadProtocolError::Unauthorized.into());
     }
 
-    stake.withdraw_ts = Clock::get()?.unix_timestamp + 7 * 24 * 60 * 60;
+    stake.withdraw_ts = Clock::get()?.unix_timestamp + 3 * 24 * 60 * 60;
 
     Ok(())
 }

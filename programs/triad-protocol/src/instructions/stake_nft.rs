@@ -25,7 +25,7 @@ pub struct StakeNFT<'info> {
     #[account(mut, seeds = [StakeVault::PREFIX_SEED, args.stake_vault.as_bytes()], bump)]
     pub stake_vault: Box<Account<'info, StakeVault>>,
 
-    #[account(init, payer = signer, space = Stake::SPACE, seeds = [Stake::PREFIX_SEED, args.name.as_ref()], bump)]
+    #[account(init_if_needed, payer = signer, space = Stake::SPACE, seeds = [Stake::PREFIX_SEED, args.name.as_ref()], bump)]
     pub stake: Box<Account<'info, Stake>>,
 
     #[account(
@@ -36,7 +36,7 @@ pub struct StakeNFT<'info> {
 
     #[account(
         mut, 
-        constraint = from_ata.amount >= 1,
+        constraint = from_ata.amount >= 1 && signer.key() == from_ata.owner && from_ata.mint == mint.key(),
     )]
     pub from_ata: Box<InterfaceAccount<'info, TokenAccount>>,
 
@@ -54,10 +54,6 @@ pub struct StakeNFT<'info> {
 }
 
 pub fn stake_nft(ctx: Context<StakeNFT>, args: StakeNFTArgs) -> Result<()> {
-    if ctx.accounts.signer.key() != ctx.accounts.from_ata.owner.key() {
-        return Err(TriadProtocolError::InvalidOwnerAuthority.into());
-    }
-
     let mint = &ctx.accounts.mint.to_account_info();
     let buffer = mint.try_borrow_data()?;
     let state = PodStateWithExtensions::<PodMint>::unpack(&buffer)?;

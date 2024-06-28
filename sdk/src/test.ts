@@ -5,7 +5,7 @@ import { Wallet } from '@coral-xyz/anchor'
 import { STAKE_SEASON } from './utils/constants'
 import STAKES from './utils/stakes.json'
 
-const file = fs.readFileSync('/Users/dannpl/.config/solana/id.json')
+const file = fs.readFileSync('/Users/dannpl/.config/solana/triad-man.json')
 const rpc_file = fs.readFileSync('/Users/dannpl/.config/solana/rpc.txt')
 const keypair = Keypair.fromSecretKey(
   new Uint8Array(JSON.parse(file.toString()))
@@ -13,6 +13,74 @@ const keypair = Keypair.fromSecretKey(
 const connection = new Connection(rpc_file.toString(), 'confirmed')
 const wallet = new Wallet(keypair)
 const triadProtocol = new TriadProtocol(connection, wallet)
+
+const requestWithdraw = async () => {
+  const response = await triadProtocol.stake.requestWithdraw(
+    {
+      wallet: wallet.publicKey,
+      nftName: 'Triad 0',
+      mint: new PublicKey('FXRhaGeYue7bMCwcksNw4hJRY7jZ1YMwgmCu1Y8fyUNd'),
+      stakeVault: 'Rev 1'
+    },
+    {
+      microLamports: 10000,
+      skipPreflight: true
+    }
+  )
+
+  console.log(response)
+}
+
+const withdraw = async () => {
+  const response = await triadProtocol.stake.withdraw(
+    {
+      wallet: wallet.publicKey,
+      nftName: 'Triad 0',
+      mint: new PublicKey('FXRhaGeYue7bMCwcksNw4hJRY7jZ1YMwgmCu1Y8fyUNd'),
+      stakeVault: 'Rev 1'
+    },
+    {
+      microLamports: 10000,
+      skipPreflight: true
+    }
+  )
+
+  console.log(response)
+}
+
+const getStake = async () => {
+  const response = await triadProtocol.stake.getStakeByWallet(wallet.publicKey)
+  const stakeVaults = await triadProtocol.stake.getStakeVaults()
+
+  console.log(response)
+  console.log(stakeVaults)
+}
+
+const stake = async () => {
+  const response = await triadProtocol.stake.stake(
+    {
+      name: 'Triad 0',
+      wallet: wallet.publicKey,
+      stakeVault: 'Rev 1',
+      rarity: { mythic: {} },
+      collections: {
+        coleta: false,
+        undead: false,
+        alligators: false,
+        pyth: false
+      },
+      mint: new PublicKey('FXRhaGeYue7bMCwcksNw4hJRY7jZ1YMwgmCu1Y8fyUNd')
+    },
+    {
+      skipPreflight: true,
+      microLamports: 20000
+    }
+  )
+
+  console.log(response)
+}
+
+stake()
 
 const getDailyBaseRewards = async () => {
   const stakeVaultRewards =

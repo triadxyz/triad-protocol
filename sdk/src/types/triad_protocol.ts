@@ -437,12 +437,8 @@ export type TriadProtocol = {
                 value: [115, 116, 97, 107, 101]
               },
               {
-                kind: 'account'
-                path: 'signer'
-              },
-              {
-                kind: 'account'
-                path: 'mint'
+                kind: 'arg'
+                path: 'args.nft_name'
               }
             ]
           }
@@ -450,18 +446,6 @@ export type TriadProtocol = {
         {
           name: 'mint'
           writable: true
-          pda: {
-            seeds: [
-              {
-                kind: 'const'
-                value: [109, 105, 110, 116]
-              },
-              {
-                kind: 'arg'
-                path: 'args.nft_name'
-              }
-            ]
-          }
         },
         {
           name: 'tokenProgram'
@@ -628,12 +612,8 @@ export type TriadProtocol = {
                 value: [115, 116, 97, 107, 101]
               },
               {
-                kind: 'account'
-                path: 'signer'
-              },
-              {
-                kind: 'account'
-                path: 'mint'
+                kind: 'arg'
+                path: 'args.nft_name'
               }
             ]
           }
@@ -641,18 +621,6 @@ export type TriadProtocol = {
         {
           name: 'mint'
           writable: true
-          pda: {
-            seeds: [
-              {
-                kind: 'const'
-                value: [109, 105, 110, 116]
-              },
-              {
-                kind: 'arg'
-                path: 'args.nft_name'
-              }
-            ]
-          }
         },
         {
           name: 'fromAta'
