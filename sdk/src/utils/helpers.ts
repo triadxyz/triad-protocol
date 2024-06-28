@@ -91,7 +91,7 @@ export const getStakeVaultAddressSync = (
 export const getATASync = (address: PublicKey, Mint: PublicKey) => {
   const [ATA] = PublicKey.findProgramAddressSync(
     [address.toBytes(), TOKEN_2022_PROGRAM_ID.toBytes(), Mint.toBytes()],
-    ATA_PROGRAM_ID
+    new PublicKey(ATA_PROGRAM_ID)
   )
 
   return ATA
