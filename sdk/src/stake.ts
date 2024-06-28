@@ -2,8 +2,13 @@ import { AnchorProvider, Program } from '@coral-xyz/anchor'
 import { ComputeBudgetProgram, PublicKey } from '@solana/web3.js'
 import { TriadProtocol } from './types/triad_protocol'
 import { getATASync, getStakeVaultAddressSync } from './utils/helpers'
-import BN from 'bn.js'
-import { RpcOptions } from './types'
+import {
+  DepositStakeRewardsArgs,
+  InitializeStakeArgs,
+  RpcOptions,
+  StakeArgs
+} from './types'
+import { TTRIAD_DECIMALS, TTRIAD_FEE } from './utils/constants'
 
 export default class Stake {
   program: Program<TriadProtocol>
@@ -36,6 +41,33 @@ export default class Stake {
   }
 
   /**
+   * Get Stake Vault by name
+   * @param stakeVault - Stake Vault name
+   */
+  async getStakeVaultByName(stakeVault: string) {
+    const StakeVault = getStakeVaultAddressSync(
+      this.program.programId,
+      stakeVault
+    )
+
+    const response = await this.program.account.stakeVault.fetch(StakeVault)
+
+    return {
+      name: response.name,
+      collection: response.collection,
+      slots: response.slots.toNumber(),
+      amount: response.amount.toNumber(),
+      isLocked: response.isLocked,
+      usersPaid: response.usersPaid,
+      amountPaid: response.amountPaid.toNumber(),
+      amountUsers: response.amountUsers.toNumber(),
+      apr: response.apr,
+      initTs: response.initTs.toNumber(),
+      endTs: response.endTs.toNumber()
+    }
+  }
+
+  /**
    * Get all stakes
    */
   async getStakes() {
@@ -44,16 +76,21 @@ export default class Stake {
     return response.map((stake) => ({
       name: stake.account.name,
       collections: stake.account.collections,
-      rarity: stake.account.rarity,
-      stakeVault: stake.account.stakeVault,
-      account: stake.account.authority,
+      rarity: Object.keys(stake.account.rarity)[0],
+      stakeVault: stake.account.stakeVault.toBase58(),
+      authority: stake.account.authority.toBase58(),
       initTs: stake.account.initTs.toNumber(),
       isLocked: stake.account.isLocked,
       withdrawTs: stake.account.withdrawTs.toNumber(),
-      mint: stake.account.mint
+      mint: stake.account.mint.toBase58(),
+      stakeRewards: stake.account.stakeRewards.toBase58()
     }))
   }
 
+  /**
+   * Get Stake by wallet
+   * @param wallet - User wallet
+   */
   async getStakeByWallet(wallet: PublicKey) {
     const response = await this.program.account.stake.all()
 
@@ -62,14 +99,97 @@ export default class Stake {
       .map((stake) => ({
         name: stake.account.name,
         collections: stake.account.collections,
-        rarity: stake.account.rarity,
-        stakeVault: stake.account.stakeVault,
-        account: stake.account.authority,
+        rarity: Object.keys(stake.account.rarity)[0],
+        stakeVault: stake.account.stakeVault.toBase58(),
+        authority: stake.account.authority.toBase58(),
         initTs: stake.account.initTs.toNumber(),
         isLocked: stake.account.isLocked,
         withdrawTs: stake.account.withdrawTs.toNumber(),
-        mint: stake.account.mint
+        mint: stake.account.mint.toBase58(),
+        stakeRewards: stake.account.stakeRewards.toBase58()
       }))
+  }
+
+  async getStakeVaultRewards(stakeVault: string) {
+    const StakeVault = getStakeVaultAddressSync(
+      this.program.programId,
+      stakeVault
+    )
+
+    const response = await this.program.account.stakeVault.fetch(StakeVault)
+
+    const data: {
+      amount: number
+      perDay: number
+      perWeek: number
+      perMonth: number
+      period: number
+      days: number[]
+    } = {
+      amount: 0,
+      perDay: 0,
+      perWeek: 0,
+      perMonth: 0,
+      period: 0,
+      days: []
+    }
+
+    const amount = response.amount.toNumber() / 10 ** TTRIAD_DECIMALS
+
+    data.period =
+      (response.endTs.toNumber() * 1000 - response.initTs.toNumber() * 1000) /
+      (1000 * 60 * 60 * 24)
+    data.amount = amount - (amount * TTRIAD_FEE) / 100
+    data.perDay = data.amount / data.period
+    data.perWeek = data.perDay * 7
+    data.perMonth = data.perDay * 30
+
+    const endTsInMs = response.endTs.toNumber() * 1000
+    const initTsInMs = response.initTs.toNumber() * 1000
+
+    let currentTs = initTsInMs
+
+    while (currentTs <= endTsInMs) {
+      data.days.push(currentTs)
+      currentTs = currentTs + 1000 * 60 * 60 * 24
+    }
+
+    return data
+  }
+
+  async getStakeRewardsByWallet(
+    wallet: PublicKey,
+    stakeVaultRewards: {
+      amount: number
+      perDay: number
+      perWeek: number
+      perMonth: number
+      period: number
+      days: number[]
+    }
+  ) {
+    const stakes = await this.getStakeByWallet(wallet)
+
+    const rewards = {}
+
+    for (const day of stakeVaultRewards.days) {
+      stakes.forEach((stake) => {
+        const date = stake.initTs * 1000
+        const currentDate = new Date().getTime()
+
+        if (date <= day && day <= currentDate) {
+          const key = new Date(day).toISOString().split('T')[0]
+
+          if (!rewards[key]) {
+            rewards[key] = []
+          }
+
+          rewards[key].push(stake)
+        }
+      })
+    }
+
+    return rewards
   }
 
   /**
@@ -82,37 +202,13 @@ export default class Stake {
    *
    */
   public async stake(
-    {
-      name,
-      wallet,
-      mint,
-      collections,
-      rarity
-    }: {
-      name: string
-      wallet: PublicKey
-      mint: PublicKey
-      collections: {
-        alligators: boolean
-        coleta: boolean
-        undead: boolean
-        pyth: boolean
-      }
-      rarity:
-        | { common: {} }
-        | { uncommon: {} }
-        | { rare: {} }
-        | { epic: {} }
-        | { legendary: {} }
-        | { mythic: {} }
-    },
+    { name, wallet, mint, collections, rarity, stakeVault }: StakeArgs,
     options?: RpcOptions
   ) {
-    const stakeVaultName = 'Triad Share 1'
     const FromAta = getATASync(wallet, mint)
     const StakeVault = getStakeVaultAddressSync(
       this.program.programId,
-      stakeVaultName
+      stakeVault
     )
     const ToAta = getATASync(StakeVault, mint)
 
@@ -129,7 +225,7 @@ export default class Stake {
         name,
         collections: items,
         rarity,
-        stakeVault: stakeVaultName
+        stakeVault
       })
       .accounts({
         signer: wallet,
@@ -157,22 +253,15 @@ export default class Stake {
    *
    */
   public async initializeStakeVault(
-    {
-      name,
-      slots,
-      collection
-    }: {
-      name: string
-      slots: BN
-      collection: string
-    },
+    { name, slots, collection, amount }: InitializeStakeArgs,
     options?: RpcOptions
   ) {
     const method = this.program.methods
       .initializeStakeVault({
         name,
         slots,
-        collection
+        collection,
+        amount
       })
       .accounts({
         signer: this.provider.wallet.publicKey
@@ -197,29 +286,20 @@ export default class Stake {
    *
    */
   public async depositStakeRewards(
-    {
-      wallet,
-      mint,
-      amount
-    }: {
-      wallet: PublicKey
-      mint: PublicKey
-      amount: BN
-    },
+    { wallet, mint, amount, stakeVault }: DepositStakeRewardsArgs,
     options?: RpcOptions
   ) {
-    const stakeVaultName = 'Triad Share 1'
     const FromAta = getATASync(wallet, mint)
     const StakeVault = getStakeVaultAddressSync(
       this.program.programId,
-      stakeVaultName
+      stakeVault
     )
     const ToAta = getATASync(StakeVault, mint)
 
     const method = this.program.methods
       .depositStakeRewards({
         amount,
-        stakeVault: stakeVaultName
+        stakeVault
       })
       .accounts({
         signer: wallet,

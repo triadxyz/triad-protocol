@@ -1,6 +1,6 @@
 {
   "name": "@triadxyz/triad-protocol",
-  "version": "0.1.3-alpha.7",
+  "version": "0.0.1-beta",
   "main": "./dist/index.js",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -25,7 +25,9 @@
     "blockchain",
     "protocol",
     "triad",
-    "trading protocols"
+    "trading protocols",
+    "dex",
+    "SPL 404"
   ],
   "author": "Triad Labs",
   "license": "ISC",

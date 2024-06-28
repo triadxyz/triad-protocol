@@ -890,6 +890,10 @@
           {
             "name": "collection",
             "type": "string"
+          },
+          {
+            "name": "amount",
+            "type": "u64"
           }
         ]
       }
@@ -1069,6 +1073,10 @@
           },
           {
             "name": "stake_vault",
+            "type": "pubkey"
+          },
+          {
+            "name": "stake_rewards",
             "type": "pubkey"
           }
         ]

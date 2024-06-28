@@ -942,6 +942,10 @@ export type TriadProtocol = {
           {
             name: 'collection'
             type: 'string'
+          },
+          {
+            name: 'amount'
+            type: 'u64'
           }
         ]
       }
@@ -1121,6 +1125,10 @@ export type TriadProtocol = {
           },
           {
             name: 'stakeVault'
+            type: 'pubkey'
+          },
+          {
+            name: 'stakeRewards'
             type: 'pubkey'
           }
         ]

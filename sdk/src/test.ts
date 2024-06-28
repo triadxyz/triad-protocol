@@ -1,70 +1,68 @@
 import fs from 'fs'
 import { Connection, Keypair, PublicKey } from '@solana/web3.js'
 import TriadProtocol from './index'
-import { BN, Wallet } from '@coral-xyz/anchor'
+import { Wallet } from '@coral-xyz/anchor'
+import { STAKE_SEASON } from './utils/constants'
+import STAKES from './utils/stakes.json'
 
-export default class Test {
-  file = fs.readFileSync('/Users/dannpl/.config/solana/id.json')
-  Keypair = Keypair.fromSecretKey(
-    new Uint8Array(JSON.parse(this.file.toString()))
-  )
-  connection = new Connection(
-    'https://mainnet.helius-rpc.com/?api-key=17c07b72-cbb1-4408-9069-8624f01ddc8f'
-  )
-  wallet = new Wallet(this.Keypair)
-  triadProtocol = new TriadProtocol(this.connection, this.wallet)
+const file = fs.readFileSync('/Users/dannpl/.config/solana/id.json')
+const rpc_file = fs.readFileSync('/Users/dannpl/.config/solana/rpc.txt')
+const keypair = Keypair.fromSecretKey(
+  new Uint8Array(JSON.parse(file.toString()))
+)
+const connection = new Connection(rpc_file.toString(), 'confirmed')
+const wallet = new Wallet(keypair)
+const triadProtocol = new TriadProtocol(connection, wallet)
 
-  constructor() {}
+const getDailyBaseRewards = async () => {
+  const stakeVaultRewards =
+    await triadProtocol.stake.getStakeVaultRewards(STAKE_SEASON)
 
-  init = async () => {}
+  const days = {}
 
-  getStakeVaults = async () => {
-    const response = await this.triadProtocol.stake.getStakeVaults()
+  STAKES.forEach((stake) => {
+    const keys = Object.keys(stake.rewards)
 
-    console.log('Stake Vaults:', response)
-  }
+    keys.forEach((key) => {
+      if (!days[key]) {
+        days[key] = 0
+      }
 
-  getStakes = async () => {
-    const response = await this.triadProtocol.stake.getStakes()
-
-    console.log('Stakes:', response)
-  }
-
-  initializeStakeVault = async () => {
-    const reponse = await this.triadProtocol.stake.initializeStakeVault(
-      {
-        name: 'Triad Share 1',
-        collection: 'Triad',
-        slots: new BN(1839)
-      },
-      { skipPreflight: true, microLamports: 40000 }
-    )
-
-    console.log('Initialize Stake Vault:', reponse)
-  }
-
-  stakeNFT = async () => {
-    const reponse = await this.triadProtocol.stake.stake({
-      name: 'Triad 2',
-      wallet: this.wallet.publicKey,
-      collections: { alligators: true, coleta: true, undead: true, pyth: true },
-      mint: new PublicKey('DQ3Uq6GDX6HA99jVBaErtZcvhm1AsCpkB421a2MEDJ7B'),
-      rarity: { mythic: {} }
+      days[key] += Object.values(stake.rewards[key]).length
     })
+  })
 
-    console.log('Initialize Stake Vault:', reponse)
-  }
+  const values = {}
 
-  depositStakeRewards = async () => {
-    const reponse = await this.triadProtocol.stake.depositStakeRewards(
-      {
-        wallet: this.wallet.publicKey,
-        amount: new BN(0),
-        mint: new PublicKey('t3DohmswhKk94PPbPYwA6ZKACyY3y5kbcqeQerAJjmV')
-      },
-      { skipPreflight: true, microLamports: 40000 }
+  Object.keys(days).forEach((key) => {
+    values[key] = stakeVaultRewards.perDay / days[key]
+  })
+
+  console.log('Daily Rewards:', values)
+}
+
+const getStakesByWallet = async () => {
+  const response = await triadProtocol.stake.getStakes()
+  const stakeVaultRewards =
+    await triadProtocol.stake.getStakeVaultRewards(STAKE_SEASON)
+
+  const users = response
+    .map((stake) => stake.authority)
+    .filter((value, index, self) => self.indexOf(value) === index)
+
+  const data = []
+
+  for (const user of users) {
+    const rewardsByWallet = await triadProtocol.stake.getStakeRewardsByWallet(
+      new PublicKey(user),
+      stakeVaultRewards
     )
 
-    console.log('Deposit Stake Rewards:', reponse)
+    data.push({
+      wallet: user,
+      rewards: rewardsByWallet
+    })
   }
+
+  fs.writeFileSync('./src/utils/stakes.json', JSON.stringify(data, null, 2))
 }
