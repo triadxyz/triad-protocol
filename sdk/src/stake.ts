@@ -1,15 +1,20 @@
 import { AnchorProvider, Program } from '@coral-xyz/anchor'
 import { ComputeBudgetProgram, PublicKey } from '@solana/web3.js'
 import { TriadProtocol } from './types/triad_protocol'
-import { getATASync, getStakeVaultAddressSync } from './utils/helpers'
+import {
+  formatStake,
+  formatStakeVault,
+  getATASync,
+  getStakeVaultAddressSync
+} from './utils/helpers'
+import { RpcOptions } from './types'
 import {
   DepositStakeRewardsArgs,
   InitializeStakeArgs,
-  RpcOptions,
   StakeArgs,
   RequestWithdrawArgs,
   WithdrawArgs
-} from './types'
+} from './types/stake'
 import { TTRIAD_DECIMALS, TTRIAD_FEE } from './utils/constants'
 
 export default class Stake {
@@ -27,19 +32,7 @@ export default class Stake {
   async getStakeVaults() {
     const response = await this.program.account.stakeVault.all()
 
-    return response.map((stakeVault) => ({
-      name: stakeVault.account.name,
-      collection: stakeVault.account.collection,
-      slots: stakeVault.account.slots.toNumber(),
-      amount: stakeVault.account.amount.toNumber(),
-      isLocked: stakeVault.account.isLocked,
-      usersPaid: stakeVault.account.usersPaid,
-      amountPaid: stakeVault.account.amountPaid.toNumber(),
-      amountUsers: stakeVault.account.amountUsers.toNumber(),
-      apr: stakeVault.account.apr,
-      initTs: stakeVault.account.initTs.toNumber(),
-      endTs: stakeVault.account.endTs.toNumber()
-    }))
+    return response.map((stakeVault) => formatStakeVault(stakeVault.account))
   }
 
   /**
@@ -52,21 +45,9 @@ export default class Stake {
       stakeVault
     )
 
-    const response = await this.program.account.stakeVault.fetch(StakeVault)
-
-    return {
-      name: response.name,
-      collection: response.collection,
-      slots: response.slots.toNumber(),
-      amount: response.amount.toNumber(),
-      isLocked: response.isLocked,
-      usersPaid: response.usersPaid,
-      amountPaid: response.amountPaid.toNumber(),
-      amountUsers: response.amountUsers.toNumber(),
-      apr: response.apr,
-      initTs: response.initTs.toNumber(),
-      endTs: response.endTs.toNumber()
-    }
+    return formatStakeVault(
+      await this.program.account.stakeVault.fetch(StakeVault)
+    )
   }
 
   /**
@@ -75,18 +56,7 @@ export default class Stake {
   async getStakes() {
     const response = await this.program.account.stake.all()
 
-    return response.map((stake) => ({
-      name: stake.account.name,
-      collections: stake.account.collections,
-      rarity: Object.keys(stake.account.rarity)[0],
-      stakeVault: stake.account.stakeVault.toBase58(),
-      authority: stake.account.authority.toBase58(),
-      initTs: stake.account.initTs.toNumber(),
-      isLocked: stake.account.isLocked,
-      withdrawTs: stake.account.withdrawTs.toNumber(),
-      mint: stake.account.mint.toBase58(),
-      stakeRewards: stake.account.stakeRewards.toBase58()
-    }))
+    return response.map((stake) => formatStake(stake.account))
   }
 
   /**
@@ -98,18 +68,7 @@ export default class Stake {
 
     return response
       .filter((stake) => stake.account.authority.equals(wallet))
-      .map((stake) => ({
-        name: stake.account.name,
-        collections: stake.account.collections,
-        rarity: Object.keys(stake.account.rarity)[0],
-        stakeVault: stake.account.stakeVault.toBase58(),
-        authority: stake.account.authority.toBase58(),
-        initTs: stake.account.initTs.toNumber(),
-        isLocked: stake.account.isLocked,
-        withdrawTs: stake.account.withdrawTs.toNumber(),
-        mint: stake.account.mint.toBase58(),
-        stakeRewards: stake.account.stakeRewards.toBase58()
-      }))
+      .map((stake) => formatStake(stake.account))
   }
 
   async getStakeVaultRewards(stakeVault: string) {
@@ -117,43 +76,28 @@ export default class Stake {
       this.program.programId,
       stakeVault
     )
-
     const response = await this.program.account.stakeVault.fetch(StakeVault)
 
-    const data: {
-      amount: number
-      perDay: number
-      perWeek: number
-      perMonth: number
-      period: number
-      days: number[]
-    } = {
-      amount: 0,
-      perDay: 0,
-      perWeek: 0,
-      perMonth: 0,
-      period: 0,
+    const amount = response.amount.toNumber() / 10 ** TTRIAD_DECIMALS
+    const period =
+      (response.endTs.toNumber() - response.initTs.toNumber()) / (60 * 60 * 24) // Days
+    const netAmount = amount - (amount * TTRIAD_FEE) / 100
+
+    const data = {
+      amount: netAmount,
+      perDay: netAmount / period,
+      perWeek: (netAmount / period) * 7,
+      perMonth: (netAmount / period) * 30,
+      period,
       days: []
     }
 
-    const amount = response.amount.toNumber() / 10 ** TTRIAD_DECIMALS
-
-    data.period =
-      (response.endTs.toNumber() * 1000 - response.initTs.toNumber() * 1000) /
-      (1000 * 60 * 60 * 24)
-    data.amount = amount - (amount * TTRIAD_FEE) / 100
-    data.perDay = data.amount / data.period
-    data.perWeek = data.perDay * 7
-    data.perMonth = data.perDay * 30
-
-    const endTsInMs = response.endTs.toNumber() * 1000
-    const initTsInMs = response.initTs.toNumber() * 1000
-
-    let currentTs = initTsInMs
-
-    while (currentTs <= endTsInMs) {
-      data.days.push(currentTs)
-      currentTs = currentTs + 1000 * 60 * 60 * 24
+    for (
+      let ts = response.initTs.toNumber() * 1000;
+      ts <= response.endTs.toNumber() * 1000;
+      ts += 1000 * 60 * 60 * 24
+    ) {
+      data.days.push(ts)
     }
 
     return data

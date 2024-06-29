@@ -3,7 +3,6 @@ import { Connection, Keypair, PublicKey } from '@solana/web3.js'
 import TriadProtocol from './index'
 import { Wallet } from '@coral-xyz/anchor'
 import { STAKE_SEASON } from './utils/constants'
-import STAKES from './utils/stakes.json'
 
 const file = fs.readFileSync('/Users/dannpl/.config/solana/triad-man.json')
 const rpc_file = fs.readFileSync('/Users/dannpl/.config/solana/rpc.txt')
@@ -13,6 +12,10 @@ const keypair = Keypair.fromSecretKey(
 const connection = new Connection(rpc_file.toString(), 'confirmed')
 const wallet = new Wallet(keypair)
 const triadProtocol = new TriadProtocol(connection, wallet)
+
+triadProtocol.stake.getStakeVaults().then(console.log)
+
+triadProtocol.stake.getStakeVaultByName('Triad Share 1').then(console.log)
 
 const requestWithdraw = async () => {
   const response = await triadProtocol.stake.requestWithdraw(
@@ -80,33 +83,31 @@ const stake = async () => {
   console.log(response)
 }
 
-stake()
-
 const getDailyBaseRewards = async () => {
   const stakeVaultRewards =
     await triadProtocol.stake.getStakeVaultRewards(STAKE_SEASON)
 
   const days = {}
 
-  STAKES.forEach((stake) => {
-    const keys = Object.keys(stake.rewards)
+  // STAKES.forEach((stake) => {
+  //   const keys = Object.keys(stake.rewards)
 
-    keys.forEach((key) => {
-      if (!days[key]) {
-        days[key] = 0
-      }
+  //   keys.forEach((key) => {
+  //     if (!days[key]) {
+  //       days[key] = 0
+  //     }
 
-      days[key] += Object.values(stake.rewards[key]).length
-    })
-  })
+  //     days[key] += Object.values(stake.rewards[key]).length
+  //   })
+  // })
 
-  const values = {}
+  // const values = {}
 
-  Object.keys(days).forEach((key) => {
-    values[key] = stakeVaultRewards.perDay / days[key]
-  })
+  // Object.keys(days).forEach((key) => {
+  //   values[key] = stakeVaultRewards.perDay / days[key]
+  // })
 
-  console.log('Daily Rewards:', values)
+  // console.log('Daily Rewards:', values)
 }
 
 const getStakesByWallet = async () => {
@@ -120,6 +121,8 @@ const getStakesByWallet = async () => {
 
   const data = []
 
+  let i = 0
+
   for (const user of users) {
     const rewardsByWallet = await triadProtocol.stake.getStakeRewardsByWallet(
       new PublicKey(user),
@@ -130,7 +133,9 @@ const getStakesByWallet = async () => {
       wallet: user,
       rewards: rewardsByWallet
     })
+    i++
+    console.log(i, '/', users.length)
   }
 
-  fs.writeFileSync('./src/utils/stakes.json', JSON.stringify(data, null, 2))
+  fs.writeFileSync('./src/utils/stakes1.json', JSON.stringify(data, null, 2))
 }
