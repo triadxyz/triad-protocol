@@ -1,3 +1,8 @@
+import {
+  COLLECTION_MUlTIPLIER,
+  StakeResponse,
+  StakeVaultResponse
+} from './../types/stake'
 import { PublicKey } from '@solana/web3.js'
 import * as anchor from '@coral-xyz/anchor'
 import BN from 'bn.js'
@@ -99,4 +104,66 @@ export const getATASync = (address: PublicKey, Mint: PublicKey) => {
 
 export const formatNumber = (number: bigint | BN, decimals = 6) => {
   return Number(number.toString()) / 10 ** decimals
+}
+
+export const formatStakeVault = (stakeVault: any): StakeVaultResponse => {
+  return {
+    name: stakeVault.name,
+    collection: stakeVault.collection,
+    slots: stakeVault.slots.toNumber(),
+    amount: stakeVault.amount.toNumber(),
+    isLocked: stakeVault.isLocked,
+    usersPaid: stakeVault.usersPaid.toBase58(),
+    amountPaid: stakeVault.amountPaid.toNumber(),
+    amountUsers: stakeVault.amountUsers.toNumber(),
+    apr: stakeVault.apr,
+    initTs: stakeVault.initTs.toNumber(),
+    endTs: stakeVault.endTs.toNumber()
+  }
+}
+
+export const formatStake = (stake: any): StakeResponse => {
+  return {
+    name: stake.name,
+    collections: stake.collections,
+    rarity: Object.keys(stake.rarity)[0],
+    stakeVault: stake.stakeVault.toBase58(),
+    authority: stake.authority.toBase58(),
+    initTs: stake.initTs.toNumber(),
+    isLocked: stake.isLocked,
+    withdrawTs: stake.withdrawTs.toNumber(),
+    mint: stake.mint.toBase58(),
+    stakeRewards: stake.stakeRewards.toBase58()
+  }
+}
+
+export const calculateTotalMultiplier = (
+  collections: COLLECTION_MUlTIPLIER[],
+  rank: { max: number; currentPosition: number }
+) => {
+  let multiplier = 1
+
+  collections.forEach((collection) => {
+    if (COLLECTION_MUlTIPLIER[collection]) {
+      multiplier *= Number(COLLECTION_MUlTIPLIER[collection])
+    }
+  })
+
+  let rankMultiplier = (rank.max + 1 - rank.currentPosition) / rank.max
+
+  return multiplier * rankMultiplier
+}
+
+export const calculateAPR = ({
+  rewards,
+  rate,
+  amount,
+  baseRewards
+}: {
+  rewards: number
+  rate: number
+  amount: number
+  baseRewards: number
+}) => {
+  return ((rewards * rate) / (amount * baseRewards)) * 100
 }
