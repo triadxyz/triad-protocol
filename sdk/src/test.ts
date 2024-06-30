@@ -2,7 +2,10 @@ import fs from 'fs'
 import { Connection, Keypair, PublicKey } from '@solana/web3.js'
 import TriadProtocol from './index'
 import { Wallet } from '@coral-xyz/anchor'
-import { STAKE_SEASON } from './utils/constants'
+import { STAKE_SEASON_1 } from './utils/constants'
+import RARITY from './utils/stake-season-1/rarity.json'
+import { calculateAPR, calculateTotalMultiplier } from './utils/helpers'
+import { TOKEN_2022_PROGRAM_ID, TOKEN_PROGRAM_ID } from '@solana/spl-token'
 
 const file = fs.readFileSync('/Users/dannpl/.config/solana/triad-man.json')
 const rpc_file = fs.readFileSync('/Users/dannpl/.config/solana/rpc.txt')
@@ -13,9 +16,64 @@ const connection = new Connection(rpc_file.toString(), 'confirmed')
 const wallet = new Wallet(keypair)
 const triadProtocol = new TriadProtocol(connection, wallet)
 
-triadProtocol.stake.getStakeVaults().then(console.log)
+const populateStakeDay = async () => {
+  const { perDay } =
+    await triadProtocol.stake.getStakeVaultRewards(STAKE_SEASON_1)
+  const day = 1719323851
+  const stakes = await triadProtocol.stake.getStakesByDay(STAKE_SEASON_1, day)
 
-triadProtocol.stake.getStakeVaultByName('Triad Share 1').then(console.log)
+  const newItems = []
+
+  stakes.forEach((item) => {
+    const itemRarity = RARITY.find((rarity) => rarity.onchainId === item.mint)
+
+    if (!itemRarity) {
+      return
+    }
+
+    newItems.push({
+      ...item,
+      rarity: itemRarity.rarity,
+      rarityRankHrtt: itemRarity.rarityRankHrtt,
+      totalMultiplier: calculateTotalMultiplier(
+        Object.keys(item.collections).map((x) => x.toUpperCase()) as any,
+        {
+          max: 1839,
+          currentPosition: itemRarity.rarityRankHrtt
+        }
+      )
+    })
+  })
+
+  const totalMultiplierSum = newItems.reduce(
+    (sum, user) => sum + user.totalMultiplier,
+    0
+  )
+
+  const rewards = newItems.map((item) => {
+    const rewards = (item.totalMultiplier / totalMultiplierSum) * perDay
+
+    return {
+      ...item,
+      rewards,
+      apr: calculateAPR({
+        rewards,
+        rate: 7,
+        amount: 1,
+        baseRewards: perDay
+      })
+    }
+  })
+
+  const orderedRewards = rewards.sort((a, b) => b.rewards - a.rewards)
+
+  console.log(orderedRewards.reduce((sum, user) => sum + user.apr, 0))
+
+  fs.writeFileSync(
+    `./src/utils/stake-season-1/stakes/1/${day}.json`,
+    JSON.stringify(orderedRewards, null, 2)
+  )
+}
 
 const requestWithdraw = async () => {
   const response = await triadProtocol.stake.requestWithdraw(
@@ -59,6 +117,22 @@ const getStake = async () => {
   console.log(stakeVaults)
 }
 
+const getStakes = async () => {
+  const response = await triadProtocol.stake.getStakes(STAKE_SEASON_1)
+
+  const users = response
+    .filter(
+      (item, index, self) =>
+        index === self.findIndex((t) => t.authority === item.authority)
+    )
+    .map((user) => user.authority)
+
+  fs.writeFileSync(
+    './src/utils/stake-season-1/users.json',
+    JSON.stringify(users, null, 2)
+  )
+}
+
 const stake = async () => {
   const response = await triadProtocol.stake.stake(
     {
@@ -81,61 +155,4 @@ const stake = async () => {
   )
 
   console.log(response)
-}
-
-const getDailyBaseRewards = async () => {
-  const stakeVaultRewards =
-    await triadProtocol.stake.getStakeVaultRewards(STAKE_SEASON)
-
-  const days = {}
-
-  // STAKES.forEach((stake) => {
-  //   const keys = Object.keys(stake.rewards)
-
-  //   keys.forEach((key) => {
-  //     if (!days[key]) {
-  //       days[key] = 0
-  //     }
-
-  //     days[key] += Object.values(stake.rewards[key]).length
-  //   })
-  // })
-
-  // const values = {}
-
-  // Object.keys(days).forEach((key) => {
-  //   values[key] = stakeVaultRewards.perDay / days[key]
-  // })
-
-  // console.log('Daily Rewards:', values)
-}
-
-const getStakesByWallet = async () => {
-  const response = await triadProtocol.stake.getStakes()
-  const stakeVaultRewards =
-    await triadProtocol.stake.getStakeVaultRewards(STAKE_SEASON)
-
-  const users = response
-    .map((stake) => stake.authority)
-    .filter((value, index, self) => self.indexOf(value) === index)
-
-  const data = []
-
-  let i = 0
-
-  for (const user of users) {
-    const rewardsByWallet = await triadProtocol.stake.getStakeRewardsByWallet(
-      new PublicKey(user),
-      stakeVaultRewards
-    )
-
-    data.push({
-      wallet: user,
-      rewards: rewardsByWallet
-    })
-    i++
-    console.log(i, '/', users.length)
-  }
-
-  fs.writeFileSync('./src/utils/stakes1.json', JSON.stringify(data, null, 2))
 }

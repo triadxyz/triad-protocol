@@ -55,7 +55,7 @@ export enum RARITY_WEIGHT {
   MYTHIC = 6
 }
 
-export enum COLLECTION_MUlTIPlIER {
+export enum COLLECTION_MUlTIPLIER {
   ALLIGATORS = 1.5,
   COLETA = 1.5,
   UNDEAD = 1.5,

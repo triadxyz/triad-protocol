@@ -13,7 +13,8 @@ import {
   InitializeStakeArgs,
   StakeArgs,
   RequestWithdrawArgs,
-  WithdrawArgs
+  WithdrawArgs,
+  StakeResponse
 } from './types/stake'
 import { TTRIAD_DECIMALS, TTRIAD_FEE } from './utils/constants'
 
@@ -51,12 +52,20 @@ export default class Stake {
   }
 
   /**
-   * Get all stakes
+   * Get all stakes by vault
    */
-  async getStakes() {
+  async getStakes(stakeVault: string) {
     const response = await this.program.account.stake.all()
+    const StakeVault = getStakeVaultAddressSync(
+      this.program.programId,
+      stakeVault
+    )
 
-    return response.map((stake) => formatStake(stake.account))
+    return response
+      .filter(
+        (item) => item.account.stakeVault.toBase58() === StakeVault.toBase58()
+      )
+      .map((stake) => formatStake(stake.account))
   }
 
   /**
@@ -71,6 +80,10 @@ export default class Stake {
       .map((stake) => formatStake(stake.account))
   }
 
+  /**
+   * Get Stake Vault Rewards details
+   * @param stakeVault - Stake Vault name
+   */
   async getStakeVaultRewards(stakeVault: string) {
     const StakeVault = getStakeVaultAddressSync(
       this.program.programId,
@@ -80,10 +93,17 @@ export default class Stake {
 
     const amount = response.amount.toNumber() / 10 ** TTRIAD_DECIMALS
     const period =
-      (response.endTs.toNumber() - response.initTs.toNumber()) / (60 * 60 * 24) // Days
+      (response.endTs.toNumber() - response.initTs.toNumber()) / (60 * 60 * 24)
     const netAmount = amount - (amount * TTRIAD_FEE) / 100
 
-    const data = {
+    const data: {
+      amount: number
+      perDay: number
+      perWeek: number
+      perMonth: number
+      period: number
+      days: number[]
+    } = {
       amount: netAmount,
       perDay: netAmount / period,
       perWeek: (netAmount / period) * 7,
@@ -93,9 +113,9 @@ export default class Stake {
     }
 
     for (
-      let ts = response.initTs.toNumber() * 1000;
-      ts <= response.endTs.toNumber() * 1000;
-      ts += 1000 * 60 * 60 * 24
+      let ts = response.initTs.toNumber();
+      ts <= response.endTs.toNumber();
+      ts += 60 * 60 * 24
     ) {
       data.days.push(ts)
     }
@@ -103,37 +123,25 @@ export default class Stake {
     return data
   }
 
-  async getStakeRewardsByWallet(
-    wallet: PublicKey,
-    stakeVaultRewards: {
-      amount: number
-      perDay: number
-      perWeek: number
-      perMonth: number
-      period: number
-      days: number[]
-    }
-  ) {
-    const stakes = await this.getStakeByWallet(wallet)
+  /**
+   * Get Stakes by day
+   * @param stakeVault - Stake Vault name
+   * @param day - Day timestamp
+   */
+  async getStakesByDay(stakeVault: string, day: number) {
+    const stakes = await this.getStakes(stakeVault)
 
-    const rewards = {}
+    const rewards: StakeResponse[] = []
 
-    for (const day of stakeVaultRewards.days) {
-      stakes.forEach((stake) => {
-        const date = stake.initTs * 1000
-        const currentDate = new Date().getTime()
+    stakes.forEach((stake) => {
+      const date = stake.initTs * 1000
+      const stakeDay = day * 1000
+      const currentDate = new Date().getTime()
 
-        if (date <= day && day <= currentDate) {
-          const key = new Date(day).toISOString().split('T')[0]
-
-          if (!rewards[key]) {
-            rewards[key] = []
-          }
-
-          rewards[key].push(stake)
-        }
-      })
-    }
+      if (date <= stakeDay && stakeDay <= currentDate) {
+        rewards.push(stake)
+      }
+    })
 
     return rewards
   }

@@ -1,4 +1,8 @@
-import { StakeResponse, StakeVaultResponse } from './../types/stake'
+import {
+  COLLECTION_MUlTIPLIER,
+  StakeResponse,
+  StakeVaultResponse
+} from './../types/stake'
 import { PublicKey } from '@solana/web3.js'
 import * as anchor from '@coral-xyz/anchor'
 import BN from 'bn.js'
@@ -131,4 +135,35 @@ export const formatStake = (stake: any): StakeResponse => {
     mint: stake.mint.toBase58(),
     stakeRewards: stake.stakeRewards.toBase58()
   }
+}
+
+export const calculateTotalMultiplier = (
+  collections: COLLECTION_MUlTIPLIER[],
+  rank: { max: number; currentPosition: number }
+) => {
+  let multiplier = 1
+
+  collections.forEach((collection) => {
+    if (COLLECTION_MUlTIPLIER[collection]) {
+      multiplier *= Number(COLLECTION_MUlTIPLIER[collection])
+    }
+  })
+
+  let rankMultiplier = (rank.max + 1 - rank.currentPosition) / rank.max
+
+  return multiplier * rankMultiplier
+}
+
+export const calculateAPR = ({
+  rewards,
+  rate,
+  amount,
+  baseRewards
+}: {
+  rewards: number
+  rate: number
+  amount: number
+  baseRewards: number
+}) => {
+  return ((rewards * rate) / (amount * baseRewards)) * 100
 }
