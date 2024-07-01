@@ -49,7 +49,7 @@ pub fn claim_stake_rewards(
     ctx: Context<ClaimStakeRewards>,
     args: ClaimStakeRewardsArgs,
 ) -> Result<()> {
-    if ctx.accounts.signer.key() != ctx.accounts.from_ata.owner.key() {
+    if ctx.accounts.signer.key() != ctx.accounts.to_ata.owner.key() {
         return Err(TriadProtocolError::InvalidOwnerAuthority.into());
     }
 

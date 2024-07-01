@@ -484,7 +484,8 @@ export default class Stake {
     const tx = new VersionedTransaction(messageV0)
 
     return this.provider.sendAndConfirm(tx, [], {
-      skipPreflight: options?.skipPreflight
+      skipPreflight: options?.skipPreflight,
+      commitment: 'confirmed',
     })
   }
 
@@ -493,7 +494,6 @@ export default class Stake {
    *  @param wallet - User wallet
    *  @param mint - NFT mint
    *  @param week - Week rewards
-   *  @param amount - Reward amount
    *  @param stakeVault - Name of the stake vault
    *  @param nftName - Name of the nft
    *
