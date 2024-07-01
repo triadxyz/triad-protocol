@@ -1,5 +1,5 @@
 use crate::constants::ADMIN;
-use crate::StakeRewards;
+use crate::NFTRewards;
 use crate::{errors::TriadProtocolError, state::Stake, StakeVault, WithdrawNFTArgs};
 use anchor_lang::prelude::*;
 use anchor_spl::token_2022::Token2022;
@@ -25,7 +25,7 @@ pub struct WithdrawNFT<'info> {
     pub admin: AccountInfo<'info>,
 
     #[account(mut, close = admin)]
-    pub stake_rewards: Account<'info, StakeRewards>,
+    pub nft_rewards: Account<'info, NFTRewards>,
 
     #[account(mut)]
     pub mint: Box<InterfaceAccount<'info, Mint>>,

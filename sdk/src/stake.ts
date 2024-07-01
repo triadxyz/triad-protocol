@@ -1,10 +1,17 @@
 import { AnchorProvider, Program } from '@coral-xyz/anchor'
-import { ComputeBudgetProgram, PublicKey } from '@solana/web3.js'
+import {
+  ComputeBudgetProgram,
+  PublicKey,
+  TransactionInstruction,
+  TransactionMessage,
+  VersionedTransaction
+} from '@solana/web3.js'
 import { TriadProtocol } from './types/triad_protocol'
 import {
   formatStake,
   formatStakeVault,
   getATASync,
+  getNFTRewardsAddressSync,
   getStakeAddressSync,
   getStakeVaultAddressSync
 } from './utils/helpers'
@@ -17,7 +24,8 @@ import {
   WithdrawArgs,
   StakeResponse,
   UpdateStakeVaultStatusArgs,
-  UpdateStakeRewardsArgs
+  UpdateStakeRewardsArgs,
+  ClaimStakeRewardsArgs
 } from './types/stake'
 import { TTRIAD_DECIMALS, TTRIAD_FEE } from './utils/constants'
 
@@ -89,8 +97,8 @@ export default class Stake {
 
     for (const stake of myStakes) {
       try {
-        const stakeRewards = await this.program.account.stakeRewards.fetch(
-          new PublicKey(response)
+        const stakeRewards = await this.program.account.nftRewards.fetch(
+          new PublicKey(stake.stakeRewards)
         )
 
         let start = stakeVaultByName.week * 7
@@ -107,7 +115,12 @@ export default class Stake {
           .reduce((a, b) => a + b, 0)
 
         stake.weeklyRewards = rewards
-      } catch (error) {}
+      } catch (error) {
+        stake.apr = 0
+        stake.dailyRewards = []
+        stake.weeklyRewardsPaid = []
+        stake.weeklyRewards = 0
+      }
     }
 
     return myStakes
@@ -430,20 +443,86 @@ export default class Stake {
    *
    */
   public async updateStakeRewards(
-    { wallet, apr, day, rewards, nft_name }: UpdateStakeRewardsArgs,
+    { wallet, day, items }: UpdateStakeRewardsArgs,
     options?: RpcOptions
   ) {
-    const Stake = getStakeAddressSync(this.program.programId, nft_name)
+    const ixs: TransactionInstruction[] = [
+      ComputeBudgetProgram.setComputeUnitPrice({
+        microLamports: options.microLamports
+      }),
+      ComputeBudgetProgram.setComputeUnitLimit({
+        units: 600000
+      })
+    ]
+
+    for (const item of items) {
+      const Stake = getStakeAddressSync(this.program.programId, item.nftName)
+
+      ixs.push(
+        await this.program.methods
+          .updateStakeRewards({
+            rewards: item.rewards,
+            apr: item.apr,
+            day
+          })
+          .accounts({
+            signer: wallet,
+            stake: Stake
+          })
+          .instruction()
+      )
+    }
+
+    const { blockhash } = await this.provider.connection.getLatestBlockhash()
+
+    const messageV0 = new TransactionMessage({
+      instructions: ixs,
+      recentBlockhash: blockhash,
+      payerKey: wallet
+    }).compileToV0Message()
+
+    const tx = new VersionedTransaction(messageV0)
+
+    return this.provider.sendAndConfirm(tx, [], {
+      skipPreflight: options?.skipPreflight
+    })
+  }
+
+  /**
+   *  Claim Stake Rewards
+   *  @param wallet - User wallet
+   *  @param mint - NFT mint
+   *  @param week - Week rewards
+   *  @param amount - Reward amount
+   *  @param stakeVault - Name of the stake vault
+   *  @param nftName - Name of the nft
+   *
+   */
+  public async claimStakeRewards(
+    { wallet, mint, week, stakeVault, nftName }: ClaimStakeRewardsArgs,
+    options?: RpcOptions
+  ) {
+    const StakeVault = getStakeVaultAddressSync(
+      this.program.programId,
+      stakeVault
+    )
+    const Stake = getStakeAddressSync(this.program.programId, nftName)
+    const NFTRewards = getNFTRewardsAddressSync(this.program.programId, Stake)
+    const FromAta = getATASync(StakeVault, mint)
+    const ToAta = getATASync(wallet, mint)
 
     const method = this.program.methods
-      .updateStakeRewards({
-        rewards,
-        apr,
-        day
+      .claimStakeRewards({
+        week
       })
       .accounts({
         signer: wallet,
-        stake: Stake
+        fromAta: FromAta,
+        toAta: ToAta,
+        mint: mint,
+        nftRewards: NFTRewards,
+        stake: Stake,
+        stakeVault: StakeVault
       })
 
     if (options?.microLamports) {

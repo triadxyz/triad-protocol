@@ -30,7 +30,7 @@ export type TriadProtocol = {
           writable: true
         },
         {
-          name: 'stakeRewards'
+          name: 'nftRewards'
           writable: true
         },
         {
@@ -619,27 +619,13 @@ export type TriadProtocol = {
           writable: true
         },
         {
-          name: 'stakeRewards'
+          name: 'nftRewards'
           writable: true
           pda: {
             seeds: [
               {
                 kind: 'const'
-                value: [
-                  115,
-                  116,
-                  97,
-                  107,
-                  101,
-                  95,
-                  114,
-                  101,
-                  119,
-                  97,
-                  114,
-                  100,
-                  115
-                ]
+                value: [110, 102, 116, 95, 114, 101, 119, 97, 114, 100, 115]
               },
               {
                 kind: 'account'
@@ -768,7 +754,7 @@ export type TriadProtocol = {
           writable: true
         },
         {
-          name: 'stakeRewards'
+          name: 'nftRewards'
           writable: true
         },
         {
@@ -810,12 +796,12 @@ export type TriadProtocol = {
   ]
   accounts: [
     {
-      name: 'stake'
-      discriminator: [150, 197, 176, 29, 55, 132, 112, 149]
+      name: 'nftRewards'
+      discriminator: [210, 99, 18, 65, 58, 128, 167, 91]
     },
     {
-      name: 'stakeRewards'
-      discriminator: [19, 183, 40, 201, 75, 202, 185, 62]
+      name: 'stake'
+      discriminator: [150, 197, 176, 29, 55, 132, 112, 149]
     },
     {
       name: 'stakeVault'
@@ -1083,6 +1069,34 @@ export type TriadProtocol = {
       }
     },
     {
+      name: 'nftRewards'
+      type: {
+        kind: 'struct'
+        fields: [
+          {
+            name: 'stake'
+            type: 'pubkey'
+          },
+          {
+            name: 'dailyRewards'
+            type: {
+              array: ['u64', 30]
+            }
+          },
+          {
+            name: 'weeklyRewardsPaid'
+            type: {
+              array: ['bool', 5]
+            }
+          },
+          {
+            name: 'apr'
+            type: 'f32'
+          }
+        ]
+      }
+    },
+    {
       name: 'openPositionArgs'
       type: {
         kind: 'struct'
@@ -1301,34 +1315,6 @@ export type TriadProtocol = {
       }
     },
     {
-      name: 'stakeRewards'
-      type: {
-        kind: 'struct'
-        fields: [
-          {
-            name: 'stake'
-            type: 'pubkey'
-          },
-          {
-            name: 'dailyRewards'
-            type: {
-              array: ['u64', 30]
-            }
-          },
-          {
-            name: 'weeklyRewardsPaid'
-            type: {
-              array: ['bool', 5]
-            }
-          },
-          {
-            name: 'apr'
-            type: 'u8'
-          }
-        ]
-      }
-    },
-    {
       name: 'stakeVault'
       type: {
         kind: 'struct'
@@ -1483,7 +1469,7 @@ export type TriadProtocol = {
           },
           {
             name: 'apr'
-            type: 'u8'
+            type: 'f32'
           }
         ]
       }

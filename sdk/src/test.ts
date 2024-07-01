@@ -1,9 +1,10 @@
 import fs from 'fs'
 import { Connection, Keypair, PublicKey } from '@solana/web3.js'
 import TriadProtocol from './index'
-import { Wallet } from '@coral-xyz/anchor'
-import { STAKE_SEASON_1 } from './utils/constants'
+import { BN, Wallet } from '@coral-xyz/anchor'
+import { STAKE_SEASON_1, TTRIAD_DECIMALS } from './utils/constants'
 import RARITY from './utils/stake-season-1/rarity.json'
+import USERS_COLLECTIONS_WEEK_1 from './utils/stake-season-1/users-collections-week-1.json'
 import { calculateAPR, calculateTotalMultiplier } from './utils/helpers'
 
 const file = fs.readFileSync('/Users/dannpl/.config/solana/id.json')
@@ -18,29 +19,57 @@ const triadProtocol = new TriadProtocol(connection, wallet)
 const populateStakeDay = async () => {
   const { perDay } =
     await triadProtocol.stake.getStakeVaultRewards(STAKE_SEASON_1)
-  const day = 1719842251
+  const day = 1719755851
   const stakes = await triadProtocol.stake.getStakesByDay(STAKE_SEASON_1, day)
 
   const newItems = []
 
-  stakes.forEach((item) => {
+  const itemsByAuthority = stakes.reduce((acc, item) => {
     const itemRarity = RARITY.find((rarity) => rarity.onchainId === item.mint)
-
     if (!itemRarity) {
-      return
+      return acc
     }
 
-    newItems.push({
+    if (!acc[item.authority]) {
+      acc[item.authority] = []
+    }
+
+    acc[item.authority].push({
       ...item,
       rarity: itemRarity.rarity,
       rarityRankHrtt: itemRarity.rarityRankHrtt,
-      totalMultiplier: calculateTotalMultiplier(
-        Object.keys(item.collections).map((x) => x.toUpperCase()) as any,
+      collections: {}
+    })
+
+    return acc
+  }, {})
+
+  Object.keys(itemsByAuthority).forEach((authority) => {
+    const items = itemsByAuthority[authority]
+    items.sort((a, b) => a.rarityRankHrtt - b.rarityRankHrtt)
+
+    items.forEach((item, index) => {
+      const collections = Object.values(
+        USERS_COLLECTIONS_WEEK_1.find(
+          (collection) => Object.keys(collection)[0] === item.authority
+        )
+      )[0]
+
+      let totalMultiplier = calculateTotalMultiplier(
+        index === 0
+          ? (Object.keys(item.collections).map((x) => x.toUpperCase()) as any)
+          : [],
         {
           max: 1839,
-          currentPosition: itemRarity.rarityRankHrtt
+          currentPosition: item.rarityRankHrtt
         }
       )
+
+      newItems.push({
+        ...item,
+        totalMultiplier,
+        collections: index === 0 ? collections : {}
+      })
     })
   })
 
@@ -66,10 +95,8 @@ const populateStakeDay = async () => {
 
   const orderedRewards = rewards.sort((a, b) => b.rewards - a.rewards)
 
-  console.log(stakes.length)
-
   fs.writeFileSync(
-    `./src/utils/stake-season-1/stakes/1/${day}.json`,
+    `./src/utils/stake-season-1/stakes/2/${day}.json`,
     JSON.stringify(orderedRewards, null, 2)
   )
 }
@@ -130,10 +157,29 @@ const getStake = async () => {
     new PublicKey('E48CKgbZVpDzerQ7DdommgqNobRHLqHy8RUVi8HXkSHE'),
     STAKE_SEASON_1
   )
+
   const stakeVaults = await triadProtocol.stake.getStakeVaults()
 
   console.log(response)
   console.log(stakeVaults)
+}
+
+const claimStakeRewards = async () => {
+  const response = await triadProtocol.stake.claimStakeRewards(
+    {
+      wallet: wallet.publicKey,
+      mint: new PublicKey(''),
+      week: 0,
+      stakeVault: STAKE_SEASON_1,
+      nftName: ''
+    },
+    {
+      skipPreflight: true,
+      microLamports: 10000
+    }
+  )
+
+  console.log(response)
 }
 
 const getStakes = async () => {

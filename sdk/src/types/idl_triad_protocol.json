@@ -24,7 +24,7 @@
           "writable": true
         },
         {
-          "name": "stake_rewards",
+          "name": "nft_rewards",
           "writable": true
         },
         {
@@ -567,15 +567,13 @@
           "writable": true
         },
         {
-          "name": "stake_rewards",
+          "name": "nft_rewards",
           "writable": true,
           "pda": {
             "seeds": [
               {
                 "kind": "const",
-                "value": [
-                  115, 116, 97, 107, 101, 95, 114, 101, 119, 97, 114, 100, 115
-                ]
+                "value": [110, 102, 116, 95, 114, 101, 119, 97, 114, 100, 115]
               },
               {
                 "kind": "account",
@@ -704,7 +702,7 @@
           "writable": true
         },
         {
-          "name": "stake_rewards",
+          "name": "nft_rewards",
           "writable": true
         },
         {
@@ -746,12 +744,12 @@
   ],
   "accounts": [
     {
-      "name": "Stake",
-      "discriminator": [150, 197, 176, 29, 55, 132, 112, 149]
+      "name": "NFTRewards",
+      "discriminator": [210, 99, 18, 65, 58, 128, 167, 91]
     },
     {
-      "name": "StakeRewards",
-      "discriminator": [19, 183, 40, 201, 75, 202, 185, 62]
+      "name": "Stake",
+      "discriminator": [150, 197, 176, 29, 55, 132, 112, 149]
     },
     {
       "name": "StakeVault",
@@ -1019,6 +1017,34 @@
       }
     },
     {
+      "name": "NFTRewards",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "stake",
+            "type": "pubkey"
+          },
+          {
+            "name": "daily_rewards",
+            "type": {
+              "array": ["u64", 30]
+            }
+          },
+          {
+            "name": "weekly_rewards_paid",
+            "type": {
+              "array": ["bool", 5]
+            }
+          },
+          {
+            "name": "apr",
+            "type": "f32"
+          }
+        ]
+      }
+    },
+    {
       "name": "OpenPositionArgs",
       "type": {
         "kind": "struct",
@@ -1237,34 +1263,6 @@
       }
     },
     {
-      "name": "StakeRewards",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "stake",
-            "type": "pubkey"
-          },
-          {
-            "name": "daily_rewards",
-            "type": {
-              "array": ["u64", 30]
-            }
-          },
-          {
-            "name": "weekly_rewards_paid",
-            "type": {
-              "array": ["bool", 5]
-            }
-          },
-          {
-            "name": "apr",
-            "type": "u8"
-          }
-        ]
-      }
-    },
-    {
       "name": "StakeVault",
       "type": {
         "kind": "struct",
@@ -1419,7 +1417,7 @@
           },
           {
             "name": "apr",
-            "type": "u8"
+            "type": "f32"
           }
         ]
       }

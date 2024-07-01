@@ -53,12 +53,22 @@ export type UpdateStakeVaultStatusArgs = {
   stakeVault: string
 }
 
+export type ClaimStakeRewardsArgs = {
+  wallet: PublicKey
+  week: number
+  mint: PublicKey
+  stakeVault: string
+  nftName: string
+}
+
 export type UpdateStakeRewardsArgs = {
   day: number
   wallet: PublicKey
-  rewards: BN
-  apr: number
-  nft_name: string
+  items: {
+    rewards: BN
+    apr: number
+    nftName: string
+  }[]
 }
 
 export enum RARITY_WEIGHT {

@@ -3,7 +3,7 @@ use crate::{
     errors::TriadProtocolError,
     state::{ClaimStakeRewardsArgs, StakeVault},
 };
-use crate::{Stake, StakeRewards};
+use crate::{NFTRewards, Stake};
 use anchor_lang::prelude::*;
 use anchor_spl::token_2022::Token2022;
 use anchor_spl::{
@@ -24,7 +24,7 @@ pub struct ClaimStakeRewards<'info> {
     pub stake: Box<Account<'info, Stake>>,
 
     #[account(mut)]
-    pub stake_rewards: Box<Account<'info, StakeRewards>>,
+    pub nft_rewards: Box<Account<'info, NFTRewards>>,
 
     #[account(mut)]
     pub mint: Box<InterfaceAccount<'info, Mint>>,
@@ -59,14 +59,14 @@ pub fn claim_stake_rewards(
 
     let stake_vault = &mut ctx.accounts.stake_vault;
     let stake = &mut ctx.accounts.stake;
-    let stake_rewards = &mut ctx.accounts.stake_rewards;
+    let nft_rewards = &mut ctx.accounts.nft_rewards;
 
-    if stake_rewards.weekly_rewards_paid[args.week as usize] {
+    if nft_rewards.weekly_rewards_paid[args.week as usize] {
         return Err(TriadProtocolError::InvalidStakeVaultWeek.into());
     }
 
     if stake.authority != *ctx.accounts.signer.key
-        || stake.to_account_info().key() != stake_rewards.stake
+        || stake.to_account_info().key() != nft_rewards.stake
     {
         return Err(TriadProtocolError::InvalidOwnerAuthority.into());
     }
@@ -80,9 +80,9 @@ pub fn claim_stake_rewards(
     let start = week * 7;
     let end = if week == 4 { 30 } else { start + 7 };
 
-    let rewards: u64 = stake_rewards.daily_rewards[start..end].iter().sum();
+    let rewards: u64 = nft_rewards.daily_rewards[start..end].iter().sum();
 
-    stake_rewards.weekly_rewards_paid[week] = true;
+    nft_rewards.weekly_rewards_paid[week] = true;
 
     let signer: &[&[&[u8]]] = &[&[
         b"stake_vault",

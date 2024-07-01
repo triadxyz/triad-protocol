@@ -16,11 +16,11 @@ pub struct Stake {
 }
 
 #[account]
-pub struct StakeRewards {
+pub struct NFTRewards {
     pub stake: Pubkey,
     pub daily_rewards: [u64; 30],
     pub weekly_rewards_paid: [bool; 5],
-    pub apr: u8,
+    pub apr: f32,
 }
 
 #[account]
@@ -109,7 +109,7 @@ pub struct ClaimStakeRewardsArgs {
 pub struct UpdateStakeRewardsArgs {
     pub day: u8,
     pub rewards: u64,
-    pub apr: u8,
+    pub apr: f32,
 }
 
 impl Stake {
@@ -124,8 +124,8 @@ impl StakeVault {
     pub const SPACE: usize = 8 + std::mem::size_of::<Self>();
 }
 
-impl StakeRewards {
-    pub const PREFIX_SEED: &'static [u8] = b"stake_rewards";
+impl NFTRewards {
+    pub const PREFIX_SEED: &'static [u8] = b"nft_rewards";
 
     pub const SPACE: usize = 8 + std::mem::size_of::<Self>();
 }

@@ -1,5 +1,5 @@
 use crate::{constants::ADMIN, errors::TriadProtocolError, state::UpdateStakeRewardsArgs};
-use crate::{Stake, StakeRewards};
+use crate::{NFTRewards, Stake};
 use anchor_lang::prelude::*;
 
 #[derive(Accounts)]
@@ -11,8 +11,8 @@ pub struct UpdateStakeRewards<'info> {
     #[account(mut)]
     pub stake: Box<Account<'info, Stake>>,
 
-    #[account(init_if_needed, payer = signer, space = StakeRewards::SPACE, seeds = [StakeRewards::PREFIX_SEED, stake.key().as_ref()], bump)]
-    pub stake_rewards: Box<Account<'info, StakeRewards>>,
+    #[account(init_if_needed, payer = signer, space = NFTRewards::SPACE, seeds = [NFTRewards::PREFIX_SEED, stake.key().as_ref()], bump)]
+    pub nft_rewards: Box<Account<'info, NFTRewards>>,
 
     pub system_program: Program<'info, System>,
 }
@@ -25,19 +25,18 @@ pub fn update_stake_rewards(
         return Err(TriadProtocolError::Unauthorized.into());
     }
 
-    let stake_rewards = &mut ctx.accounts.stake_rewards;
+    let nft_rewards = &mut ctx.accounts.nft_rewards;
     let stake = &mut ctx.accounts.stake;
 
-    if stake.stake_rewards == Pubkey::default() {
-        stake.stake_rewards = stake_rewards.key();
-    }
+    stake.stake_rewards = nft_rewards.key();
+    nft_rewards.stake = stake.key();
 
-    if stake_rewards.stake != stake.key() {
+    if nft_rewards.stake != stake.key() {
         return Err(TriadProtocolError::InvalidAccount.into());
     }
 
-    stake_rewards.daily_rewards[args.day as usize] = args.rewards;
-    stake_rewards.apr = args.apr;
+    nft_rewards.daily_rewards[args.day as usize] = args.rewards;
+    nft_rewards.apr = args.apr;
 
     Ok(())
 }
