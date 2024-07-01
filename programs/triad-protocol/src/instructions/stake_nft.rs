@@ -79,6 +79,10 @@ pub fn stake_nft(ctx: Context<StakeNFT>, args: StakeNFTArgs) -> Result<()> {
         return Err(TriadProtocolError::StakeVaultFull.into());
     }
 
+    if stake_vault.is_locked {
+        return Err(TriadProtocolError::StakeVaultLocked.into());
+    }
+
     stake.authority = *ctx.accounts.signer.key;
     stake.init_ts = Clock::get()?.unix_timestamp;
     stake.withdraw_ts = 0;

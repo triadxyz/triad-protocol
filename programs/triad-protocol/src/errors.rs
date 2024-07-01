@@ -2,20 +2,11 @@ use anchor_lang::prelude::*;
 
 #[error_code]
 pub enum TriadProtocolError {
-    #[msg("Unauthorized to delete the project")]
-    UnauthorizedToDeleteProject,
-
-    #[msg("Invalid shadow account")]
-    InvalidShadowAccount,
-
     #[msg("Invalid account")]
     InvalidAccount,
 
     #[msg("Unauthorized access")]
     Unauthorized,
-
-    #[msg("Failed to get data from Vybe Network")]
-    AlphaVantageApiError,
 
     #[msg("Failed to deposit")]
     DepositFailed,
@@ -61,4 +52,10 @@ pub enum TriadProtocolError {
 
     #[msg("Stake Vault Full")]
     StakeVaultFull,
+
+    #[msg("Invalid Mint")]
+    InvalidMint,
+
+    #[msg("Invalid Stake Vault Week")]
+    InvalidStakeVaultWeek,
 }

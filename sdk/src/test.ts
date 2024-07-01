@@ -5,7 +5,6 @@ import { Wallet } from '@coral-xyz/anchor'
 import { STAKE_SEASON_1 } from './utils/constants'
 import RARITY from './utils/stake-season-1/rarity.json'
 import { calculateAPR, calculateTotalMultiplier } from './utils/helpers'
-import { TOKEN_2022_PROGRAM_ID, TOKEN_PROGRAM_ID } from '@solana/spl-token'
 
 const file = fs.readFileSync('/Users/dannpl/.config/solana/triad-man.json')
 const rpc_file = fs.readFileSync('/Users/dannpl/.config/solana/rpc.txt')
@@ -19,7 +18,7 @@ const triadProtocol = new TriadProtocol(connection, wallet)
 const populateStakeDay = async () => {
   const { perDay } =
     await triadProtocol.stake.getStakeVaultRewards(STAKE_SEASON_1)
-  const day = 1719323851
+  const day = 1719842251
   const stakes = await triadProtocol.stake.getStakesByDay(STAKE_SEASON_1, day)
 
   const newItems = []
@@ -67,13 +66,15 @@ const populateStakeDay = async () => {
 
   const orderedRewards = rewards.sort((a, b) => b.rewards - a.rewards)
 
-  console.log(orderedRewards.reduce((sum, user) => sum + user.apr, 0))
+  console.log(stakes.length)
 
   fs.writeFileSync(
     `./src/utils/stake-season-1/stakes/1/${day}.json`,
     JSON.stringify(orderedRewards, null, 2)
   )
 }
+
+populateStakeDay()
 
 const requestWithdraw = async () => {
   const response = await triadProtocol.stake.requestWithdraw(

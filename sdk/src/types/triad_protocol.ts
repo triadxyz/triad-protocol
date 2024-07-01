@@ -13,6 +13,63 @@ export type TriadProtocol = {
   }
   instructions: [
     {
+      name: 'claimStakeRewards'
+      discriminator: [107, 91, 233, 196, 211, 47, 218, 21]
+      accounts: [
+        {
+          name: 'signer'
+          writable: true
+          signer: true
+        },
+        {
+          name: 'stakeVault'
+          writable: true
+        },
+        {
+          name: 'stake'
+          writable: true
+        },
+        {
+          name: 'stakeRewards'
+          writable: true
+        },
+        {
+          name: 'mint'
+          writable: true
+        },
+        {
+          name: 'fromAta'
+          writable: true
+        },
+        {
+          name: 'toAta'
+          writable: true
+        },
+        {
+          name: 'tokenProgram'
+          address: 'TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb'
+        },
+        {
+          name: 'associatedTokenProgram'
+          address: 'ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL'
+        },
+        {
+          name: 'systemProgram'
+          address: '11111111111111111111111111111111'
+        }
+      ]
+      args: [
+        {
+          name: 'args'
+          type: {
+            defined: {
+              name: 'claimStakeRewardsArgs'
+            }
+          }
+        }
+      ]
+    },
+    {
       name: 'closePosition'
       discriminator: [123, 134, 81, 0, 49, 68, 98, 98]
       accounts: [
@@ -549,6 +606,94 @@ export type TriadProtocol = {
       ]
     },
     {
+      name: 'updateStakeRewards'
+      discriminator: [39, 82, 38, 43, 234, 67, 69, 94]
+      accounts: [
+        {
+          name: 'signer'
+          writable: true
+          signer: true
+        },
+        {
+          name: 'stake'
+          writable: true
+        },
+        {
+          name: 'stakeRewards'
+          writable: true
+          pda: {
+            seeds: [
+              {
+                kind: 'const'
+                value: [
+                  115,
+                  116,
+                  97,
+                  107,
+                  101,
+                  95,
+                  114,
+                  101,
+                  119,
+                  97,
+                  114,
+                  100,
+                  115
+                ]
+              },
+              {
+                kind: 'account'
+                path: 'stake'
+              }
+            ]
+          }
+        },
+        {
+          name: 'systemProgram'
+          address: '11111111111111111111111111111111'
+        }
+      ]
+      args: [
+        {
+          name: 'args'
+          type: {
+            defined: {
+              name: 'updateStakeRewardsArgs'
+            }
+          }
+        }
+      ]
+    },
+    {
+      name: 'updateStakeVaultStatus'
+      discriminator: [71, 64, 188, 150, 86, 254, 221, 65]
+      accounts: [
+        {
+          name: 'signer'
+          writable: true
+          signer: true
+        },
+        {
+          name: 'stakeVault'
+          writable: true
+        },
+        {
+          name: 'systemProgram'
+          address: '11111111111111111111111111111111'
+        }
+      ]
+      args: [
+        {
+          name: 'args'
+          type: {
+            defined: {
+              name: 'updateStakeVaultStatusArgs'
+            }
+          }
+        }
+      ]
+    },
+    {
       name: 'updateTickerPrice'
       discriminator: [203, 166, 139, 83, 76, 144, 250, 29]
       accounts: [
@@ -619,6 +764,14 @@ export type TriadProtocol = {
           }
         },
         {
+          name: 'admin'
+          writable: true
+        },
+        {
+          name: 'stakeRewards'
+          writable: true
+        },
+        {
           name: 'mint'
           writable: true
         },
@@ -661,6 +814,10 @@ export type TriadProtocol = {
       discriminator: [150, 197, 176, 29, 55, 132, 112, 149]
     },
     {
+      name: 'stakeRewards'
+      discriminator: [19, 183, 40, 201, 75, 202, 185, 62]
+    },
+    {
       name: 'stakeVault'
       discriminator: [192, 112, 65, 125, 129, 151, 173, 226]
     },
@@ -694,106 +851,113 @@ export type TriadProtocol = {
   errors: [
     {
       code: 6000
-      name: 'unauthorizedToDeleteProject'
-      msg: 'Unauthorized to delete the project'
-    },
-    {
-      code: 6001
-      name: 'invalidShadowAccount'
-      msg: 'Invalid shadow account'
-    },
-    {
-      code: 6002
       name: 'invalidAccount'
       msg: 'Invalid account'
     },
     {
-      code: 6003
+      code: 6001
       name: 'unauthorized'
       msg: 'Unauthorized access'
     },
     {
-      code: 6004
-      name: 'alphaVantageApiError'
-      msg: 'Failed to get data from Vybe Network'
-    },
-    {
-      code: 6005
+      code: 6002
       name: 'depositFailed'
       msg: 'Failed to deposit'
     },
     {
-      code: 6006
+      code: 6003
       name: 'invalidOwnerAuthority'
       msg: 'Invalid Owner authority'
     },
     {
-      code: 6007
+      code: 6004
       name: 'invalidPosition'
       msg: 'Invalid Position'
     },
     {
-      code: 6008
+      code: 6005
       name: 'invalidTickerPosition'
       msg: 'Invalid Ticker position'
     },
     {
-      code: 6009
+      code: 6006
       name: 'noFreePositionSlot'
       msg: 'No free position slot'
     },
     {
-      code: 6010
+      code: 6007
       name: 'invalidMintAddress'
       msg: 'Invalid Mint address'
     },
     {
-      code: 6011
+      code: 6008
       name: 'invalidProfitShare'
       msg: 'Invalid Profit Share'
     },
     {
-      code: 6012
+      code: 6009
       name: 'invalidDepositAmount'
       msg: 'Invalid Deposit Amount'
     },
     {
-      code: 6013
+      code: 6010
       name: 'invalidWithdrawAmount'
       msg: 'Invalid Withdraw Amount'
     },
     {
-      code: 6014
+      code: 6011
       name: 'invalidStakeVault'
       msg: 'Invalid Stake Vault'
     },
     {
-      code: 6015
+      code: 6012
       name: 'invalidStakeVaultAuthority'
       msg: 'Invalid Stake Vault Authority'
     },
     {
-      code: 6016
+      code: 6013
       name: 'invalidStakeVaultAmount'
       msg: 'Invalid Stake Vault Amount'
     },
     {
-      code: 6017
+      code: 6014
       name: 'stakeVaultLocked'
       msg: 'Stake Vault Available'
     },
     {
-      code: 6018
+      code: 6015
       name: 'stakeLocked'
       msg: 'Stake is locked'
     },
     {
-      code: 6019
+      code: 6016
       name: 'stakeVaultFull'
       msg: 'Stake Vault Full'
+    },
+    {
+      code: 6017
+      name: 'invalidMint'
+      msg: 'Invalid Mint'
+    },
+    {
+      code: 6018
+      name: 'invalidStakeVaultWeek'
+      msg: 'Invalid Stake Vault Week'
     }
   ]
   types: [
+    {
+      name: 'claimStakeRewardsArgs'
+      type: {
+        kind: 'struct'
+        fields: [
+          {
+            name: 'week'
+            type: 'u8'
+          }
+        ]
+      }
+    },
     {
       name: 'closePositionArgs'
       type: {
@@ -1137,6 +1301,34 @@ export type TriadProtocol = {
       }
     },
     {
+      name: 'stakeRewards'
+      type: {
+        kind: 'struct'
+        fields: [
+          {
+            name: 'stake'
+            type: 'pubkey'
+          },
+          {
+            name: 'dailyRewards'
+            type: {
+              array: ['u64', 30]
+            }
+          },
+          {
+            name: 'weeklyRewardsPaid'
+            type: {
+              array: ['bool', 5]
+            }
+          },
+          {
+            name: 'apr'
+            type: 'u8'
+          }
+        ]
+      }
+    },
+    {
       name: 'stakeVault'
       type: {
         kind: 'struct'
@@ -1194,9 +1386,13 @@ export type TriadProtocol = {
             type: 'pubkey'
           },
           {
+            name: 'week'
+            type: 'u8'
+          },
+          {
             name: 'padding'
             type: {
-              array: ['u8', 64]
+              array: ['u8', 56]
             }
           }
         ]
@@ -1268,6 +1464,42 @@ export type TriadProtocol = {
           {
             name: 'ticker'
             type: 'pubkey'
+          }
+        ]
+      }
+    },
+    {
+      name: 'updateStakeRewardsArgs'
+      type: {
+        kind: 'struct'
+        fields: [
+          {
+            name: 'day'
+            type: 'u8'
+          },
+          {
+            name: 'rewards'
+            type: 'u64'
+          },
+          {
+            name: 'apr'
+            type: 'u8'
+          }
+        ]
+      }
+    },
+    {
+      name: 'updateStakeVaultStatusArgs'
+      type: {
+        kind: 'struct'
+        fields: [
+          {
+            name: 'isLocked'
+            type: 'bool'
+          },
+          {
+            name: 'week'
+            type: 'u8'
           }
         ]
       }

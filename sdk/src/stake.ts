@@ -5,6 +5,7 @@ import {
   formatStake,
   formatStakeVault,
   getATASync,
+  getStakeAddressSync,
   getStakeVaultAddressSync
 } from './utils/helpers'
 import { RpcOptions } from './types'
@@ -14,7 +15,9 @@ import {
   StakeArgs,
   RequestWithdrawArgs,
   WithdrawArgs,
-  StakeResponse
+  StakeResponse,
+  UpdateStakeVaultStatusArgs,
+  UpdateStakeRewardsArgs
 } from './types/stake'
 import { TTRIAD_DECIMALS, TTRIAD_FEE } from './utils/constants'
 
@@ -334,7 +337,83 @@ export default class Stake {
         signer: wallet,
         fromAta: FromAta,
         toAta: ToAta,
+        admin: new PublicKey('82ppCojm3yrEKgdpH8B5AmBJTU1r1uAWXFWhxvPs9UCR'),
         mint: mint
+      })
+
+    if (options?.microLamports) {
+      method.postInstructions([
+        ComputeBudgetProgram.setComputeUnitPrice({
+          microLamports: options.microLamports
+        })
+      ])
+    }
+
+    return method.rpc({ skipPreflight: options?.skipPreflight })
+  }
+
+  /**
+   *  Update Stake Vault Status
+   *  @param wallet - User wallet
+   *  @param stakeVault - Name of the stake vault
+   *  @param isLocked - Status of the stake vault
+   *  @param week - Current week rewards (Starts from 0)
+   *
+   */
+  public async updateStakeVaultStatus(
+    { wallet, isLocked, week, stakeVault }: UpdateStakeVaultStatusArgs,
+    options?: RpcOptions
+  ) {
+    const StakeVault = getStakeVaultAddressSync(
+      this.program.programId,
+      stakeVault
+    )
+
+    const method = this.program.methods
+      .updateStakeVaultStatus({
+        isLocked,
+        week
+      })
+      .accounts({
+        signer: wallet,
+        stakeVault: StakeVault
+      })
+
+    if (options?.microLamports) {
+      method.postInstructions([
+        ComputeBudgetProgram.setComputeUnitPrice({
+          microLamports: options.microLamports
+        })
+      ])
+    }
+
+    return method.rpc({ skipPreflight: options?.skipPreflight })
+  }
+
+  /**
+   *  Update Stake Rewards
+   *  @param wallet - User wallet
+   *  @param nft_name - Name of the nft
+   *  @param apr - APR based in the current day
+   *  @param day - Day for update rewards (Starts from 0)
+   *  @param rewards - Rewards for the day
+   *
+   */
+  public async updateStakeRewards(
+    { wallet, apr, day, rewards, nft_name }: UpdateStakeRewardsArgs,
+    options?: RpcOptions
+  ) {
+    const Stake = getStakeAddressSync(this.program.programId, nft_name)
+
+    const method = this.program.methods
+      .updateStakeRewards({
+        rewards,
+        apr,
+        day
+      })
+      .accounts({
+        signer: wallet,
+        stake: Stake
       })
 
     if (options?.microLamports) {

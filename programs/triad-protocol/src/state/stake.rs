@@ -17,11 +17,9 @@ pub struct Stake {
 
 #[account]
 pub struct StakeRewards {
-    pub bump: u8,
-    pub authority: Pubkey,
-    pub stake_vault: Pubkey,
     pub stake: Pubkey,
     pub daily_rewards: [u64; 30],
+    pub weekly_rewards_paid: [bool; 5],
     pub apr: u8,
 }
 
@@ -40,7 +38,8 @@ pub struct StakeVault {
     pub name: String,
     pub collection: String,
     pub users_paid: Pubkey,
-    pub padding: [u8; 64],
+    pub week: u8,
+    pub padding: [u8; 56],
 }
 
 #[derive(Clone, AnchorSerialize, AnchorDeserialize)]
@@ -78,6 +77,12 @@ pub struct InitializeStakeVaultArgs {
 }
 
 #[derive(AnchorSerialize, AnchorDeserialize, Clone)]
+pub struct UpdateStakeVaultStatusArgs {
+    pub is_locked: bool,
+    pub week: u8,
+}
+
+#[derive(AnchorSerialize, AnchorDeserialize, Clone)]
 pub struct WithdrawNFTArgs {
     pub stake_vault: String,
     pub nft_name: String,
@@ -95,6 +100,18 @@ pub struct DepositStakeRewardsArgs {
     pub stake_vault: String,
 }
 
+#[derive(AnchorSerialize, AnchorDeserialize, Clone)]
+pub struct ClaimStakeRewardsArgs {
+    pub week: u8,
+}
+
+#[derive(AnchorSerialize, AnchorDeserialize, Clone)]
+pub struct UpdateStakeRewardsArgs {
+    pub day: u8,
+    pub rewards: u64,
+    pub apr: u8,
+}
+
 impl Stake {
     pub const PREFIX_SEED: &'static [u8] = b"stake";
 
@@ -103,6 +120,12 @@ impl Stake {
 
 impl StakeVault {
     pub const PREFIX_SEED: &'static [u8] = b"stake_vault";
+
+    pub const SPACE: usize = 8 + std::mem::size_of::<Self>();
+}
+
+impl StakeRewards {
+    pub const PREFIX_SEED: &'static [u8] = b"stake_rewards";
 
     pub const SPACE: usize = 8 + std::mem::size_of::<Self>();
 }

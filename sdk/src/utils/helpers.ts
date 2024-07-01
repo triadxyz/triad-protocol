@@ -93,6 +93,15 @@ export const getStakeVaultAddressSync = (
   return StakeVaultPDA
 }
 
+export const getStakeAddressSync = (programId: PublicKey, nftName: string) => {
+  const [StakeVaultPDA] = PublicKey.findProgramAddressSync(
+    [Buffer.from('stake'), Buffer.from(nftName)],
+    programId
+  )
+
+  return StakeVaultPDA
+}
+
 export const getATASync = (address: PublicKey, Mint: PublicKey) => {
   const [ATA] = PublicKey.findProgramAddressSync(
     [address.toBytes(), TOKEN_2022_PROGRAM_ID.toBytes(), Mint.toBytes()],

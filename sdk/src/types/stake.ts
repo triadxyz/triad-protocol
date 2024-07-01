@@ -46,6 +46,21 @@ export type WithdrawArgs = {
   stakeVault: string
 }
 
+export type UpdateStakeVaultStatusArgs = {
+  wallet: PublicKey
+  isLocked: boolean
+  week: number
+  stakeVault: string
+}
+
+export type UpdateStakeRewardsArgs = {
+  day: number
+  wallet: PublicKey
+  rewards: BN
+  apr: number
+  nft_name: string
+}
+
 export enum RARITY_WEIGHT {
   COMMON = 1,
   UNCOMMON = 2,
