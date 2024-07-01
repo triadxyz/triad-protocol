@@ -6,7 +6,7 @@ import { STAKE_SEASON_1 } from './utils/constants'
 import RARITY from './utils/stake-season-1/rarity.json'
 import { calculateAPR, calculateTotalMultiplier } from './utils/helpers'
 
-const file = fs.readFileSync('/Users/dannpl/.config/solana/triad-man.json')
+const file = fs.readFileSync('/Users/dannpl/.config/solana/id.json')
 const rpc_file = fs.readFileSync('/Users/dannpl/.config/solana/rpc.txt')
 const keypair = Keypair.fromSecretKey(
   new Uint8Array(JSON.parse(file.toString()))
@@ -74,8 +74,6 @@ const populateStakeDay = async () => {
   )
 }
 
-populateStakeDay()
-
 const requestWithdraw = async () => {
   const response = await triadProtocol.stake.requestWithdraw(
     {
@@ -87,6 +85,23 @@ const requestWithdraw = async () => {
     {
       microLamports: 10000,
       skipPreflight: true
+    }
+  )
+
+  console.log(response)
+}
+
+const updateStakeVaultStatus = async () => {
+  const response = await triadProtocol.stake.updateStakeVaultStatus(
+    {
+      wallet: wallet.publicKey,
+      isLocked: false,
+      week: 0,
+      stakeVault: STAKE_SEASON_1
+    },
+    {
+      skipPreflight: true,
+      microLamports: 10000
     }
   )
 
@@ -111,7 +126,10 @@ const withdraw = async () => {
 }
 
 const getStake = async () => {
-  const response = await triadProtocol.stake.getStakeByWallet(wallet.publicKey)
+  const response = await triadProtocol.stake.getStakeByWallet(
+    new PublicKey('E48CKgbZVpDzerQ7DdommgqNobRHLqHy8RUVi8HXkSHE'),
+    STAKE_SEASON_1
+  )
   const stakeVaults = await triadProtocol.stake.getStakeVaults()
 
   console.log(response)

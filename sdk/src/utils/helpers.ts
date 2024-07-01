@@ -125,6 +125,7 @@ export const formatStakeVault = (stakeVault: any): StakeVaultResponse => {
     usersPaid: stakeVault.usersPaid.toBase58(),
     amountPaid: stakeVault.amountPaid.toNumber(),
     amountUsers: stakeVault.amountUsers.toNumber(),
+    week: stakeVault.week,
     apr: stakeVault.apr,
     initTs: stakeVault.initTs.toNumber(),
     endTs: stakeVault.endTs.toNumber()

@@ -88,6 +88,7 @@ export type StakeVaultResponse = {
   amountPaid: number
   amountUsers: number
   apr: number
+  week: number
   initTs: number
   endTs: number
 }
@@ -103,4 +104,8 @@ export type StakeResponse = {
   withdrawTs: number
   mint: string
   stakeRewards: string
+  apr?: number
+  dailyRewards?: number[]
+  weeklyRewardsPaid?: boolean[]
+  weeklyRewards?: number
 }

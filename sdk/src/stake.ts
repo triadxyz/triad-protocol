@@ -56,6 +56,8 @@ export default class Stake {
 
   /**
    * Get all stakes by vault
+   * @param stakeVault - Stake Vault name
+   *
    */
   async getStakes(stakeVault: string) {
     const response = await this.program.account.stake.all()
@@ -74,13 +76,41 @@ export default class Stake {
   /**
    * Get Stake by wallet
    * @param wallet - User wallet
+   * @param stakeVault - Stake Vault name
+   *
    */
-  async getStakeByWallet(wallet: PublicKey) {
-    const response = await this.program.account.stake.all()
+  async getStakeByWallet(wallet: PublicKey, stakeVault: string) {
+    const response = await this.getStakes(stakeVault)
+    const stakeVaultByName = await this.getStakeVaultByName(stakeVault)
 
-    return response
-      .filter((stake) => stake.account.authority.equals(wallet))
-      .map((stake) => formatStake(stake.account))
+    const myStakes = response.filter(
+      (item) => item.authority === wallet.toBase58()
+    )
+
+    for (const stake of myStakes) {
+      try {
+        const stakeRewards = await this.program.account.stakeRewards.fetch(
+          new PublicKey(response)
+        )
+
+        let start = stakeVaultByName.week * 7
+        let end = stakeVaultByName.week == 4 ? 30 : start + 7
+
+        stake.apr = stakeRewards.apr
+        stake.dailyRewards = stakeRewards.dailyRewards.map(
+          (reward) => reward.toNumber() / 10 ** TTRIAD_DECIMALS
+        )
+        stake.weeklyRewardsPaid = stakeRewards.weeklyRewardsPaid
+
+        let rewards = stake.dailyRewards
+          .slice(start, end)
+          .reduce((a, b) => a + b, 0)
+
+        stake.weeklyRewards = rewards
+      } catch (error) {}
+    }
+
+    return myStakes
   }
 
   /**
