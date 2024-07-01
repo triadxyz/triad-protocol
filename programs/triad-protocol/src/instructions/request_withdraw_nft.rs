@@ -31,10 +31,6 @@ pub fn request_withdraw_nft(
         return Err(TriadProtocolError::Unauthorized.into());
     }
 
-    if ctx.accounts.stake_vault.is_locked {
-        return Err(TriadProtocolError::StakeVaultLocked.into());
-    }
-
     let mint = &ctx.accounts.mint.to_account_info();
     let stake = &mut ctx.accounts.stake;
 

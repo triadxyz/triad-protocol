@@ -93,6 +93,27 @@ export const getStakeVaultAddressSync = (
   return StakeVaultPDA
 }
 
+export const getStakeAddressSync = (programId: PublicKey, nftName: string) => {
+  const [StakePDA] = PublicKey.findProgramAddressSync(
+    [Buffer.from('stake'), Buffer.from(nftName)],
+    programId
+  )
+
+  return StakePDA
+}
+
+export const getNFTRewardsAddressSync = (
+  programId: PublicKey,
+  stake: PublicKey
+) => {
+  const [NFTRewardsPDA] = PublicKey.findProgramAddressSync(
+    [Buffer.from('nft_rewards'), stake.toBuffer()],
+    programId
+  )
+
+  return NFTRewardsPDA
+}
+
 export const getATASync = (address: PublicKey, Mint: PublicKey) => {
   const [ATA] = PublicKey.findProgramAddressSync(
     [address.toBytes(), TOKEN_2022_PROGRAM_ID.toBytes(), Mint.toBytes()],
@@ -116,6 +137,7 @@ export const formatStakeVault = (stakeVault: any): StakeVaultResponse => {
     usersPaid: stakeVault.usersPaid.toBase58(),
     amountPaid: stakeVault.amountPaid.toNumber(),
     amountUsers: stakeVault.amountUsers.toNumber(),
+    week: stakeVault.week,
     apr: stakeVault.apr,
     initTs: stakeVault.initTs.toNumber(),
     endTs: stakeVault.endTs.toNumber()

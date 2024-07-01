@@ -1,10 +1,18 @@
 import { AnchorProvider, Program } from '@coral-xyz/anchor'
-import { ComputeBudgetProgram, PublicKey } from '@solana/web3.js'
+import {
+  ComputeBudgetProgram,
+  PublicKey,
+  TransactionInstruction,
+  TransactionMessage,
+  VersionedTransaction
+} from '@solana/web3.js'
 import { TriadProtocol } from './types/triad_protocol'
 import {
   formatStake,
   formatStakeVault,
   getATASync,
+  getNFTRewardsAddressSync,
+  getStakeAddressSync,
   getStakeVaultAddressSync
 } from './utils/helpers'
 import { RpcOptions } from './types'
@@ -14,7 +22,10 @@ import {
   StakeArgs,
   RequestWithdrawArgs,
   WithdrawArgs,
-  StakeResponse
+  StakeResponse,
+  UpdateStakeVaultStatusArgs,
+  UpdateStakeRewardsArgs,
+  ClaimStakeRewardsArgs
 } from './types/stake'
 import { TTRIAD_DECIMALS, TTRIAD_FEE } from './utils/constants'
 
@@ -53,6 +64,8 @@ export default class Stake {
 
   /**
    * Get all stakes by vault
+   * @param stakeVault - Stake Vault name
+   *
    */
   async getStakes(stakeVault: string) {
     const response = await this.program.account.stake.all()
@@ -71,13 +84,46 @@ export default class Stake {
   /**
    * Get Stake by wallet
    * @param wallet - User wallet
+   * @param stakeVault - Stake Vault name
+   *
    */
-  async getStakeByWallet(wallet: PublicKey) {
-    const response = await this.program.account.stake.all()
+  async getStakeByWallet(wallet: PublicKey, stakeVault: string) {
+    const response = await this.getStakes(stakeVault)
+    const stakeVaultByName = await this.getStakeVaultByName(stakeVault)
 
-    return response
-      .filter((stake) => stake.account.authority.equals(wallet))
-      .map((stake) => formatStake(stake.account))
+    const myStakes = response.filter(
+      (item) => item.authority === wallet.toBase58()
+    )
+
+    for (const stake of myStakes) {
+      try {
+        const stakeRewards = await this.program.account.nftRewards.fetch(
+          new PublicKey(stake.stakeRewards)
+        )
+
+        let start = stakeVaultByName.week * 7
+        let end = stakeVaultByName.week == 4 ? 30 : start + 7
+
+        stake.apr = stakeRewards.apr
+        stake.dailyRewards = stakeRewards.dailyRewards.map(
+          (reward) => reward.toNumber() / 10 ** TTRIAD_DECIMALS
+        )
+        stake.weeklyRewardsPaid = stakeRewards.weeklyRewardsPaid
+
+        let rewards = stake.dailyRewards
+          .slice(start, end)
+          .reduce((a, b) => a + b, 0)
+
+        stake.weeklyRewards = rewards
+      } catch (error) {
+        stake.apr = 0
+        stake.dailyRewards = []
+        stake.weeklyRewardsPaid = []
+        stake.weeklyRewards = 0
+      }
+    }
+
+    return myStakes
   }
 
   /**
@@ -334,7 +380,149 @@ export default class Stake {
         signer: wallet,
         fromAta: FromAta,
         toAta: ToAta,
+        admin: new PublicKey('82ppCojm3yrEKgdpH8B5AmBJTU1r1uAWXFWhxvPs9UCR'),
         mint: mint
+      })
+
+    if (options?.microLamports) {
+      method.postInstructions([
+        ComputeBudgetProgram.setComputeUnitPrice({
+          microLamports: options.microLamports
+        })
+      ])
+    }
+
+    return method.rpc({ skipPreflight: options?.skipPreflight })
+  }
+
+  /**
+   *  Update Stake Vault Status
+   *  @param wallet - User wallet
+   *  @param stakeVault - Name of the stake vault
+   *  @param isLocked - Status of the stake vault
+   *  @param week - Current week rewards (Starts from 0)
+   *
+   */
+  public async updateStakeVaultStatus(
+    { wallet, isLocked, week, stakeVault }: UpdateStakeVaultStatusArgs,
+    options?: RpcOptions
+  ) {
+    const StakeVault = getStakeVaultAddressSync(
+      this.program.programId,
+      stakeVault
+    )
+
+    const method = this.program.methods
+      .updateStakeVaultStatus({
+        isLocked,
+        week
+      })
+      .accounts({
+        signer: wallet,
+        stakeVault: StakeVault
+      })
+
+    if (options?.microLamports) {
+      method.postInstructions([
+        ComputeBudgetProgram.setComputeUnitPrice({
+          microLamports: options.microLamports
+        })
+      ])
+    }
+
+    return method.rpc({ skipPreflight: options?.skipPreflight })
+  }
+
+  /**
+   *  Update Stake Rewards
+   *  @param wallet - User wallet
+   *  @param nft_name - Name of the nft
+   *  @param apr - APR based in the current day
+   *  @param day - Day for update rewards (Starts from 0)
+   *  @param rewards - Rewards for the day
+   *
+   */
+  public async updateStakeRewards(
+    { wallet, day, items }: UpdateStakeRewardsArgs,
+    options?: RpcOptions
+  ) {
+    const ixs: TransactionInstruction[] = [
+      ComputeBudgetProgram.setComputeUnitPrice({
+        microLamports: options.microLamports
+      }),
+      ComputeBudgetProgram.setComputeUnitLimit({
+        units: 600000
+      })
+    ]
+
+    for (const item of items) {
+      const Stake = getStakeAddressSync(this.program.programId, item.nftName)
+
+      ixs.push(
+        await this.program.methods
+          .updateStakeRewards({
+            rewards: item.rewards,
+            apr: item.apr,
+            day
+          })
+          .accounts({
+            signer: wallet,
+            stake: Stake
+          })
+          .instruction()
+      )
+    }
+
+    const { blockhash } = await this.provider.connection.getLatestBlockhash()
+
+    const messageV0 = new TransactionMessage({
+      instructions: ixs,
+      recentBlockhash: blockhash,
+      payerKey: wallet
+    }).compileToV0Message()
+
+    const tx = new VersionedTransaction(messageV0)
+
+    return this.provider.sendAndConfirm(tx, [], {
+      skipPreflight: options?.skipPreflight,
+      commitment: 'confirmed',
+    })
+  }
+
+  /**
+   *  Claim Stake Rewards
+   *  @param wallet - User wallet
+   *  @param mint - NFT mint
+   *  @param week - Week rewards
+   *  @param stakeVault - Name of the stake vault
+   *  @param nftName - Name of the nft
+   *
+   */
+  public async claimStakeRewards(
+    { wallet, mint, week, stakeVault, nftName }: ClaimStakeRewardsArgs,
+    options?: RpcOptions
+  ) {
+    const StakeVault = getStakeVaultAddressSync(
+      this.program.programId,
+      stakeVault
+    )
+    const Stake = getStakeAddressSync(this.program.programId, nftName)
+    const NFTRewards = getNFTRewardsAddressSync(this.program.programId, Stake)
+    const FromAta = getATASync(StakeVault, mint)
+    const ToAta = getATASync(wallet, mint)
+
+    const method = this.program.methods
+      .claimStakeRewards({
+        week
+      })
+      .accounts({
+        signer: wallet,
+        fromAta: FromAta,
+        toAta: ToAta,
+        mint: mint,
+        nftRewards: NFTRewards,
+        stake: Stake,
+        stakeVault: StakeVault
       })
 
     if (options?.microLamports) {

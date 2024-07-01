@@ -46,6 +46,31 @@ export type WithdrawArgs = {
   stakeVault: string
 }
 
+export type UpdateStakeVaultStatusArgs = {
+  wallet: PublicKey
+  isLocked: boolean
+  week: number
+  stakeVault: string
+}
+
+export type ClaimStakeRewardsArgs = {
+  wallet: PublicKey
+  week: number
+  mint: PublicKey
+  stakeVault: string
+  nftName: string
+}
+
+export type UpdateStakeRewardsArgs = {
+  day: number
+  wallet: PublicKey
+  items: {
+    rewards: BN
+    apr: number
+    nftName: string
+  }[]
+}
+
 export enum RARITY_WEIGHT {
   COMMON = 1,
   UNCOMMON = 2,
@@ -73,6 +98,7 @@ export type StakeVaultResponse = {
   amountPaid: number
   amountUsers: number
   apr: number
+  week: number
   initTs: number
   endTs: number
 }
@@ -88,4 +114,8 @@ export type StakeResponse = {
   withdrawTs: number
   mint: string
   stakeRewards: string
+  apr?: number
+  dailyRewards?: number[]
+  weeklyRewardsPaid?: boolean[]
+  weeklyRewards?: number
 }

@@ -6,4 +6,4 @@ node_modules
 test-ledger
 .yarn
 dist
-stakes.json
+stake-season-1

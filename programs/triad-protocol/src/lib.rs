@@ -75,4 +75,25 @@ pub mod triad_protocol {
     ) -> Result<()> {
         instructions::deposit_stake_rewards(ctx, args)
     }
+
+    pub fn update_stake_vault_status<'info>(
+        ctx: Context<UpdateStakeVaultStatus<'info>>,
+        args: UpdateStakeVaultStatusArgs,
+    ) -> Result<()> {
+        instructions::update_stake_vault_status(ctx, args)
+    }
+
+    pub fn claim_stake_rewards<'info>(
+        ctx: Context<ClaimStakeRewards<'info>>,
+        args: ClaimStakeRewardsArgs,
+    ) -> Result<()> {
+        instructions::claim_stake_rewards(ctx, args)
+    }
+
+    pub fn update_stake_rewards<'info>(
+        ctx: Context<UpdateStakeRewards<'info>>,
+        args: UpdateStakeRewardsArgs,
+    ) -> Result<()> {
+        instructions::update_stake_rewards(ctx, args)
+    }
 }

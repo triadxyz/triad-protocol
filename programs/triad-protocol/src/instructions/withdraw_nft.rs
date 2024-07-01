@@ -1,3 +1,5 @@
+use crate::constants::ADMIN;
+use crate::NFTRewards;
 use crate::{errors::TriadProtocolError, state::Stake, StakeVault, WithdrawNFTArgs};
 use anchor_lang::prelude::*;
 use anchor_spl::token_2022::Token2022;
@@ -18,6 +20,13 @@ pub struct WithdrawNFT<'info> {
     #[account(mut, close = signer, seeds = [Stake::PREFIX_SEED, args.nft_name.as_ref()], bump)]
     pub stake: Box<Account<'info, Stake>>,
 
+    /// CHECK: verified if the admin pubkey is equal the ADMIN constant
+    #[account(mut)]
+    pub admin: AccountInfo<'info>,
+
+    #[account(mut, close = admin)]
+    pub nft_rewards: Account<'info, NFTRewards>,
+
     #[account(mut)]
     pub mint: Box<InterfaceAccount<'info, Mint>>,
 
@@ -33,11 +42,9 @@ pub struct WithdrawNFT<'info> {
 }
 
 pub fn withdraw_nft(ctx: Context<WithdrawNFT>, _args: WithdrawNFTArgs) -> Result<()> {
-    if ctx.accounts.stake_vault.is_locked {
-        return Err(TriadProtocolError::StakeVaultLocked.into());
-    }
-
-    if ctx.accounts.stake.authority != *ctx.accounts.signer.key {
+    if ctx.accounts.stake.authority != *ctx.accounts.signer.key
+        || ctx.accounts.admin.key.to_string() != ADMIN
+    {
         return Err(TriadProtocolError::Unauthorized.into());
     }
 
