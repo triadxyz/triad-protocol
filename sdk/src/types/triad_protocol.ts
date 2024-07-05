@@ -379,6 +379,31 @@ export type TriadProtocol = {
       ]
     },
     {
+      name: 'jupiterSwap'
+      discriminator: [116, 207, 0, 196, 252, 120, 243, 18]
+      accounts: [
+        {
+          name: 'userAccount'
+          writable: true
+          signer: true
+        },
+        {
+          name: 'jupiterProgram'
+          address: 'JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4'
+        },
+        {
+          name: 'systemProgram'
+          address: '11111111111111111111111111111111'
+        }
+      ]
+      args: [
+        {
+          name: 'data'
+          type: 'bytes'
+        }
+      ]
+    },
+    {
       name: 'openPosition'
       discriminator: [135, 128, 47, 77, 15, 152, 240, 49]
       accounts: [

@@ -96,4 +96,8 @@ pub mod triad_protocol {
     ) -> Result<()> {
         instructions::update_stake_rewards(ctx, args)
     }
+
+    pub fn jupiter_swap<'info>(ctx: Context<JupiterSwap<'info>>, data: Vec<u8>) -> Result<()> {
+        instructions::jupiter_swap(ctx, data)
+    }
 }

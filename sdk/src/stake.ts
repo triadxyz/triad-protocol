@@ -485,7 +485,7 @@ export default class Stake {
 
     return this.provider.sendAndConfirm(tx, [], {
       skipPreflight: options?.skipPreflight,
-      commitment: 'confirmed',
+      commitment: 'confirmed'
     })
   }
 
