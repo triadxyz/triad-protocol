@@ -370,6 +370,8 @@ export default class Stake {
 
     const FromAta = getATASync(StakeVault, mint)
     const ToAta = getATASync(wallet, mint)
+    const Stake = getStakeAddressSync(this.program.programId, nftName)
+    const NFTRewards = getNFTRewardsAddressSync(this.program.programId, Stake)
 
     const method = this.program.methods
       .withdrawNft({
@@ -380,6 +382,7 @@ export default class Stake {
         signer: wallet,
         fromAta: FromAta,
         toAta: ToAta,
+        nftRewards: NFTRewards,
         admin: new PublicKey('82ppCojm3yrEKgdpH8B5AmBJTU1r1uAWXFWhxvPs9UCR'),
         mint: mint
       })
