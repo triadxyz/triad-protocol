@@ -55,7 +55,7 @@ export type UpdateStakeVaultStatusArgs = {
 
 export type ClaimStakeRewardsArgs = {
   wallet: PublicKey
-  week: number
+  week: number[]
   mint: PublicKey
   stakeVault: string
   nftName: string

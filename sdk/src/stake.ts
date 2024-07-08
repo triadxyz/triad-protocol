@@ -514,28 +514,32 @@ export default class Stake {
     const FromAta = getATASync(StakeVault, mint)
     const ToAta = getATASync(wallet, mint)
 
-    const method = this.program.methods
-      .claimStakeRewards({
-        week
-      })
-      .accounts({
-        signer: wallet,
-        fromAta: FromAta,
-        toAta: ToAta,
-        mint: mint,
-        nftRewards: NFTRewards,
-        stake: Stake,
-        stakeVault: StakeVault
-      })
-
-    if (options?.microLamports) {
-      method.postInstructions([
-        ComputeBudgetProgram.setComputeUnitPrice({
-          microLamports: options.microLamports
+    const promises = week.map((item) => {
+      const method = this.program.methods
+        .claimStakeRewards({
+          week: item
         })
-      ])
-    }
+        .accounts({
+          signer: wallet,
+          fromAta: FromAta,
+          toAta: ToAta,
+          mint: mint,
+          nftRewards: NFTRewards,
+          stake: Stake,
+          stakeVault: StakeVault
+        })
 
-    return method.rpc({ skipPreflight: options?.skipPreflight })
+      if (options?.microLamports) {
+        method.postInstructions([
+          ComputeBudgetProgram.setComputeUnitPrice({
+            microLamports: options.microLamports
+          })
+        ])
+      }
+
+      return method.rpc({ skipPreflight: options?.skipPreflight })
+    })
+
+    return Promise.all(promises)
   }
 }
