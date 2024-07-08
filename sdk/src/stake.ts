@@ -1,9 +1,11 @@
 import { AnchorProvider, Program } from '@coral-xyz/anchor'
 import {
   ComputeBudgetProgram,
+  MessageV0,
   PublicKey,
   TransactionInstruction,
   TransactionMessage,
+  VersionedMessage,
   VersionedTransaction
 } from '@solana/web3.js'
 import { TriadProtocol } from './types/triad_protocol'
@@ -514,32 +516,47 @@ export default class Stake {
     const FromAta = getATASync(StakeVault, mint)
     const ToAta = getATASync(wallet, mint)
 
-    let method
+    let ixs: TransactionInstruction[] = []
 
     for (let w of week) {
-      method = this.program.methods
-        .claimStakeRewards({
-          week: w
-        })
-        .accounts({
-          signer: wallet,
-          fromAta: FromAta,
-          toAta: ToAta,
-          mint: mint,
-          nftRewards: NFTRewards,
-          stake: Stake,
-          stakeVault: StakeVault
-        })
+      ixs.push(
+        await this.program.methods
+          .claimStakeRewards({
+            week: w
+          })
+          .accounts({
+            signer: wallet,
+            fromAta: FromAta,
+            toAta: ToAta,
+            mint: mint,
+            nftRewards: NFTRewards,
+            stake: Stake,
+            stakeVault: StakeVault
+          })
+          .instruction()
+      )
     }
 
     if (options?.microLamports) {
-      method.postInstructions([
+      ixs.push(
         ComputeBudgetProgram.setComputeUnitPrice({
           microLamports: options.microLamports
         })
-      ])
+      )
     }
 
-    return method.rpc({ skipPreflight: options?.skipPreflight })
+    const { blockhash } = await this.provider.connection.getLatestBlockhash()
+    const messageV0 = new TransactionMessage({
+      payerKey: wallet,
+      recentBlockhash: blockhash,
+      instructions: ixs
+    }).compileToV0Message()
+
+    const tx = new VersionedTransaction(messageV0)
+
+    return this.provider.sendAndConfirm(tx, [], {
+      skipPreflight: options?.skipPreflight,
+      commitment: 'confirmed'
+    })
   }
 }

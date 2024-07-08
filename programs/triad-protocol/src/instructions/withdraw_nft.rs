@@ -33,7 +33,13 @@ pub struct WithdrawNFT<'info> {
     #[account(mut)]
     pub from_ata: Box<InterfaceAccount<'info, TokenAccount>>,
 
-    #[account(mut, constraint = signer.key() == to_ata.owner && to_ata.mint == mint.key())]
+    #[account(
+        init_if_needed,
+        payer = signer,
+        associated_token::mint = mint,
+        associated_token::authority = signer,
+        constraint = signer.key() == to_ata.owner && to_ata.mint == mint.key()
+    )]
     pub to_ata: Box<InterfaceAccount<'info, TokenAccount>>,
 
     pub token_program: Program<'info, Token2022>,
