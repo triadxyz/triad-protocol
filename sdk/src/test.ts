@@ -19,14 +19,19 @@ const triadProtocol = new TriadProtocol(connection, wallet)
 const populateStakeDay = async () => {
   const { perDay } =
     await triadProtocol.stake.getStakeVaultRewards(STAKE_SEASON_1)
-  const day = 1719755851
+  const day = 1720360651
   const stakes = await triadProtocol.stake.getStakesByDay(STAKE_SEASON_1, day)
 
   const newItems = []
 
   const itemsByAuthority = stakes.reduce((acc, item) => {
     const itemRarity = RARITY.find((rarity) => rarity.onchainId === item.mint)
+
     if (!itemRarity) {
+      return acc
+    }
+
+    if (item.withdrawTs !== 0 && item.withdrawTs < 1720441379) {
       return acc
     }
 
@@ -46,19 +51,22 @@ const populateStakeDay = async () => {
 
   Object.keys(itemsByAuthority).forEach((authority) => {
     const items = itemsByAuthority[authority]
+
     items.sort((a, b) => a.rarityRankHrtt - b.rarityRankHrtt)
 
     items.forEach((item, index) => {
-      const collections = Object.values(
-        USERS_COLLECTIONS_WEEK_1.find(
-          (collection) => Object.keys(collection)[0] === item.authority
-        )
-      )[0]
+      const collections = USERS_COLLECTIONS_WEEK_1[item.authority] ?? {}
+
+      const items: string[] = []
+
+      Object.keys(collections).forEach((collection) => {
+        if (collections[collection]) {
+          items.push(collection)
+        }
+      })
 
       let totalMultiplier = calculateTotalMultiplier(
-        index === 0
-          ? (Object.keys(item.collections).map((x) => x.toUpperCase()) as any)
-          : [],
+        index === 0 ? items.map((item) => item.toUpperCase() as any) : [],
         {
           max: 1839,
           currentPosition: item.rarityRankHrtt
@@ -68,7 +76,7 @@ const populateStakeDay = async () => {
       newItems.push({
         ...item,
         totalMultiplier,
-        collections: index === 0 ? collections : {}
+        collections: index === 0 ? collections[0] : {}
       })
     })
   })
@@ -123,7 +131,7 @@ const updateStakeVaultStatus = async () => {
     {
       wallet: wallet.publicKey,
       isLocked: true,
-      week: 0,
+      week: 1,
       stakeVault: STAKE_SEASON_1
     },
     {
@@ -169,7 +177,7 @@ const claimStakeRewards = async () => {
     {
       wallet: wallet.publicKey,
       mint: new PublicKey(''),
-      week: 0,
+      week: [],
       stakeVault: STAKE_SEASON_1,
       nftName: ''
     },
@@ -184,6 +192,8 @@ const claimStakeRewards = async () => {
 
 const getStakes = async () => {
   const response = await triadProtocol.stake.getStakes(STAKE_SEASON_1)
+
+  console.log(JSON.stringify(response, null, 2))
 
   const users = response
     .filter(
@@ -220,4 +230,70 @@ const stake = async () => {
   )
 
   console.log(response)
+}
+
+const updateStakeRewards = async () => {
+  const day = null
+  const ts = null
+
+  let file = fs.readFileSync(`./src/utils/stake-season-1/stakes/2/${ts}.json`)
+
+  const data = JSON.parse(file.toString())
+
+  const chunkLengths = 10
+  const chunks = []
+
+  for (let i = 0; i < data.length; i += chunkLengths) {
+    chunks.push(data.slice(i, i + chunkLengths))
+  }
+
+  console.log(chunks.length)
+
+  const failedChunks = []
+
+  for (let i = 0; i < chunks.length; i++) {
+    const chunk = chunks[i]
+    const items = []
+
+    console.log(`Processing chunk ${i + 1} of ${chunks.length}`)
+
+    for (let j = 0; j < chunk.length; j++) {
+      const item = chunk[j]
+
+      items.push({
+        rewards: new BN(item.rewards * 10 ** TTRIAD_DECIMALS),
+        apr: item.apr,
+        nftName: item.name
+      })
+    }
+
+    try {
+      const rewards = await triadProtocol.stake.updateStakeRewards(
+        {
+          day,
+          wallet: wallet.publicKey,
+          items: items
+        },
+        {
+          skipPreflight: false,
+          microLamports: 20000
+        }
+      )
+
+      console.log(rewards)
+    } catch (error) {
+      console.error(`Failed to update stake rewards for chunk ${i}:`, error)
+      failedChunks.push(chunk)
+    }
+  }
+
+  if (failedChunks.length > 0) {
+    fs.writeFileSync(
+      `./src/utils/stake-season-1/stakes/2/failedChunks_${ts}.json`,
+      JSON.stringify(failedChunks, null, 2)
+    )
+    console.log(
+      `Failed chunks saved to ./src/utils/stake-season-1/stakes/2/failedChunks_${ts}.json`
+    )
+  }
 }
