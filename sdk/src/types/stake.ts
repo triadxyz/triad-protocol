@@ -118,4 +118,6 @@ export type StakeResponse = {
   dailyRewards?: number[]
   weeklyRewardsPaid?: boolean[]
   weeklyRewards?: number
+  rewardsToClaim?: number
+  allRewards?: number
 }
