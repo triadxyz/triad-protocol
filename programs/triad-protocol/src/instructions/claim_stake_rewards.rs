@@ -62,7 +62,7 @@ pub fn claim_stake_rewards(
     let nft_rewards = &mut ctx.accounts.nft_rewards;
 
     if nft_rewards.weekly_rewards_paid[args.week as usize] {
-        return Err(TriadProtocolError::InvalidStakeVaultWeek.into());
+        return Err(TriadProtocolError::RewardsAlreadyClaimed.into());
     }
 
     if stake.authority != *ctx.accounts.signer.key

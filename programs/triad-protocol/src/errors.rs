@@ -11,51 +11,54 @@ pub enum TriadProtocolError {
     #[msg("Failed to deposit")]
     DepositFailed,
 
-    #[msg("Invalid Owner authority")]
+    #[msg("Invalid owner authority")]
     InvalidOwnerAuthority,
 
-    #[msg("Invalid Position")]
+    #[msg("Invalid position")]
     InvalidPosition,
 
-    #[msg("Invalid Ticker position")]
+    #[msg("Invalid ticker position")]
     InvalidTickerPosition,
 
     #[msg("No free position slot")]
     NoFreePositionSlot,
 
-    #[msg("Invalid Mint address")]
+    #[msg("Invalid mint address")]
     InvalidMintAddress,
 
-    #[msg("Invalid Profit Share")]
+    #[msg("Invalid profit share")]
     InvalidProfitShare,
 
-    #[msg("Invalid Deposit Amount")]
+    #[msg("Invalid deposit amount")]
     InvalidDepositAmount,
 
-    #[msg("Invalid Withdraw Amount")]
+    #[msg("Invalid withdraw amount")]
     InvalidWithdrawAmount,
 
-    #[msg("Invalid Stake Vault")]
+    #[msg("Invalid stake vault")]
     InvalidStakeVault,
 
-    #[msg("Invalid Stake Vault Authority")]
+    #[msg("Invalid stake vault authority")]
     InvalidStakeVaultAuthority,
 
-    #[msg("Invalid Stake Vault Amount")]
+    #[msg("Invalid stake vault amount")]
     InvalidStakeVaultAmount,
 
-    #[msg("Stake Vault Available")]
+    #[msg("Stake vault available")]
     StakeVaultLocked,
 
     #[msg("Stake is locked")]
     StakeLocked,
 
-    #[msg("Stake Vault Full")]
+    #[msg("Stake vault full")]
     StakeVaultFull,
 
-    #[msg("Invalid Mint")]
+    #[msg("Invalid mint")]
     InvalidMint,
 
-    #[msg("Invalid Stake Vault Week")]
+    #[msg("Invalid stake vault week")]
     InvalidStakeVaultWeek,
+
+    #[msg("Rewards already claimed")]
+    RewardsAlreadyClaimed,
 }
