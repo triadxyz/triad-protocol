@@ -3,7 +3,6 @@ use crate::{
     constraints::is_authority_for_ticker,
     errors::TriadProtocolError,
     state::{Ticker, UpdateTickerPriceArgs},
-    TickerPriceUpdateRecord,
 };
 
 use anchor_lang::prelude::*;
@@ -32,12 +31,6 @@ pub fn update_ticker_price(
 
     ticker.updated_ts = Clock::get()?.unix_timestamp;
     ticker.price = args.price;
-
-    emit!(TickerPriceUpdateRecord {
-        price: ticker.price,
-        ticker: ticker.key(),
-        ts: ticker.updated_ts,
-    });
 
     Ok(())
 }
