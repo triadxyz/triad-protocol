@@ -117,23 +117,27 @@ export default class Stake {
 
         stake.rewardsToClaim = 0
 
-        stake.dailyRewards.forEach((item, index) => {
-          let week = 0
-          let limit = 6
+        let index = 0
+        let week = 0
+        let limit = 7
 
+        for (const item of stake.dailyRewards) {
           if (!stake.weeklyRewardsPaid[week]) {
             stake.rewardsToClaim += item
           }
 
           if (index === limit) {
             limit += 6
-            week + 1
+            week += 1
           }
-        })
+
+          index++
+        }
 
         stake.weeklyRewards = rewards
         stake.allRewards = allRewards
       } catch (error) {
+        console.log(error)
         stake.apr = 0
         stake.dailyRewards = []
         stake.weeklyRewardsPaid = []
