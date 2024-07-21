@@ -1,11 +1,9 @@
 import { AnchorProvider, Program } from '@coral-xyz/anchor'
 import {
   ComputeBudgetProgram,
-  MessageV0,
   PublicKey,
   TransactionInstruction,
   TransactionMessage,
-  VersionedMessage,
   VersionedTransaction
 } from '@solana/web3.js'
 import { TriadProtocol } from './types/triad_protocol'
@@ -115,13 +113,37 @@ export default class Stake {
         let rewards = stake.dailyRewards
           .slice(start, end)
           .reduce((a, b) => a + b, 0)
+        let allRewards = stake.dailyRewards.reduce((a, b) => a + b)
+
+        stake.rewardsToClaim = 0
+
+        let index = 0
+        let week = 0
+        let limit = 7
+
+        for (const item of stake.dailyRewards) {
+          if (!stake.weeklyRewardsPaid[week]) {
+            stake.rewardsToClaim += item
+          }
+
+          if (index === limit) {
+            limit += 6
+            week += 1
+          }
+
+          index++
+        }
 
         stake.weeklyRewards = rewards
+        stake.allRewards = allRewards
       } catch (error) {
+        console.log(error)
         stake.apr = 0
         stake.dailyRewards = []
         stake.weeklyRewardsPaid = []
         stake.weeklyRewards = 0
+        stake.rewardsToClaim = 0
+        stake.allRewards = 0
       }
     }
 
