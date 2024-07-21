@@ -225,7 +225,7 @@ export default class Stake {
    *  @param rarity - NFT rarity
    *
    */
-  public async stake(
+  public async stakeNft(
     { name, wallet, mint, collections, rarity, stakeVault }: StakeArgs,
     options?: RpcOptions
   ) {
@@ -245,7 +245,7 @@ export default class Stake {
     })
 
     const method = this.program.methods
-      .stake({
+      .stakeNft({
         name,
         collections: items,
         rarity,

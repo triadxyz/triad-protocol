@@ -211,7 +211,7 @@ const getStakers = async () => {
 }
 
 const stake = async () => {
-  const response = await triadProtocol.stake.stake(
+  const response = await triadProtocol.stake.stakeNft(
     {
       name: 'Triad 0',
       wallet: wallet.publicKey,

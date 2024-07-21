@@ -465,8 +465,8 @@
       ]
     },
     {
-      "name": "stake",
-      "discriminator": [206, 176, 202, 18, 200, 209, 179, 108],
+      "name": "stake_nft",
+      "discriminator": [38, 27, 66, 46, 69, 65, 151, 219],
       "accounts": [
         {
           "name": "signer",
@@ -503,8 +503,8 @@
                 "path": "signer"
               },
               {
-                "kind": "arg",
-                "path": "args.name"
+                "kind": "account",
+                "path": "mint"
               }
             ]
           }
@@ -540,6 +540,87 @@
           "type": {
             "defined": {
               "name": "StakeNFTArgs"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "stake_token",
+      "discriminator": [191, 127, 193, 101, 37, 96, 87, 211],
+      "accounts": [
+        {
+          "name": "signer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "stake_vault",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [115, 116, 97, 107, 101, 95, 118, 97, 117, 108, 116]
+              },
+              {
+                "kind": "arg",
+                "path": "args.stake_vault"
+              }
+            ]
+          }
+        },
+        {
+          "name": "stake",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [115, 116, 97, 107, 101]
+              },
+              {
+                "kind": "account",
+                "path": "signer"
+              },
+              {
+                "kind": "account",
+                "path": "mint"
+              }
+            ]
+          }
+        },
+        {
+          "name": "mint",
+          "writable": true
+        },
+        {
+          "name": "from_ata",
+          "writable": true
+        },
+        {
+          "name": "to_ata",
+          "writable": true
+        },
+        {
+          "name": "token_program",
+          "address": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb"
+        },
+        {
+          "name": "associated_token_program",
+          "address": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "args",
+          "type": {
+            "defined": {
+              "name": "StakeTokenArgs"
             }
           }
         }
@@ -1165,6 +1246,22 @@
                 }
               }
             }
+          }
+        ]
+      }
+    },
+    {
+      "name": "StakeTokenArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "stake_vault",
+            "type": "string"
+          },
+          {
+            "name": "amount",
+            "type": "u64"
           }
         ]
       }

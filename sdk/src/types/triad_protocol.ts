@@ -517,8 +517,8 @@ export type TriadProtocol = {
       ]
     },
     {
-      name: 'stake'
-      discriminator: [206, 176, 202, 18, 200, 209, 179, 108]
+      name: 'stakeNft'
+      discriminator: [38, 27, 66, 46, 69, 65, 151, 219]
       accounts: [
         {
           name: 'signer'
@@ -555,8 +555,8 @@ export type TriadProtocol = {
                 path: 'signer'
               },
               {
-                kind: 'arg'
-                path: 'args.name'
+                kind: 'account'
+                path: 'mint'
               }
             ]
           }
@@ -592,6 +592,87 @@ export type TriadProtocol = {
           type: {
             defined: {
               name: 'stakeNftArgs'
+            }
+          }
+        }
+      ]
+    },
+    {
+      name: 'stakeToken'
+      discriminator: [191, 127, 193, 101, 37, 96, 87, 211]
+      accounts: [
+        {
+          name: 'signer'
+          writable: true
+          signer: true
+        },
+        {
+          name: 'stakeVault'
+          writable: true
+          pda: {
+            seeds: [
+              {
+                kind: 'const'
+                value: [115, 116, 97, 107, 101, 95, 118, 97, 117, 108, 116]
+              },
+              {
+                kind: 'arg'
+                path: 'args.stake_vault'
+              }
+            ]
+          }
+        },
+        {
+          name: 'stake'
+          writable: true
+          pda: {
+            seeds: [
+              {
+                kind: 'const'
+                value: [115, 116, 97, 107, 101]
+              },
+              {
+                kind: 'account'
+                path: 'signer'
+              },
+              {
+                kind: 'account'
+                path: 'mint'
+              }
+            ]
+          }
+        },
+        {
+          name: 'mint'
+          writable: true
+        },
+        {
+          name: 'fromAta'
+          writable: true
+        },
+        {
+          name: 'toAta'
+          writable: true
+        },
+        {
+          name: 'tokenProgram'
+          address: 'TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb'
+        },
+        {
+          name: 'associatedTokenProgram'
+          address: 'ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL'
+        },
+        {
+          name: 'systemProgram'
+          address: '11111111111111111111111111111111'
+        }
+      ]
+      args: [
+        {
+          name: 'args'
+          type: {
+            defined: {
+              name: 'stakeTokenArgs'
             }
           }
         }
@@ -1217,6 +1298,22 @@ export type TriadProtocol = {
                 }
               }
             }
+          }
+        ]
+      }
+    },
+    {
+      name: 'stakeTokenArgs'
+      type: {
+        kind: 'struct'
+        fields: [
+          {
+            name: 'stakeVault'
+            type: 'string'
+          },
+          {
+            name: 'amount'
+            type: 'u64'
           }
         ]
       }

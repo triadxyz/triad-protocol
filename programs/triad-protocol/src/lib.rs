@@ -37,8 +37,12 @@ pub mod triad_protocol {
         instructions::close_position(ctx, args)
     }
 
-    pub fn stake(ctx: Context<StakeNFT>, args: StakeNFTArgs) -> Result<()> {
+    pub fn stake_nft(ctx: Context<StakeNFT>, args: StakeNFTArgs) -> Result<()> {
         instructions::stake_nft(ctx, args)
+    }
+
+    pub fn stake_token(ctx: Context<StakeToken>, args: StakeTokenArgs) -> Result<()> {
+        instructions::stake_token(ctx, args)
     }
 
     pub fn initialize_stake_vault(
