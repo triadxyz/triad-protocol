@@ -344,31 +344,6 @@
       ]
     },
     {
-      "name": "jupiter_swap",
-      "discriminator": [116, 207, 0, 196, 252, 120, 243, 18],
-      "accounts": [
-        {
-          "name": "user_account",
-          "writable": true,
-          "signer": true
-        },
-        {
-          "name": "jupiter_program",
-          "address": "JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4"
-        },
-        {
-          "name": "system_program",
-          "address": "11111111111111111111111111111111"
-        }
-      ],
-      "args": [
-        {
-          "name": "data",
-          "type": "bytes"
-        }
-      ]
-    },
-    {
       "name": "open_position",
       "discriminator": [135, 128, 47, 77, 15, 152, 240, 49],
       "accounts": [
@@ -459,19 +434,7 @@
         },
         {
           "name": "stake",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [115, 116, 97, 107, 101]
-              },
-              {
-                "kind": "arg",
-                "path": "args.nft_name"
-              }
-            ]
-          }
+          "writable": true
         },
         {
           "name": "mint",
@@ -534,6 +497,10 @@
               {
                 "kind": "const",
                 "value": [115, 116, 97, 107, 101]
+              },
+              {
+                "kind": "account",
+                "path": "signer"
               },
               {
                 "kind": "arg",
@@ -708,19 +675,7 @@
         },
         {
           "name": "stake",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [115, 116, 97, 107, 101]
-              },
-              {
-                "kind": "arg",
-                "path": "args.nft_name"
-              }
-            ]
-          }
+          "writable": true
         },
         {
           "name": "admin",
@@ -793,20 +748,6 @@
       "discriminator": [211, 8, 232, 43, 2, 152, 117, 119]
     }
   ],
-  "events": [
-    {
-      "name": "ClosePositionRecord",
-      "discriminator": [202, 208, 157, 166, 193, 229, 76, 5]
-    },
-    {
-      "name": "OpenPositionRecord",
-      "discriminator": [118, 71, 105, 89, 222, 111, 56, 63]
-    },
-    {
-      "name": "TickerPriceUpdateRecord",
-      "discriminator": [11, 38, 250, 234, 149, 218, 144, 15]
-    }
-  ],
   "errors": [
     {
       "code": 6000,
@@ -826,17 +767,17 @@
     {
       "code": 6003,
       "name": "InvalidOwnerAuthority",
-      "msg": "Invalid Owner authority"
+      "msg": "Invalid owner authority"
     },
     {
       "code": 6004,
       "name": "InvalidPosition",
-      "msg": "Invalid Position"
+      "msg": "Invalid position"
     },
     {
       "code": 6005,
       "name": "InvalidTickerPosition",
-      "msg": "Invalid Ticker position"
+      "msg": "Invalid ticker position"
     },
     {
       "code": 6006,
@@ -846,42 +787,42 @@
     {
       "code": 6007,
       "name": "InvalidMintAddress",
-      "msg": "Invalid Mint address"
+      "msg": "Invalid mint address"
     },
     {
       "code": 6008,
       "name": "InvalidProfitShare",
-      "msg": "Invalid Profit Share"
+      "msg": "Invalid profit share"
     },
     {
       "code": 6009,
       "name": "InvalidDepositAmount",
-      "msg": "Invalid Deposit Amount"
+      "msg": "Invalid deposit amount"
     },
     {
       "code": 6010,
       "name": "InvalidWithdrawAmount",
-      "msg": "Invalid Withdraw Amount"
+      "msg": "Invalid withdraw amount"
     },
     {
       "code": 6011,
       "name": "InvalidStakeVault",
-      "msg": "Invalid Stake Vault"
+      "msg": "Invalid stake vault"
     },
     {
       "code": 6012,
       "name": "InvalidStakeVaultAuthority",
-      "msg": "Invalid Stake Vault Authority"
+      "msg": "Invalid stake vault authority"
     },
     {
       "code": 6013,
       "name": "InvalidStakeVaultAmount",
-      "msg": "Invalid Stake Vault Amount"
+      "msg": "Invalid stake vault amount"
     },
     {
       "code": 6014,
       "name": "StakeVaultLocked",
-      "msg": "Stake Vault Available"
+      "msg": "Stake vault locked"
     },
     {
       "code": 6015,
@@ -891,17 +832,22 @@
     {
       "code": 6016,
       "name": "StakeVaultFull",
-      "msg": "Stake Vault Full"
+      "msg": "Stake vault full"
     },
     {
       "code": 6017,
       "name": "InvalidMint",
-      "msg": "Invalid Mint"
+      "msg": "Invalid mint"
     },
     {
       "code": 6018,
       "name": "InvalidStakeVaultWeek",
-      "msg": "Invalid Stake Vault Week"
+      "msg": "Invalid stake vault week"
+    },
+    {
+      "code": 6019,
+      "name": "RewardsAlreadyClaimed",
+      "msg": "Rewards already claimed"
     }
   ],
   "types": [
@@ -925,42 +871,6 @@
           {
             "name": "position_index",
             "type": "u8"
-          }
-        ]
-      }
-    },
-    {
-      "name": "ClosePositionRecord",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "amount",
-            "type": "u64"
-          },
-          {
-            "name": "ticker",
-            "type": "pubkey"
-          },
-          {
-            "name": "close_price",
-            "type": "u64"
-          },
-          {
-            "name": "ts",
-            "type": "i64"
-          },
-          {
-            "name": "is_long",
-            "type": "bool"
-          },
-          {
-            "name": "pnl",
-            "type": "i64"
-          },
-          {
-            "name": "user",
-            "type": "pubkey"
           }
         ]
       }
@@ -1081,38 +991,6 @@
           {
             "name": "is_long",
             "type": "bool"
-          }
-        ]
-      }
-    },
-    {
-      "name": "OpenPositionRecord",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "amount",
-            "type": "u64"
-          },
-          {
-            "name": "ticker",
-            "type": "pubkey"
-          },
-          {
-            "name": "entry_price",
-            "type": "u64"
-          },
-          {
-            "name": "ts",
-            "type": "i64"
-          },
-          {
-            "name": "is_long",
-            "type": "bool"
-          },
-          {
-            "name": "user",
-            "type": "pubkey"
           }
         ]
       }
@@ -1249,6 +1127,10 @@
           {
             "name": "stake_rewards",
             "type": "pubkey"
+          },
+          {
+            "name": "amount",
+            "type": "u64"
           }
         ]
       }
@@ -1317,11 +1199,11 @@
             "type": "u64"
           },
           {
-            "name": "apr",
+            "name": "token_decimals",
             "type": "u8"
           },
           {
-            "name": "amount_users",
+            "name": "nft_staked",
             "type": "u64"
           },
           {
@@ -1341,7 +1223,7 @@
             "type": "string"
           },
           {
-            "name": "users_paid",
+            "name": "token_mint",
             "type": "pubkey"
           },
           {
@@ -1349,9 +1231,13 @@
             "type": "u8"
           },
           {
+            "name": "token_staked",
+            "type": "u64"
+          },
+          {
             "name": "padding",
             "type": {
-              "array": ["u8", 56]
+              "array": ["u8", 48]
             }
           }
         ]
@@ -1364,64 +1250,34 @@
         "fields": [
           {
             "name": "init_ts",
-            "docs": ["timestamp of the creation of the ticker"],
             "type": "i64"
           },
           {
             "name": "updated_ts",
-            "docs": ["timestamp of the last update of the ticker"],
             "type": "i64"
           },
           {
             "name": "bump",
-            "docs": ["The bump for the ticker pda"],
             "type": "u8"
           },
           {
             "name": "authority",
-            "docs": ["authority for the ticker"],
             "type": "pubkey"
           },
           {
             "name": "name",
-            "docs": ["name of the ticekt"],
             "type": "string"
           },
           {
             "name": "protocol_program_id",
-            "docs": [
-              "protocol program id like dRiftyHA39MWEi3m9aunc5MzRF1JYuBsbn6VPcn33UH to get data info"
-            ],
             "type": "pubkey"
           },
-          {
-            "name": "price",
-            "docs": ["ticker price"],
-            "type": "u64"
-          },
-          {
-            "name": "vault",
-            "docs": ["Vault PDA"],
-            "type": "pubkey"
-          }
-        ]
-      }
-    },
-    {
-      "name": "TickerPriceUpdateRecord",
-      "type": {
-        "kind": "struct",
-        "fields": [
           {
             "name": "price",
             "type": "u64"
           },
           {
-            "name": "ts",
-            "type": "i64"
-          },
-          {
-            "name": "ticker",
+            "name": "vault",
             "type": "pubkey"
           }
         ]
@@ -1482,47 +1338,38 @@
         "fields": [
           {
             "name": "ts",
-            "docs": ["timestamp"],
             "type": "i64"
           },
           {
             "name": "bump",
-            "docs": ["bump seed"],
             "type": "u8"
           },
           {
             "name": "total_deposited",
-            "docs": ["total deposited"],
             "type": "u64"
           },
           {
             "name": "total_withdrawn",
-            "docs": ["total withdrawn"],
             "type": "u64"
           },
           {
             "name": "lp_share",
-            "docs": ["total liquidity provided"],
             "type": "u64"
           },
           {
             "name": "total_positions",
-            "docs": ["total positions"],
             "type": "u16"
           },
           {
             "name": "ticker",
-            "docs": ["ticker account"],
             "type": "pubkey"
           },
           {
             "name": "authority",
-            "docs": ["user's authority"],
             "type": "pubkey"
           },
           {
             "name": "positions",
-            "docs": ["user's position"],
             "type": {
               "array": [
                 {
@@ -1544,72 +1391,58 @@
         "fields": [
           {
             "name": "bump",
-            "docs": ["The bump for the vault pda"],
             "type": "u8"
           },
           {
             "name": "authority",
-            "docs": ["authority for the vault"],
             "type": "pubkey"
           },
           {
             "name": "name",
-            "docs": ["name of the vault"],
             "type": "string"
           },
           {
             "name": "token_account",
-            "docs": ["token account for the vault e.g. tDRIFT"],
             "type": "pubkey"
           },
           {
             "name": "ticker_address",
-            "docs": ["ticker address"],
             "type": "pubkey"
           },
           {
             "name": "total_deposited",
-            "docs": ["lifetime total deposited"],
             "type": "u64"
           },
           {
             "name": "total_withdrawn",
-            "docs": ["lifetime total withdrawn"],
             "type": "u64"
           },
           {
             "name": "init_ts",
-            "docs": ["timestamp vault initialized"],
             "type": "i64"
           },
           {
             "name": "net_deposits",
-            "docs": ["lifetime net deposits"],
             "type": "u128"
           },
           {
             "name": "net_withdraws",
-            "docs": ["lifetime net withdraws"],
             "type": "u128"
           },
           {
             "name": "long_balance",
-            "docs": ["Long bet balance"],
             "type": "u64"
           },
           {
             "name": "short_balance",
-            "docs": ["Short bet balance"],
             "type": "u64"
           },
           {
             "name": "long_positions_opened",
-            "docs": ["Opened long positions"],
             "type": "u64"
           },
           {
             "name": "short_positions_opened",
-            "docs": ["Opened short positions"],
             "type": "u64"
           }
         ]

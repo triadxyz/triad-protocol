@@ -1,3 +1,4 @@
+use crate::constraints::is_authority_for_stake;
 use crate::{errors::TriadProtocolError, state::Stake, RequestWithdrawNFTArgs, StakeVault};
 use anchor_lang::prelude::*;
 use anchor_spl::token_2022::Token2022;
@@ -12,7 +13,7 @@ pub struct RequestWithdrawNFT<'info> {
     #[account(mut, seeds = [StakeVault::PREFIX_SEED, args.stake_vault.as_bytes()], bump)]
     pub stake_vault: Box<Account<'info, StakeVault>>,
 
-    #[account(mut, seeds = [Stake::PREFIX_SEED, args.nft_name.as_ref()], bump)]
+    #[account(mut, constraint = is_authority_for_stake(&stake, &signer)?)]
     pub stake: Box<Account<'info, Stake>>,
 
     #[account(mut)]
@@ -27,10 +28,6 @@ pub fn request_withdraw_nft(
     ctx: Context<RequestWithdrawNFT>,
     _args: RequestWithdrawNFTArgs,
 ) -> Result<()> {
-    if ctx.accounts.stake.authority != *ctx.accounts.signer.key {
-        return Err(TriadProtocolError::Unauthorized.into());
-    }
-
     let mint = &ctx.accounts.mint.to_account_info();
     let stake = &mut ctx.accounts.stake;
 

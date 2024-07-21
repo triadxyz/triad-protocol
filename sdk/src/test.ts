@@ -172,6 +172,8 @@ const getStake = async () => {
   console.log(stakeVaults)
 }
 
+getStake()
+
 const claimStakeRewards = async () => {
   const response = await triadProtocol.stake.claimStakeRewards(
     {
@@ -190,7 +192,7 @@ const claimStakeRewards = async () => {
   console.log(response)
 }
 
-const getStakes = async () => {
+const getStakers = async () => {
   const response = await triadProtocol.stake.getStakes(STAKE_SEASON_1)
 
   console.log(JSON.stringify(response, null, 2))

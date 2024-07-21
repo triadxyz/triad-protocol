@@ -13,6 +13,7 @@ pub struct Stake {
     pub mint: Pubkey,
     pub stake_vault: Pubkey,
     pub stake_rewards: Pubkey,
+    pub amount: u64,
 }
 
 #[account]
@@ -31,15 +32,16 @@ pub struct StakeVault {
     pub end_ts: i64,
     pub amount: u64,
     pub amount_paid: u64,
-    pub apr: u8,
-    pub amount_users: u64,
+    pub token_decimals: u8,
+    pub nft_staked: u64,
     pub slots: u64,
     pub is_locked: bool,
     pub name: String,
     pub collection: String,
-    pub users_paid: Pubkey,
+    pub token_mint: Pubkey,
     pub week: u8,
-    pub padding: [u8; 56],
+    pub token_staked: u64,
+    pub padding: [u8; 48],
 }
 
 #[derive(Clone, AnchorSerialize, AnchorDeserialize)]

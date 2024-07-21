@@ -64,5 +64,7 @@ pub fn deposit_stake_rewards(ctx: Context<DepositStakeRewards>, args: DepositSta
 
     transfer_checked(cpi_context, args.amount, ctx.accounts.mint.decimals)?;
 
+    stake_vault.amount += args.amount;
+
     Ok(())
 }

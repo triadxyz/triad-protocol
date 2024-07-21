@@ -91,13 +91,15 @@ export enum COLLECTION_MUlTIPLIER {
 export type StakeVaultResponse = {
   name: string
   collection: string
+  authority: string
   slots: number
   amount: number
   isLocked: boolean
-  usersPaid: PublicKey
+  tokenMint: string
   amountPaid: number
-  amountUsers: number
-  apr: number
+  nftStaked: number
+  tokenDecimals: number
+  tokenStaked: number
   week: number
   initTs: number
   endTs: number
@@ -109,6 +111,7 @@ export type StakeResponse = {
   rarity: string
   stakeVault: string
   authority: string
+  amount: number
   initTs: number
   isLocked: boolean
   withdrawTs: number

@@ -134,13 +134,16 @@ export const formatStakeVault = (stakeVault: any): StakeVaultResponse => {
     slots: stakeVault.slots.toNumber(),
     amount: stakeVault.amount.toNumber(),
     isLocked: stakeVault.isLocked,
-    usersPaid: stakeVault.usersPaid.toBase58(),
+    tokenMint: stakeVault.tokenMint.toBase58(),
+    tokenDecimals: stakeVault.tokenDecimals,
     amountPaid: stakeVault.amountPaid.toNumber(),
-    amountUsers: stakeVault.amountUsers.toNumber(),
+    nftStaked: stakeVault.nftStaked.toNumber(),
     week: stakeVault.week,
-    apr: stakeVault.apr,
     initTs: stakeVault.initTs.toNumber(),
-    endTs: stakeVault.endTs.toNumber()
+    endTs: stakeVault.endTs.toNumber(),
+    authority: stakeVault.authority.toBase58(),
+    tokenStaked:
+      stakeVault.tokenStaked.toNumber() / 10 ** stakeVault.tokenDecimals
   }
 }
 
@@ -152,6 +155,7 @@ export const formatStake = (stake: any): StakeResponse => {
     stakeVault: stake.stakeVault.toBase58(),
     authority: stake.authority.toBase58(),
     initTs: stake.initTs.toNumber(),
+    amount: stake.amount.toNumber(),
     isLocked: stake.isLocked,
     withdrawTs: stake.withdrawTs.toNumber(),
     mint: stake.mint.toBase58(),

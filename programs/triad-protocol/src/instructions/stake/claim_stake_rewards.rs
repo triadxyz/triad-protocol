@@ -1,5 +1,6 @@
 use crate::{
     constants::TTRIAD_MINT,
+    constraints::is_authority_for_stake,
     errors::TriadProtocolError,
     state::{ClaimStakeRewardsArgs, StakeVault},
 };
@@ -20,13 +21,13 @@ pub struct ClaimStakeRewards<'info> {
     #[account(mut)]
     pub stake_vault: Box<Account<'info, StakeVault>>,
 
-    #[account(mut)]
+    #[account(mut, constraint = is_authority_for_stake(&stake, &signer)?)]
     pub stake: Box<Account<'info, Stake>>,
 
     #[account(mut)]
     pub nft_rewards: Box<Account<'info, NFTRewards>>,
 
-    #[account(mut)]
+    #[account(mut, constraint = mint.key().to_string() == TTRIAD_MINT)]
     pub mint: Box<InterfaceAccount<'info, Mint>>,
 
     #[account(mut)]
@@ -35,6 +36,7 @@ pub struct ClaimStakeRewards<'info> {
     #[account(
         init_if_needed,
         payer = signer,
+        constraint = to_ata.owner == *signer.key && to_ata.mint == mint.key(),
         associated_token::mint = mint,
         associated_token::authority = signer,
     )]
@@ -49,14 +51,6 @@ pub fn claim_stake_rewards(
     ctx: Context<ClaimStakeRewards>,
     args: ClaimStakeRewardsArgs,
 ) -> Result<()> {
-    if ctx.accounts.signer.key() != ctx.accounts.to_ata.owner.key() {
-        return Err(TriadProtocolError::InvalidOwnerAuthority.into());
-    }
-
-    if ctx.accounts.mint.key().to_string() != TTRIAD_MINT {
-        return Err(TriadProtocolError::InvalidMint.into());
-    }
-
     let stake_vault = &mut ctx.accounts.stake_vault;
     let stake = &mut ctx.accounts.stake;
     let nft_rewards = &mut ctx.accounts.nft_rewards;
@@ -65,9 +59,7 @@ pub fn claim_stake_rewards(
         return Err(TriadProtocolError::RewardsAlreadyClaimed.into());
     }
 
-    if stake.authority != *ctx.accounts.signer.key
-        || stake.to_account_info().key() != nft_rewards.stake
-    {
+    if stake.to_account_info().key() != nft_rewards.stake {
         return Err(TriadProtocolError::InvalidOwnerAuthority.into());
     }
 
@@ -86,20 +78,23 @@ pub fn claim_stake_rewards(
 
     let signer: &[&[&[u8]]] = &[&[
         b"stake_vault",
-        ctx.accounts.stake_vault.name.as_bytes(),
-        &[ctx.accounts.stake_vault.bump],
+        stake_vault.name.as_bytes(),
+        &[stake_vault.bump],
     ]];
 
     let cpi_accounts = TransferChecked {
         from: ctx.accounts.from_ata.to_account_info(),
         mint: ctx.accounts.mint.to_account_info(),
         to: ctx.accounts.to_ata.to_account_info(),
-        authority: ctx.accounts.stake_vault.to_account_info(),
+        authority: stake_vault.to_account_info(),
     };
     let cpi_program = ctx.accounts.token_program.to_account_info();
     let cpi_context = CpiContext::new_with_signer(cpi_program, cpi_accounts, signer);
 
     transfer_checked(cpi_context, rewards, ctx.accounts.mint.decimals)?;
+
+    stake_vault.amount -= rewards;
+    stake_vault.amount_paid += rewards;
 
     Ok(())
 }

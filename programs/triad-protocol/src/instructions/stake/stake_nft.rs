@@ -25,7 +25,7 @@ pub struct StakeNFT<'info> {
     #[account(mut, seeds = [StakeVault::PREFIX_SEED, args.stake_vault.as_bytes()], bump)]
     pub stake_vault: Box<Account<'info, StakeVault>>,
 
-    #[account(init_if_needed, payer = signer, space = Stake::SPACE, seeds = [Stake::PREFIX_SEED, args.name.as_ref()], bump)]
+    #[account(init_if_needed, payer = signer, space = Stake::SPACE, seeds = [Stake::PREFIX_SEED, signer.to_account_info().key().as_ref(), args.name.as_ref()], bump)]
     pub stake: Box<Account<'info, Stake>>,
 
     #[account(
@@ -75,10 +75,6 @@ pub fn stake_nft(ctx: Context<StakeNFT>, args: StakeNFTArgs) -> Result<()> {
     let stake = &mut ctx.accounts.stake;
     let stake_vault = &mut ctx.accounts.stake_vault;
 
-    if stake_vault.amount_users > stake_vault.slots {
-        return Err(TriadProtocolError::StakeVaultFull.into());
-    }
-
     if stake_vault.is_locked {
         return Err(TriadProtocolError::StakeVaultLocked.into());
     }
@@ -94,7 +90,7 @@ pub fn stake_nft(ctx: Context<StakeNFT>, args: StakeNFTArgs) -> Result<()> {
     stake.name = token_metadata.name;
     stake.stake_vault = stake_vault.key();
 
-    stake_vault.amount_users += 1;
+    stake_vault.nft_staked += 1;
 
     let cpi_accounts = TransferChecked {
         from: ctx.accounts.from_ata.to_account_info(),
