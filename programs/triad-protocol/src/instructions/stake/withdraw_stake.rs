@@ -1,9 +1,11 @@
-use crate::constants::ADMIN;
+use std::str::FromStr;
+
+use crate::constants::{ADMIN, TTRIAD_MINT};
 use crate::constraints::is_authority_for_stake;
 use crate::NFTRewards;
 use crate::{errors::TriadProtocolError, state::Stake, StakeVault};
 use anchor_lang::prelude::*;
-use anchor_spl::token_2022::Token2022;
+use anchor_spl::token_2022::{close_account, CloseAccount, Token2022};
 use anchor_spl::{
     associated_token::AssociatedToken,
     token_interface::{transfer_checked, Mint, TokenAccount, TransferChecked},
@@ -60,24 +62,48 @@ pub fn withdraw_stake(ctx: Context<WithdrawStake>) -> Result<()> {
         return Err(TriadProtocolError::StakeLocked.into());
     }
 
-    stake_vault.nft_staked -= 1;
-
     let signer: &[&[&[u8]]] = &[&[
         b"stake_vault",
         stake_vault.name.as_bytes(),
         &[stake_vault.bump],
     ]];
 
-    let cpi_accounts = TransferChecked {
-        from: ctx.accounts.from_ata.to_account_info().clone(),
-        mint: ctx.accounts.mint.to_account_info().clone(),
-        to: ctx.accounts.to_ata.to_account_info().clone(),
-        authority: stake_vault.to_account_info(),
-    };
-    let cpi_program = ctx.accounts.token_program.to_account_info();
-    let cpi_context = CpiContext::new_with_signer(cpi_program, cpi_accounts, signer);
+    let is_token_stake = stake.mint.eq(&Pubkey::from_str(TTRIAD_MINT).unwrap());
 
-    transfer_checked(cpi_context, 1, ctx.accounts.mint.decimals)?;
+    let mut amount = 1;
+
+    if is_token_stake {
+        amount = stake.amount;
+    }
+
+    let cpi_context = CpiContext::new_with_signer(
+        ctx.accounts.token_program.to_account_info(),
+        TransferChecked {
+            from: ctx.accounts.from_ata.to_account_info().clone(),
+            mint: ctx.accounts.mint.to_account_info().clone(),
+            to: ctx.accounts.to_ata.to_account_info().clone(),
+            authority: stake_vault.to_account_info(),
+        },
+        signer,
+    );
+
+    transfer_checked(cpi_context, amount, ctx.accounts.mint.decimals)?;
+
+    if is_token_stake {
+        stake_vault.token_staked -= stake.amount;
+    } else {
+        close_account(CpiContext::new_with_signer(
+            ctx.accounts.token_program.to_account_info(),
+            CloseAccount {
+                account: ctx.accounts.from_ata.to_account_info(),
+                destination: ctx.accounts.signer.to_account_info(),
+                authority: stake_vault.to_account_info(),
+            },
+            signer,
+        ))?;
+
+        stake_vault.nft_staked -= 1;
+    }
 
     Ok(())
 }
