@@ -408,8 +408,8 @@
       ]
     },
     {
-      "name": "request_withdraw_nft",
-      "discriminator": [132, 52, 242, 121, 178, 147, 240, 223],
+      "name": "request_withdraw_stake",
+      "discriminator": [175, 9, 77, 31, 145, 136, 30, 207],
       "accounts": [
         {
           "name": "signer",
@@ -418,19 +418,7 @@
         },
         {
           "name": "stake_vault",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [115, 116, 97, 107, 101, 95, 118, 97, 117, 108, 116]
-              },
-              {
-                "kind": "arg",
-                "path": "args.stake_vault"
-              }
-            ]
-          }
+          "writable": true
         },
         {
           "name": "stake",
@@ -453,16 +441,7 @@
           "address": "11111111111111111111111111111111"
         }
       ],
-      "args": [
-        {
-          "name": "args",
-          "type": {
-            "defined": {
-              "name": "RequestWithdrawNFTArgs"
-            }
-          }
-        }
-      ]
+      "args": []
     },
     {
       "name": "stake_nft",
@@ -730,8 +709,8 @@
       ]
     },
     {
-      "name": "withdraw_nft",
-      "discriminator": [142, 181, 191, 149, 82, 175, 216, 100],
+      "name": "withdraw_stake",
+      "discriminator": [153, 8, 22, 138, 105, 176, 87, 66],
       "accounts": [
         {
           "name": "signer",
@@ -740,19 +719,7 @@
         },
         {
           "name": "stake_vault",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [115, 116, 97, 107, 101, 95, 118, 97, 117, 108, 116]
-              },
-              {
-                "kind": "arg",
-                "path": "args.stake_vault"
-              }
-            ]
-          }
+          "writable": true
         },
         {
           "name": "stake",
@@ -791,16 +758,7 @@
           "address": "11111111111111111111111111111111"
         }
       ],
-      "args": [
-        {
-          "name": "args",
-          "type": {
-            "defined": {
-              "name": "WithdrawNFTArgs"
-            }
-          }
-        }
-      ]
+      "args": []
     }
   ],
   "accounts": [
@@ -1130,22 +1088,6 @@
           },
           {
             "name": "MYTHIC"
-          }
-        ]
-      }
-    },
-    {
-      "name": "RequestWithdrawNFTArgs",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "stake_vault",
-            "type": "string"
-          },
-          {
-            "name": "nft_name",
-            "type": "string"
           }
         ]
       }
@@ -1541,22 +1483,6 @@
           {
             "name": "short_positions_opened",
             "type": "u64"
-          }
-        ]
-      }
-    },
-    {
-      "name": "WithdrawNFTArgs",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "stake_vault",
-            "type": "string"
-          },
-          {
-            "name": "nft_name",
-            "type": "string"
           }
         ]
       }

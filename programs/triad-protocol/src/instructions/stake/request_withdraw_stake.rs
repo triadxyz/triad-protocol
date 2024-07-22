@@ -1,16 +1,15 @@
 use crate::constraints::is_authority_for_stake;
-use crate::{errors::TriadProtocolError, state::Stake, RequestWithdrawNFTArgs, StakeVault};
+use crate::{errors::TriadProtocolError, state::Stake, StakeVault};
 use anchor_lang::prelude::*;
 use anchor_spl::token_2022::Token2022;
 use anchor_spl::{associated_token::AssociatedToken, token_interface::Mint};
 
 #[derive(Accounts)]
-#[instruction(args: RequestWithdrawNFTArgs)]
-pub struct RequestWithdrawNFT<'info> {
+pub struct RequestWithdrawStake<'info> {
     #[account(mut)]
     pub signer: Signer<'info>,
 
-    #[account(mut, seeds = [StakeVault::PREFIX_SEED, args.stake_vault.as_bytes()], bump)]
+    #[account(mut)]
     pub stake_vault: Box<Account<'info, StakeVault>>,
 
     #[account(mut, constraint = is_authority_for_stake(&stake, &signer)?)]
@@ -24,10 +23,7 @@ pub struct RequestWithdrawNFT<'info> {
     pub system_program: Program<'info, System>,
 }
 
-pub fn request_withdraw_nft(
-    ctx: Context<RequestWithdrawNFT>,
-    _args: RequestWithdrawNFTArgs,
-) -> Result<()> {
+pub fn request_withdraw_stake(ctx: Context<RequestWithdrawStake>) -> Result<()> {
     let mint = &ctx.accounts.mint.to_account_info();
     let stake = &mut ctx.accounts.stake;
 

@@ -97,12 +97,6 @@ pub struct WithdrawNFTArgs {
 }
 
 #[derive(AnchorSerialize, AnchorDeserialize, Clone)]
-pub struct RequestWithdrawNFTArgs {
-    pub stake_vault: String,
-    pub nft_name: String,
-}
-
-#[derive(AnchorSerialize, AnchorDeserialize, Clone)]
 pub struct DepositStakeRewardsArgs {
     pub amount: u64,
     pub stake_vault: String,

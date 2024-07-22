@@ -460,8 +460,8 @@ export type TriadProtocol = {
       ]
     },
     {
-      name: 'requestWithdrawNft'
-      discriminator: [132, 52, 242, 121, 178, 147, 240, 223]
+      name: 'requestWithdrawStake'
+      discriminator: [175, 9, 77, 31, 145, 136, 30, 207]
       accounts: [
         {
           name: 'signer'
@@ -471,18 +471,6 @@ export type TriadProtocol = {
         {
           name: 'stakeVault'
           writable: true
-          pda: {
-            seeds: [
-              {
-                kind: 'const'
-                value: [115, 116, 97, 107, 101, 95, 118, 97, 117, 108, 116]
-              },
-              {
-                kind: 'arg'
-                path: 'args.stake_vault'
-              }
-            ]
-          }
         },
         {
           name: 'stake'
@@ -505,16 +493,7 @@ export type TriadProtocol = {
           address: '11111111111111111111111111111111'
         }
       ]
-      args: [
-        {
-          name: 'args'
-          type: {
-            defined: {
-              name: 'requestWithdrawNftArgs'
-            }
-          }
-        }
-      ]
+      args: []
     },
     {
       name: 'stakeNft'
@@ -782,8 +761,8 @@ export type TriadProtocol = {
       ]
     },
     {
-      name: 'withdrawNft'
-      discriminator: [142, 181, 191, 149, 82, 175, 216, 100]
+      name: 'withdrawStake'
+      discriminator: [153, 8, 22, 138, 105, 176, 87, 66]
       accounts: [
         {
           name: 'signer'
@@ -793,18 +772,6 @@ export type TriadProtocol = {
         {
           name: 'stakeVault'
           writable: true
-          pda: {
-            seeds: [
-              {
-                kind: 'const'
-                value: [115, 116, 97, 107, 101, 95, 118, 97, 117, 108, 116]
-              },
-              {
-                kind: 'arg'
-                path: 'args.stake_vault'
-              }
-            ]
-          }
         },
         {
           name: 'stake'
@@ -843,16 +810,7 @@ export type TriadProtocol = {
           address: '11111111111111111111111111111111'
         }
       ]
-      args: [
-        {
-          name: 'args'
-          type: {
-            defined: {
-              name: 'withdrawNftArgs'
-            }
-          }
-        }
-      ]
+      args: []
     }
   ]
   accounts: [
@@ -1182,22 +1140,6 @@ export type TriadProtocol = {
           },
           {
             name: 'mythic'
-          }
-        ]
-      }
-    },
-    {
-      name: 'requestWithdrawNftArgs'
-      type: {
-        kind: 'struct'
-        fields: [
-          {
-            name: 'stakeVault'
-            type: 'string'
-          },
-          {
-            name: 'nftName'
-            type: 'string'
           }
         ]
       }
@@ -1593,22 +1535,6 @@ export type TriadProtocol = {
           {
             name: 'shortPositionsOpened'
             type: 'u64'
-          }
-        ]
-      }
-    },
-    {
-      name: 'withdrawNftArgs'
-      type: {
-        kind: 'struct'
-        fields: [
-          {
-            name: 'stakeVault'
-            type: 'string'
-          },
-          {
-            name: 'nftName'
-            type: 'string'
           }
         ]
       }

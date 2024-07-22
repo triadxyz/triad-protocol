@@ -354,15 +354,18 @@ export default class Stake {
     { wallet, nftName, mint, stakeVault }: RequestWithdrawArgs,
     options?: RpcOptions
   ) {
-    const method = this.program.methods
-      .requestWithdrawNft({
-        nftName,
-        stakeVault
-      })
-      .accounts({
-        signer: wallet,
-        mint: mint
-      })
+    const stakeVaultPDA = getStakeVaultAddressSync(
+      this.program.programId,
+      stakeVault
+    )
+    const stakePDA = getStakeAddressSync(this.program.programId, nftName)
+
+    const method = this.program.methods.requestWithdrawStake().accounts({
+      signer: wallet,
+      mint: mint,
+      stake: stakePDA,
+      stakeVault: stakeVaultPDA
+    })
 
     if (options?.microLamports) {
       method.postInstructions([
@@ -383,33 +386,33 @@ export default class Stake {
    *  @param stakeVault - Name of the stake vault
    *
    */
-  public async withdraw(
+  public async withdrawStake(
     { wallet, nftName, mint, stakeVault }: WithdrawArgs,
     options?: RpcOptions
   ) {
-    const StakeVault = getStakeVaultAddressSync(
+    const stakeVaultPDA = getStakeVaultAddressSync(
       this.program.programId,
       stakeVault
     )
 
-    const FromAta = getATASync(StakeVault, mint)
+    const FromAta = getATASync(stakeVaultPDA, mint)
     const ToAta = getATASync(wallet, mint)
-    const Stake = getStakeAddressSync(this.program.programId, nftName)
-    const NFTRewards = getNFTRewardsAddressSync(this.program.programId, Stake)
+    const stakePDA = getStakeAddressSync(this.program.programId, nftName)
+    const NFTRewards = getNFTRewardsAddressSync(
+      this.program.programId,
+      stakePDA
+    )
 
-    const method = this.program.methods
-      .withdrawNft({
-        nftName,
-        stakeVault
-      })
-      .accounts({
-        signer: wallet,
-        fromAta: FromAta,
-        toAta: ToAta,
-        nftRewards: NFTRewards,
-        admin: new PublicKey('82ppCojm3yrEKgdpH8B5AmBJTU1r1uAWXFWhxvPs9UCR'),
-        mint: mint
-      })
+    const method = this.program.methods.withdrawStake().accounts({
+      signer: wallet,
+      fromAta: FromAta,
+      toAta: ToAta,
+      nftRewards: NFTRewards,
+      stake: stakePDA,
+      stakeVault: stakeVaultPDA,
+      admin: new PublicKey('82ppCojm3yrEKgdpH8B5AmBJTU1r1uAWXFWhxvPs9UCR'),
+      mint: mint
+    })
 
     if (options?.microLamports) {
       method.postInstructions([

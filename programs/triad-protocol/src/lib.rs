@@ -52,15 +52,12 @@ pub mod triad_protocol {
         instructions::initialize_stake_vault(ctx, args)
     }
 
-    pub fn withdraw_nft(ctx: Context<WithdrawNFT>, args: WithdrawNFTArgs) -> Result<()> {
-        instructions::withdraw_nft(ctx, args)
+    pub fn request_withdraw_stake(ctx: Context<RequestWithdrawStake>) -> Result<()> {
+        instructions::request_withdraw_stake(ctx)
     }
 
-    pub fn request_withdraw_nft(
-        ctx: Context<RequestWithdrawNFT>,
-        args: RequestWithdrawNFTArgs,
-    ) -> Result<()> {
-        instructions::request_withdraw_nft(ctx, args)
+    pub fn withdraw_stake(ctx: Context<WithdrawStake>) -> Result<()> {
+        instructions::withdraw_stake(ctx)
     }
 
     pub fn deposit_stake_rewards(

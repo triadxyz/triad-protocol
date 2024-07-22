@@ -144,7 +144,7 @@ const updateStakeVaultStatus = async () => {
 }
 
 const withdraw = async () => {
-  const response = await triadProtocol.stake.withdraw(
+  const response = await triadProtocol.stake.withdrawStake(
     {
       wallet: wallet.publicKey,
       nftName: 'Triad 0',
@@ -171,8 +171,6 @@ const getStake = async () => {
   console.log(response)
   console.log(stakeVaults)
 }
-
-getStake()
 
 const claimStakeRewards = async () => {
   const response = await triadProtocol.stake.claimStakeRewards(
