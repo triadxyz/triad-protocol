@@ -150,8 +150,9 @@ export const formatStakeVault = (stakeVault: any): StakeVaultResponse => {
 export const formatStake = (stake: any): StakeResponse => {
   return {
     name: stake.name,
+    rank: stake.rank.toNumber(),
     collections: stake.collections,
-    rarity: Object.keys(stake.rarity)[0],
+    rarity: stake.rarity,
     stakeVault: stake.stakeVault.toBase58(),
     authority: stake.authority.toBase58(),
     initTs: stake.initTs.toNumber(),

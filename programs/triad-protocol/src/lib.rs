@@ -5,6 +5,7 @@ use state::*;
 mod constants;
 mod constraints;
 mod errors;
+mod events;
 mod instructions;
 mod state;
 
@@ -86,5 +87,9 @@ pub mod triad_protocol {
         args: UpdateStakeRewardsArgs,
     ) -> Result<()> {
         instructions::update_stake_rewards(ctx, args)
+    }
+
+    pub fn create_user(ctx: Context<CreateUser>, args: CreateUserArgs) -> Result<()> {
+        instructions::create_user(ctx, args)
     }
 }

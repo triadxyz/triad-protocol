@@ -1,5 +1,6 @@
 use crate::constraints::{is_authority_for_user_position, is_token_mint_for_vault};
 use crate::errors::TriadProtocolError;
+use crate::events::OpenPositionRecord;
 use crate::state::Vault;
 use crate::{OpenPositionArgs, UserPosition};
 use crate::{Position, Ticker};
@@ -88,20 +89,29 @@ pub fn open_position(ctx: Context<OpenPosition>, args: OpenPositionArgs) -> Resu
         return Err(TriadProtocolError::InvalidTickerPosition.into());
     }
 
-    user_position.total_deposited = user_position.total_deposited.saturating_add(args.amount);
-    user_position.total_positions = user_position.total_positions.saturating_add(1);
-    user_position.lp_share = user_position.lp_share.saturating_add(args.amount);
+    user_position.total_deposited += args.amount;
+    user_position.total_positions += 1;
+    user_position.lp_share += args.amount;
 
     if args.is_long {
-        vault.long_positions_opened = vault.long_positions_opened.saturating_add(1);
-        vault.long_balance = vault.long_balance.saturating_add(args.amount);
+        vault.long_positions_opened += 1;
+        vault.long_balance += args.amount;
     } else {
-        vault.short_positions_opened = vault.short_positions_opened.saturating_add(1);
-        vault.short_balance = vault.short_balance.saturating_add(args.amount);
+        vault.short_positions_opened += 1;
+        vault.short_balance += args.amount;
     }
 
-    vault.total_deposited = vault.total_deposited.saturating_add(args.amount);
-    vault.net_deposits = vault.net_deposits.saturating_add(1);
+    vault.total_deposited += args.amount;
+    vault.net_deposits += 1;
+
+    emit!(OpenPositionRecord {
+        ticker: vault.ticker_address,
+        entry_price: position.entry_price,
+        ts: position.ts,
+        user: user_position.authority,
+        amount: args.amount,
+        is_long: args.is_long,
+    });
 
     Ok(())
 }

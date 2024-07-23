@@ -17,7 +17,7 @@ pub struct StakeToken<'info> {
     #[account(mut, seeds = [StakeVault::PREFIX_SEED, args.stake_vault.as_bytes()], bump)]
     pub stake_vault: Box<Account<'info, StakeVault>>,
 
-    #[account(init_if_needed, payer = signer, space = Stake::SPACE, seeds = [Stake::PREFIX_SEED, signer.to_account_info().key().as_ref(), mint.to_account_info().key().as_ref()], bump)]
+    #[account(init_if_needed, payer = signer, space = Stake::SPACE, seeds = [Stake::PREFIX_SEED, signer.to_account_info().key().as_ref(), args.name.as_bytes()], bump)]
     pub stake: Box<Account<'info, Stake>>,
 
     #[account(mut, constraint = is_mint_for_stake_vault(&stake_vault, &mint.key())?)]
@@ -51,29 +51,26 @@ pub fn stake_token(ctx: Context<StakeToken>, args: StakeTokenArgs) -> Result<()>
         return Err(TriadProtocolError::StakeVaultLocked.into());
     }
 
-    if stake.authority == Pubkey::default() {
-        stake.authority = *ctx.accounts.signer.key;
-        stake.init_ts = Clock::get()?.unix_timestamp;
-        stake.bump = ctx.bumps.stake;
-        stake.mint = *mint.key;
-        stake.name = "tTRIAD".to_string();
-        stake.stake_vault = stake_vault.key();
-    }
-
+    stake.authority = *ctx.accounts.signer.key;
+    stake.init_ts = Clock::get()?.unix_timestamp;
+    stake.bump = ctx.bumps.stake;
+    stake.mint = *mint.key;
+    stake.name = args.name;
+    stake.stake_vault = stake_vault.key();
     stake.withdraw_ts = 0;
     stake.is_locked = true;
     stake.amount += args.amount;
 
     stake_vault.token_staked += args.amount;
 
-    let cpi_accounts = TransferChecked {
+    let cpi_context = CpiContext::new(
+    ctx.accounts.token_program.to_account_info(),
+    TransferChecked {
         from: ctx.accounts.from_ata.to_account_info(),
         mint: ctx.accounts.mint.to_account_info(),
         to: ctx.accounts.to_ata.to_account_info(),
         authority: ctx.accounts.signer.to_account_info(),
-    };
-    let cpi_program = ctx.accounts.token_program.to_account_info();
-    let cpi_context = CpiContext::new(cpi_program, cpi_accounts);
+    });
 
     transfer_checked(cpi_context, args.amount, ctx.accounts.mint.decimals)?;
 

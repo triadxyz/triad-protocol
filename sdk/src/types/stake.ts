@@ -117,6 +117,7 @@ export type StakeResponse = {
   withdrawTs: number
   mint: string
   stakeRewards: string
+  rank: number
   apr?: number
   dailyRewards?: number[]
   weeklyRewardsPaid?: boolean[]

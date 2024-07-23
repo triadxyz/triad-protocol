@@ -1,5 +1,6 @@
 use crate::constraints::{is_authority_for_user_position, is_token_mint_for_vault};
 use crate::errors::TriadProtocolError;
+use crate::events::ClosePositionRecord;
 use crate::state::Vault;
 use crate::{ClosePositionArgs, Position, Ticker, UserPosition};
 use anchor_lang::prelude::*;
@@ -79,30 +80,21 @@ pub fn close_position(ctx: Context<ClosePosition>, args: ClosePositionArgs) -> R
     let vault = &mut ctx.accounts.vault;
 
     if current_pubkey_position.is_long {
-        vault.long_balance = vault
-            .long_balance
-            .saturating_sub(current_pubkey_position.amount);
-        vault.long_positions_opened = vault.long_positions_opened.saturating_sub(1);
+        vault.long_balance -= current_pubkey_position.amount;
+        vault.long_positions_opened -= 1;
     } else {
-        vault.short_balance = vault
-            .short_balance
-            .saturating_sub(current_pubkey_position.amount);
-        vault.short_positions_opened = vault.short_positions_opened.saturating_sub(1);
+        vault.short_balance -= current_pubkey_position.amount;
+        vault.short_positions_opened -= 1;
     }
 
     let user_position = &mut ctx.accounts.user_position;
 
-    vault.total_withdrawn = vault
-        .total_withdrawn
-        .saturating_add(current_pubkey_position.amount);
-    vault.net_withdraws = vault.net_withdraws.saturating_add(1);
+    vault.total_withdrawn += current_pubkey_position.amount;
+    vault.net_withdraws += 1;
 
-    user_position.total_withdrawn = user_position
-        .total_withdrawn
-        .saturating_add(current_pubkey_position.amount);
-    user_position.lp_share = user_position
-        .lp_share
-        .saturating_sub(current_pubkey_position.amount);
+    user_position.total_withdrawn += current_pubkey_position.amount;
+
+    user_position.lp_share -= current_pubkey_position.amount;
 
     user_position.positions[args.position_index as usize] = Position {
         amount: 0,
@@ -112,6 +104,16 @@ pub fn close_position(ctx: Context<ClosePosition>, args: ClosePositionArgs) -> R
         is_open: false,
         pnl: 0,
     };
+
+    emit!(ClosePositionRecord {
+        ticker: ctx.accounts.vault.ticker_address,
+        close_price: ctx.accounts.ticker.price,
+        ts: Clock::get()?.unix_timestamp,
+        pnl: ctx.accounts.ticker.price as i64 - current_pubkey_position.entry_price as i64,
+        user: user_position.authority,
+        amount: current_pubkey_position.amount,
+        is_long: current_pubkey_position.is_long,
+    });
 
     Ok(())
 }

@@ -44,6 +44,92 @@ export type TriadProtocol = {
         {
           name: 'toAta'
           writable: true
+          pda: {
+            seeds: [
+              {
+                kind: 'account'
+                path: 'signer'
+              },
+              {
+                kind: 'const'
+                value: [
+                  6,
+                  221,
+                  246,
+                  225,
+                  215,
+                  101,
+                  161,
+                  147,
+                  217,
+                  203,
+                  225,
+                  70,
+                  206,
+                  235,
+                  121,
+                  172,
+                  28,
+                  180,
+                  133,
+                  237,
+                  95,
+                  91,
+                  55,
+                  145,
+                  58,
+                  140,
+                  245,
+                  133,
+                  126,
+                  255,
+                  0,
+                  169
+                ]
+              },
+              {
+                kind: 'account'
+                path: 'mint'
+              }
+            ]
+            program: {
+              kind: 'const'
+              value: [
+                140,
+                151,
+                37,
+                143,
+                78,
+                36,
+                137,
+                241,
+                187,
+                61,
+                16,
+                41,
+                20,
+                142,
+                13,
+                131,
+                11,
+                90,
+                19,
+                153,
+                218,
+                255,
+                16,
+                132,
+                4,
+                142,
+                123,
+                216,
+                219,
+                233,
+                248,
+                89
+              ]
+            }
+          }
         },
         {
           name: 'tokenProgram'
@@ -308,6 +394,92 @@ export type TriadProtocol = {
         {
           name: 'toAta'
           writable: true
+          pda: {
+            seeds: [
+              {
+                kind: 'account'
+                path: 'stakeVault'
+              },
+              {
+                kind: 'const'
+                value: [
+                  6,
+                  221,
+                  246,
+                  225,
+                  215,
+                  101,
+                  161,
+                  147,
+                  217,
+                  203,
+                  225,
+                  70,
+                  206,
+                  235,
+                  121,
+                  172,
+                  28,
+                  180,
+                  133,
+                  237,
+                  95,
+                  91,
+                  55,
+                  145,
+                  58,
+                  140,
+                  245,
+                  133,
+                  126,
+                  255,
+                  0,
+                  169
+                ]
+              },
+              {
+                kind: 'account'
+                path: 'mint'
+              }
+            ]
+            program: {
+              kind: 'const'
+              value: [
+                140,
+                151,
+                37,
+                143,
+                78,
+                36,
+                137,
+                241,
+                187,
+                61,
+                16,
+                41,
+                20,
+                142,
+                13,
+                131,
+                11,
+                90,
+                19,
+                153,
+                218,
+                255,
+                16,
+                132,
+                4,
+                142,
+                123,
+                216,
+                219,
+                233,
+                248,
+                89
+              ]
+            }
+          }
         },
         {
           name: 'tokenProgram'
@@ -534,8 +706,8 @@ export type TriadProtocol = {
                 path: 'signer'
               },
               {
-                kind: 'account'
-                path: 'mint'
+                kind: 'arg'
+                path: 'args.name'
               }
             ]
           }
@@ -551,6 +723,92 @@ export type TriadProtocol = {
         {
           name: 'toAta'
           writable: true
+          pda: {
+            seeds: [
+              {
+                kind: 'account'
+                path: 'stakeVault'
+              },
+              {
+                kind: 'const'
+                value: [
+                  6,
+                  221,
+                  246,
+                  225,
+                  215,
+                  101,
+                  161,
+                  147,
+                  217,
+                  203,
+                  225,
+                  70,
+                  206,
+                  235,
+                  121,
+                  172,
+                  28,
+                  180,
+                  133,
+                  237,
+                  95,
+                  91,
+                  55,
+                  145,
+                  58,
+                  140,
+                  245,
+                  133,
+                  126,
+                  255,
+                  0,
+                  169
+                ]
+              },
+              {
+                kind: 'account'
+                path: 'mint'
+              }
+            ]
+            program: {
+              kind: 'const'
+              value: [
+                140,
+                151,
+                37,
+                143,
+                78,
+                36,
+                137,
+                241,
+                187,
+                61,
+                16,
+                41,
+                20,
+                142,
+                13,
+                131,
+                11,
+                90,
+                19,
+                153,
+                218,
+                255,
+                16,
+                132,
+                4,
+                142,
+                123,
+                216,
+                219,
+                233,
+                248,
+                89
+              ]
+            }
+          }
         },
         {
           name: 'tokenProgram'
@@ -615,8 +873,8 @@ export type TriadProtocol = {
                 path: 'signer'
               },
               {
-                kind: 'account'
-                path: 'mint'
+                kind: 'arg'
+                path: 'args.name'
               }
             ]
           }
@@ -632,6 +890,92 @@ export type TriadProtocol = {
         {
           name: 'toAta'
           writable: true
+          pda: {
+            seeds: [
+              {
+                kind: 'account'
+                path: 'stakeVault'
+              },
+              {
+                kind: 'const'
+                value: [
+                  6,
+                  221,
+                  246,
+                  225,
+                  215,
+                  101,
+                  161,
+                  147,
+                  217,
+                  203,
+                  225,
+                  70,
+                  206,
+                  235,
+                  121,
+                  172,
+                  28,
+                  180,
+                  133,
+                  237,
+                  95,
+                  91,
+                  55,
+                  145,
+                  58,
+                  140,
+                  245,
+                  133,
+                  126,
+                  255,
+                  0,
+                  169
+                ]
+              },
+              {
+                kind: 'account'
+                path: 'mint'
+              }
+            ]
+            program: {
+              kind: 'const'
+              value: [
+                140,
+                151,
+                37,
+                143,
+                78,
+                36,
+                137,
+                241,
+                187,
+                61,
+                16,
+                41,
+                20,
+                142,
+                13,
+                131,
+                11,
+                90,
+                19,
+                153,
+                218,
+                255,
+                16,
+                132,
+                4,
+                142,
+                123,
+                216,
+                219,
+                233,
+                248,
+                89
+              ]
+            }
+          }
         },
         {
           name: 'tokenProgram'
@@ -796,6 +1140,92 @@ export type TriadProtocol = {
         {
           name: 'toAta'
           writable: true
+          pda: {
+            seeds: [
+              {
+                kind: 'account'
+                path: 'signer'
+              },
+              {
+                kind: 'const'
+                value: [
+                  6,
+                  221,
+                  246,
+                  225,
+                  215,
+                  101,
+                  161,
+                  147,
+                  217,
+                  203,
+                  225,
+                  70,
+                  206,
+                  235,
+                  121,
+                  172,
+                  28,
+                  180,
+                  133,
+                  237,
+                  95,
+                  91,
+                  55,
+                  145,
+                  58,
+                  140,
+                  245,
+                  133,
+                  126,
+                  255,
+                  0,
+                  169
+                ]
+              },
+              {
+                kind: 'account'
+                path: 'mint'
+              }
+            ]
+            program: {
+              kind: 'const'
+              value: [
+                140,
+                151,
+                37,
+                143,
+                78,
+                36,
+                137,
+                241,
+                187,
+                61,
+                16,
+                41,
+                20,
+                142,
+                13,
+                131,
+                11,
+                90,
+                19,
+                153,
+                218,
+                255,
+                16,
+                132,
+                4,
+                142,
+                123,
+                216,
+                219,
+                233,
+                248,
+                89
+              ]
+            }
+          }
         },
         {
           name: 'tokenProgram'
@@ -1206,6 +1636,10 @@ export type TriadProtocol = {
           {
             name: 'amount'
             type: 'u64'
+          },
+          {
+            name: 'rank'
+            type: 'u64'
           }
         ]
       }
@@ -1251,6 +1685,10 @@ export type TriadProtocol = {
         fields: [
           {
             name: 'stakeVault'
+            type: 'string'
+          },
+          {
+            name: 'name'
             type: 'string'
           },
           {

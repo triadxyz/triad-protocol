@@ -25,7 +25,7 @@ pub struct StakeNFT<'info> {
     #[account(mut, seeds = [StakeVault::PREFIX_SEED, args.stake_vault.as_bytes()], bump)]
     pub stake_vault: Box<Account<'info, StakeVault>>,
 
-    #[account(init_if_needed, payer = signer, space = Stake::SPACE, seeds = [Stake::PREFIX_SEED, signer.to_account_info().key().as_ref(), mint.to_account_info().key().as_ref()], bump)]
+    #[account(init_if_needed, payer = signer, space = Stake::SPACE, seeds = [Stake::PREFIX_SEED, signer.to_account_info().key().as_ref(), args.name.as_bytes()], bump)]
     pub stake: Box<Account<'info, Stake>>,
 
     #[account(
