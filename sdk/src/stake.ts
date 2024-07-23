@@ -254,7 +254,6 @@ export default class Stake {
       .accounts({
         signer: wallet,
         fromAta: FromAta,
-        toAta: ToAta,
         mint: mint
       })
 
@@ -328,7 +327,6 @@ export default class Stake {
       .accounts({
         signer: wallet,
         fromAta: FromAta,
-        toAta: ToAta,
         mint: mint
       })
 
@@ -396,7 +394,6 @@ export default class Stake {
     )
 
     const FromAta = getATASync(stakeVaultPDA, mint)
-    const ToAta = getATASync(wallet, mint)
     const stakePDA = getStakeAddressSync(this.program.programId, nftName)
     const NFTRewards = getNFTRewardsAddressSync(
       this.program.programId,
@@ -406,7 +403,6 @@ export default class Stake {
     const method = this.program.methods.withdrawStake().accounts({
       signer: wallet,
       fromAta: FromAta,
-      toAta: ToAta,
       nftRewards: NFTRewards,
       stake: stakePDA,
       stakeVault: stakeVaultPDA,
@@ -539,7 +535,6 @@ export default class Stake {
     const Stake = getStakeAddressSync(this.program.programId, nftName)
     const NFTRewards = getNFTRewardsAddressSync(this.program.programId, Stake)
     const FromAta = getATASync(StakeVault, mint)
-    const ToAta = getATASync(wallet, mint)
 
     let ixs: TransactionInstruction[] = []
 
@@ -552,7 +547,6 @@ export default class Stake {
           .accounts({
             signer: wallet,
             fromAta: FromAta,
-            toAta: ToAta,
             mint: mint,
             nftRewards: NFTRewards,
             stake: Stake,

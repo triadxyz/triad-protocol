@@ -1,6 +1,5 @@
 use crate::{
-    constants::TTRIAD_MINT,
-    constraints::is_authority_for_stake,
+    constraints::{is_authority_for_stake, is_ttriad_mint},
     errors::TriadProtocolError,
     state::{ClaimStakeRewardsArgs, StakeVault},
 };
@@ -27,7 +26,7 @@ pub struct ClaimStakeRewards<'info> {
     #[account(mut)]
     pub nft_rewards: Box<Account<'info, NFTRewards>>,
 
-    #[account(mut, constraint = mint.key().to_string() == TTRIAD_MINT)]
+    #[account(mut, constraint = is_ttriad_mint(&mint.key())?)]
     pub mint: Box<InterfaceAccount<'info, Mint>>,
 
     #[account(mut)]
