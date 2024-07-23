@@ -305,6 +305,55 @@ export type TriadProtocol = {
       ]
     },
     {
+      name: 'createUser'
+      discriminator: [108, 227, 130, 130, 252, 109, 75, 218]
+      accounts: [
+        {
+          name: 'signer'
+          writable: true
+          signer: true
+        },
+        {
+          name: 'referral'
+          writable: true
+        },
+        {
+          name: 'user'
+          writable: true
+          pda: {
+            seeds: [
+              {
+                kind: 'const'
+                value: [117, 115, 101, 114]
+              },
+              {
+                kind: 'account'
+                path: 'signer'
+              },
+              {
+                kind: 'arg'
+                path: 'args.name'
+              }
+            ]
+          }
+        },
+        {
+          name: 'systemProgram'
+          address: '11111111111111111111111111111111'
+        }
+      ]
+      args: [
+        {
+          name: 'args'
+          type: {
+            defined: {
+              name: 'createUserArgs'
+            }
+          }
+        }
+      ]
+    },
+    {
       name: 'createUserPosition'
       discriminator: [6, 137, 127, 227, 135, 241, 14, 109]
       accounts: [
@@ -1261,12 +1310,30 @@ export type TriadProtocol = {
       discriminator: [214, 74, 184, 188, 214, 64, 251, 53]
     },
     {
+      name: 'user'
+      discriminator: [159, 117, 95, 227, 239, 151, 58, 236]
+    },
+    {
       name: 'userPosition'
       discriminator: [251, 248, 209, 245, 83, 234, 17, 27]
     },
     {
       name: 'vault'
       discriminator: [211, 8, 232, 43, 2, 152, 117, 119]
+    }
+  ]
+  events: [
+    {
+      name: 'closePositionRecord'
+      discriminator: [202, 208, 157, 166, 193, 229, 76, 5]
+    },
+    {
+      name: 'openPositionRecord'
+      discriminator: [118, 71, 105, 89, 222, 111, 56, 63]
+    },
+    {
+      name: 'tickerPriceUpdateRecord'
+      discriminator: [11, 38, 250, 234, 149, 218, 144, 15]
     }
   ]
   errors: [
@@ -1397,6 +1464,42 @@ export type TriadProtocol = {
       }
     },
     {
+      name: 'closePositionRecord'
+      type: {
+        kind: 'struct'
+        fields: [
+          {
+            name: 'amount'
+            type: 'u64'
+          },
+          {
+            name: 'ticker'
+            type: 'pubkey'
+          },
+          {
+            name: 'closePrice'
+            type: 'u64'
+          },
+          {
+            name: 'ts'
+            type: 'i64'
+          },
+          {
+            name: 'isLong'
+            type: 'bool'
+          },
+          {
+            name: 'pnl'
+            type: 'i64'
+          },
+          {
+            name: 'user'
+            type: 'pubkey'
+          }
+        ]
+      }
+    },
+    {
       name: 'collection'
       type: {
         kind: 'enum'
@@ -1428,6 +1531,18 @@ export type TriadProtocol = {
           {
             name: 'protocolProgramId'
             type: 'pubkey'
+          }
+        ]
+      }
+    },
+    {
+      name: 'createUserArgs'
+      type: {
+        kind: 'struct'
+        fields: [
+          {
+            name: 'name'
+            type: 'string'
           }
         ]
       }
@@ -1512,6 +1627,38 @@ export type TriadProtocol = {
           {
             name: 'isLong'
             type: 'bool'
+          }
+        ]
+      }
+    },
+    {
+      name: 'openPositionRecord'
+      type: {
+        kind: 'struct'
+        fields: [
+          {
+            name: 'amount'
+            type: 'u64'
+          },
+          {
+            name: 'ticker'
+            type: 'pubkey'
+          },
+          {
+            name: 'entryPrice'
+            type: 'u64'
+          },
+          {
+            name: 'ts'
+            type: 'i64'
+          },
+          {
+            name: 'isLong'
+            type: 'bool'
+          },
+          {
+            name: 'user'
+            type: 'pubkey'
           }
         ]
       }
@@ -1813,6 +1960,26 @@ export type TriadProtocol = {
       }
     },
     {
+      name: 'tickerPriceUpdateRecord'
+      type: {
+        kind: 'struct'
+        fields: [
+          {
+            name: 'price'
+            type: 'u64'
+          },
+          {
+            name: 'ts'
+            type: 'i64'
+          },
+          {
+            name: 'ticker'
+            type: 'pubkey'
+          }
+        ]
+      }
+    },
+    {
       name: 'updateStakeRewardsArgs'
       type: {
         kind: 'struct'
@@ -1856,6 +2023,44 @@ export type TriadProtocol = {
           {
             name: 'price'
             type: 'u64'
+          }
+        ]
+      }
+    },
+    {
+      name: 'user'
+      type: {
+        kind: 'struct'
+        fields: [
+          {
+            name: 'ts'
+            type: 'i64'
+          },
+          {
+            name: 'authority'
+            type: 'pubkey'
+          },
+          {
+            name: 'bump'
+            type: 'u8'
+          },
+          {
+            name: 'referral'
+            type: 'pubkey'
+          },
+          {
+            name: 'referred'
+            type: 'i64'
+          },
+          {
+            name: 'name'
+            type: 'string'
+          },
+          {
+            name: 'padding'
+            type: {
+              array: ['u8', 32]
+            }
           }
         ]
       }

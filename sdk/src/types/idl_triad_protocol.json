@@ -224,6 +224,55 @@
       ]
     },
     {
+      "name": "create_user",
+      "discriminator": [108, 227, 130, 130, 252, 109, 75, 218],
+      "accounts": [
+        {
+          "name": "signer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "referral",
+          "writable": true
+        },
+        {
+          "name": "user",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [117, 115, 101, 114]
+              },
+              {
+                "kind": "account",
+                "path": "signer"
+              },
+              {
+                "kind": "arg",
+                "path": "args.name"
+              }
+            ]
+          }
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "args",
+          "type": {
+            "defined": {
+              "name": "CreateUserArgs"
+            }
+          }
+        }
+      ]
+    },
+    {
       "name": "create_user_position",
       "discriminator": [6, 137, 127, 227, 135, 241, 14, 109],
       "accounts": [
@@ -919,12 +968,30 @@
       "discriminator": [214, 74, 184, 188, 214, 64, 251, 53]
     },
     {
+      "name": "User",
+      "discriminator": [159, 117, 95, 227, 239, 151, 58, 236]
+    },
+    {
       "name": "UserPosition",
       "discriminator": [251, 248, 209, 245, 83, 234, 17, 27]
     },
     {
       "name": "Vault",
       "discriminator": [211, 8, 232, 43, 2, 152, 117, 119]
+    }
+  ],
+  "events": [
+    {
+      "name": "ClosePositionRecord",
+      "discriminator": [202, 208, 157, 166, 193, 229, 76, 5]
+    },
+    {
+      "name": "OpenPositionRecord",
+      "discriminator": [118, 71, 105, 89, 222, 111, 56, 63]
+    },
+    {
+      "name": "TickerPriceUpdateRecord",
+      "discriminator": [11, 38, 250, 234, 149, 218, 144, 15]
     }
   ],
   "errors": [
@@ -1055,6 +1122,42 @@
       }
     },
     {
+      "name": "ClosePositionRecord",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "amount",
+            "type": "u64"
+          },
+          {
+            "name": "ticker",
+            "type": "pubkey"
+          },
+          {
+            "name": "close_price",
+            "type": "u64"
+          },
+          {
+            "name": "ts",
+            "type": "i64"
+          },
+          {
+            "name": "is_long",
+            "type": "bool"
+          },
+          {
+            "name": "pnl",
+            "type": "i64"
+          },
+          {
+            "name": "user",
+            "type": "pubkey"
+          }
+        ]
+      }
+    },
+    {
       "name": "Collection",
       "type": {
         "kind": "enum",
@@ -1086,6 +1189,18 @@
           {
             "name": "protocol_program_id",
             "type": "pubkey"
+          }
+        ]
+      }
+    },
+    {
+      "name": "CreateUserArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "name",
+            "type": "string"
           }
         ]
       }
@@ -1170,6 +1285,38 @@
           {
             "name": "is_long",
             "type": "bool"
+          }
+        ]
+      }
+    },
+    {
+      "name": "OpenPositionRecord",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "amount",
+            "type": "u64"
+          },
+          {
+            "name": "ticker",
+            "type": "pubkey"
+          },
+          {
+            "name": "entry_price",
+            "type": "u64"
+          },
+          {
+            "name": "ts",
+            "type": "i64"
+          },
+          {
+            "name": "is_long",
+            "type": "bool"
+          },
+          {
+            "name": "user",
+            "type": "pubkey"
           }
         ]
       }
@@ -1471,6 +1618,26 @@
       }
     },
     {
+      "name": "TickerPriceUpdateRecord",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "price",
+            "type": "u64"
+          },
+          {
+            "name": "ts",
+            "type": "i64"
+          },
+          {
+            "name": "ticker",
+            "type": "pubkey"
+          }
+        ]
+      }
+    },
+    {
       "name": "UpdateStakeRewardsArgs",
       "type": {
         "kind": "struct",
@@ -1514,6 +1681,44 @@
           {
             "name": "price",
             "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "User",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "ts",
+            "type": "i64"
+          },
+          {
+            "name": "authority",
+            "type": "pubkey"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          },
+          {
+            "name": "referral",
+            "type": "pubkey"
+          },
+          {
+            "name": "referred",
+            "type": "i64"
+          },
+          {
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "name": "padding",
+            "type": {
+              "array": ["u8", 32]
+            }
           }
         ]
       }
