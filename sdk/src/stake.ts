@@ -230,11 +230,6 @@ export default class Stake {
     options?: RpcOptions
   ) {
     const FromAta = getATASync(wallet, mint)
-    const StakeVault = getStakeVaultAddressSync(
-      this.program.programId,
-      stakeVault
-    )
-    const ToAta = getATASync(StakeVault, mint)
 
     let items = []
 
@@ -313,11 +308,6 @@ export default class Stake {
     options?: RpcOptions
   ) {
     const FromAta = getATASync(wallet, mint)
-    const StakeVault = getStakeVaultAddressSync(
-      this.program.programId,
-      stakeVault
-    )
-    const ToAta = getATASync(StakeVault, mint)
 
     const method = this.program.methods
       .depositStakeRewards({

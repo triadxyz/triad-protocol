@@ -1787,6 +1787,10 @@ export type TriadProtocol = {
           {
             name: 'rank'
             type: 'u64'
+          },
+          {
+            name: 'claimed'
+            type: 'u64'
           }
         ]
       }

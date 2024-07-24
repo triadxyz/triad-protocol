@@ -15,6 +15,7 @@ pub struct Stake {
     pub stake_rewards: Pubkey,
     pub amount: u64,
     pub rank: u64,
+    pub claimed: u64,
 }
 
 #[account]
@@ -42,7 +43,8 @@ pub struct StakeVault {
     pub token_mint: Pubkey,
     pub week: u8,
     pub token_staked: u64,
-    pub padding: [u8; 48],
+    pub sum_all_users: f64,
+    pub padding: [u8; 32],
 }
 
 #[derive(Clone, AnchorSerialize, AnchorDeserialize)]

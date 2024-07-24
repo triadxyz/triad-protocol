@@ -2,7 +2,7 @@ export const TRIAD_PROTOCOL_PROGRAM_ID =
   'TRDwq3BN4mP3m9KsuNUWSN6QDff93VKGSwE95Jbr9Ss'
 export const ATA_PROGRAM_ID = 'ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL'
 export const ADMIN = ''
-export const STAKE_SEASON_1 = 'Triad Share 1'
+export const STAKE_SEASON = 'Triad Share 1'
 export const TTRIAD_DECIMALS = 6
 export const TTRIAD_FEE = 2
 export const RARITY_RANK_SEASON_1 = {
