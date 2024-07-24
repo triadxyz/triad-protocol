@@ -38,7 +38,7 @@ const updateStakeVaultStatus = async () => {
     {
       wallet: wallet.publicKey,
       isLocked: true,
-      week: 5,
+      week: 4,
       stakeVault: STAKE_SEASON
     },
     {
@@ -79,16 +79,14 @@ const getStake = async () => {
   console.log(stakeVaults)
 }
 
-getStake()
-
 const claimStakeRewardsV1 = async () => {
   const response = await triadProtocol.stake.claimStakeRewards(
     {
       wallet: wallet.publicKey,
-      mint: new PublicKey(''),
-      week: [],
+      mint: new PublicKey('A4fu2s6bCbKAveVgACkxpMgtJUHqoRJsTyzRp1Jp8nuE'),
+      week: [4],
       stakeVault: STAKE_SEASON,
-      nftName: ''
+      nftName: 'Triad 2807'
     },
     {
       skipPreflight: true,
@@ -98,6 +96,8 @@ const claimStakeRewardsV1 = async () => {
 
   console.log(response)
 }
+
+claimStakeRewardsV1()
 
 const getStakers = async () => {
   const response = await triadProtocol.stake.getStakes(STAKE_SEASON)

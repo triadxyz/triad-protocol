@@ -59,7 +59,7 @@ pub fn stake_token(ctx: Context<StakeToken>, args: StakeTokenArgs) -> Result<()>
     stake.stake_vault = stake_vault.key();
     stake.withdraw_ts = 0;
     stake.is_locked = true;
-    stake.amount += args.amount;
+    // stake.amount += args.amount;
 
     stake_vault.token_staked += args.amount;
 

@@ -1909,18 +1909,6 @@ export type TriadProtocol = {
           {
             name: 'stakeRewards'
             type: 'pubkey'
-          },
-          {
-            name: 'amount'
-            type: 'u64'
-          },
-          {
-            name: 'rank'
-            type: 'u64'
-          },
-          {
-            name: 'claimed'
-            type: 'u64'
           }
         ]
       }

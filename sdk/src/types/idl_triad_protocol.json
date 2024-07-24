@@ -1509,18 +1509,6 @@
           {
             "name": "stake_rewards",
             "type": "pubkey"
-          },
-          {
-            "name": "amount",
-            "type": "u64"
-          },
-          {
-            "name": "rank",
-            "type": "u64"
-          },
-          {
-            "name": "claimed",
-            "type": "u64"
           }
         ]
       }

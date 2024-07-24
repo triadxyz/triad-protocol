@@ -50,7 +50,7 @@ pub fn claim_rewards(ctx: Context<ClaimRewards>) -> Result<()> {
     }
 
     let stake_vault = &mut ctx.accounts.stake_vault;
-    let stake = &mut ctx.accounts.stake;
+    // let stake: &mut Box<Account<Stake>> = &mut ctx.accounts.stake;
 
     let signer: &[&[&[u8]]] = &[&[
         b"stake_vault",
@@ -91,7 +91,7 @@ pub fn claim_rewards(ctx: Context<ClaimRewards>) -> Result<()> {
 
     stake_vault.amount -= rewards;
     stake_vault.amount_paid += rewards;
-    stake.claimed += rewards;
+    // stake.claimed += rewards;
 
     Ok(())
 }

@@ -13,9 +13,6 @@ pub struct Stake {
     pub mint: Pubkey,
     pub stake_vault: Pubkey,
     pub stake_rewards: Pubkey,
-    pub amount: u64,
-    pub rank: u64,
-    pub claimed: u64,
 }
 
 #[account]
