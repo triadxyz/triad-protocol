@@ -71,10 +71,16 @@ pub fn claim_rewards(ctx: Context<ClaimRewards>) -> Result<()> {
 
     // IF TOKEN 10K tokens
 
+    // let mut og_rewards = 0.0;
+
+    // if stake.stake_rewards != Pubkey::default() {
+    //     og_rewards = 3.69;
+    // }
+
     // let max_rank = 1839;
-    // let rank_weigth = (max_rank - stake.rank + 1) / max_rank;
-    // let multiplier = stake.collections.len() * 1.5;
-    // let auw = rank_weigth * multiplier;
+    // let rank_weigth = (max_rank - stake.rank + 1) as f64 / max_rank as f64;
+    // let multiplier = stake.collections.len() as f64 * 1.5;
+    // let auw = rank_weigth * multiplier * og_rewards;
     // let pdru = auw / stake_vault.sum_all_users;
 
     // let days_staked = stake_vault.init_ts - stake.init_ts;
