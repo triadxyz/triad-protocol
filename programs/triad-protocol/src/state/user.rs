@@ -8,7 +8,6 @@ pub struct User {
     pub referral: Pubkey,
     pub referred: i64,
     pub name: String,
-    pub padding: [u8; 32],
 }
 
 #[derive(AnchorSerialize, AnchorDeserialize)]

@@ -93,7 +93,6 @@ pub fn close_position(ctx: Context<ClosePosition>, args: ClosePositionArgs) -> R
     vault.net_withdraws += 1;
 
     user_position.total_withdrawn += current_pubkey_position.amount;
-
     user_position.lp_share -= current_pubkey_position.amount;
 
     user_position.positions[args.position_index as usize] = Position {

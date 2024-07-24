@@ -1,4 +1,4 @@
-use crate::constants::ADMIN;
+use crate::constraints::is_admin;
 use crate::errors::TriadProtocolError;
 use crate::Stake;
 use crate::{
@@ -45,7 +45,7 @@ pub struct ClaimRewards<'info> {
 }
 
 pub fn claim_rewards(ctx: Context<ClaimRewards>) -> Result<()> {
-    if ctx.accounts.signer.key.to_string() != ADMIN {
+    if !is_admin(&ctx.accounts.signer)? {
         return Err(TriadProtocolError::Unauthorized.into());
     }
 

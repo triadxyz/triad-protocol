@@ -367,9 +367,9 @@ export default class Stake {
   }
 
   /**
-   *  Withdraw NFT
+   *  Withdraw Stake
    *  @param wallet - User wallet
-   *  @param nftName - NFT name
+   *  @param nftName - Stake name
    *  @param mint - NFT mint
    *  @param stakeVault - Name of the stake vault
    *
