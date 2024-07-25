@@ -517,6 +517,124 @@
       ]
     },
     {
+      "name": "migrate_stake",
+      "discriminator": [178, 5, 26, 85, 56, 20, 153, 160],
+      "accounts": [
+        {
+          "name": "signer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "stake_vault",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [115, 116, 97, 107, 101, 95, 118, 97, 117, 108, 116]
+              },
+              {
+                "kind": "arg",
+                "path": "args.stake_vault"
+              }
+            ]
+          }
+        },
+        {
+          "name": "stake_v1",
+          "writable": true
+        },
+        {
+          "name": "stake_v2",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [115, 116, 97, 107, 101]
+              },
+              {
+                "kind": "account",
+                "path": "stake_v1.authority",
+                "account": "Stake"
+              },
+              {
+                "kind": "arg",
+                "path": "args.name"
+              }
+            ]
+          }
+        },
+        {
+          "name": "mint",
+          "writable": true
+        },
+        {
+          "name": "nft_rewards",
+          "writable": true
+        },
+        {
+          "name": "from_ata",
+          "writable": true
+        },
+        {
+          "name": "to_ata",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "account",
+                "path": "stake_vault"
+              },
+              {
+                "kind": "const",
+                "value": [
+                  6, 221, 246, 225, 215, 101, 161, 147, 217, 203, 225, 70, 206,
+                  235, 121, 172, 28, 180, 133, 237, 95, 91, 55, 145, 58, 140,
+                  245, 133, 126, 255, 0, 169
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "mint"
+              }
+            ],
+            "program": {
+              "kind": "const",
+              "value": [
+                140, 151, 37, 143, 78, 36, 137, 241, 187, 61, 16, 41, 20, 142,
+                13, 131, 11, 90, 19, 153, 218, 255, 16, 132, 4, 142, 123, 216,
+                219, 233, 248, 89
+              ]
+            }
+          }
+        },
+        {
+          "name": "token_program",
+          "address": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb"
+        },
+        {
+          "name": "associated_token_program",
+          "address": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "args",
+          "type": {
+            "defined": {
+              "name": "MigrateStakeArgs"
+            }
+          }
+        }
+      ]
+    },
+    {
       "name": "open_position",
       "discriminator": [135, 128, 47, 77, 15, 152, 240, 49],
       "accounts": [
@@ -604,10 +722,6 @@
         {
           "name": "token_program",
           "address": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb"
-        },
-        {
-          "name": "associated_token_program",
-          "address": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"
         },
         {
           "name": "system_program",
@@ -835,51 +949,6 @@
       ]
     },
     {
-      "name": "update_stake_rewards",
-      "discriminator": [39, 82, 38, 43, 234, 67, 69, 94],
-      "accounts": [
-        {
-          "name": "signer",
-          "writable": true,
-          "signer": true
-        },
-        {
-          "name": "stake",
-          "writable": true
-        },
-        {
-          "name": "nft_rewards",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [110, 102, 116, 95, 114, 101, 119, 97, 114, 100, 115]
-              },
-              {
-                "kind": "account",
-                "path": "stake"
-              }
-            ]
-          }
-        },
-        {
-          "name": "system_program",
-          "address": "11111111111111111111111111111111"
-        }
-      ],
-      "args": [
-        {
-          "name": "args",
-          "type": {
-            "defined": {
-              "name": "UpdateStakeRewardsArgs"
-            }
-          }
-        }
-      ]
-    },
-    {
       "name": "update_stake_vault_status",
       "discriminator": [71, 64, 188, 150, 86, 254, 221, 65],
       "accounts": [
@@ -1026,6 +1095,10 @@
     {
       "name": "Stake",
       "discriminator": [150, 197, 176, 29, 55, 132, 112, 149]
+    },
+    {
+      "name": "StakeV2",
+      "discriminator": [207, 98, 130, 13, 118, 181, 238, 47]
     },
     {
       "name": "StakeVault",
@@ -1314,6 +1387,22 @@
       }
     },
     {
+      "name": "MigrateStakeArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "name": "stake_vault",
+            "type": "string"
+          }
+        ]
+      }
+    },
+    {
       "name": "NFTRewards",
       "type": {
         "kind": "struct",
@@ -1564,6 +1653,62 @@
       }
     },
     {
+      "name": "StakeV2",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "bump",
+            "type": "u8"
+          },
+          {
+            "name": "authority",
+            "type": "pubkey"
+          },
+          {
+            "name": "init_ts",
+            "type": "i64"
+          },
+          {
+            "name": "withdraw_ts",
+            "type": "i64"
+          },
+          {
+            "name": "claimed_ts",
+            "type": "i64"
+          },
+          {
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "name": "mint",
+            "type": "pubkey"
+          },
+          {
+            "name": "boost",
+            "type": "bool"
+          },
+          {
+            "name": "stake_vault",
+            "type": "pubkey"
+          },
+          {
+            "name": "claimed",
+            "type": "u64"
+          },
+          {
+            "name": "available",
+            "type": "u64"
+          },
+          {
+            "name": "amount",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
       "name": "StakeVault",
       "type": {
         "kind": "struct",
@@ -1697,26 +1842,6 @@
           {
             "name": "ticker",
             "type": "pubkey"
-          }
-        ]
-      }
-    },
-    {
-      "name": "UpdateStakeRewardsArgs",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "day",
-            "type": "u8"
-          },
-          {
-            "name": "rewards",
-            "type": "u64"
-          },
-          {
-            "name": "apr",
-            "type": "f32"
           }
         ]
       }

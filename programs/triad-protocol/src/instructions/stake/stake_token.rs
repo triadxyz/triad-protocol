@@ -1,5 +1,5 @@
 use crate::{
-    constraints::is_mint_for_stake_vault, errors::TriadProtocolError, state::{Stake, StakeTokenArgs, StakeVault}
+    constraints::is_mint_for_stake_vault, errors::TriadProtocolError, state::{Stake, StakeTokenArgs, StakeVault}, StakeV2
 };
 use anchor_lang::prelude::*;
 use anchor_spl::token_2022::Token2022;
@@ -18,7 +18,7 @@ pub struct StakeToken<'info> {
     pub stake_vault: Box<Account<'info, StakeVault>>,
 
     #[account(init_if_needed, payer = signer, space = Stake::SPACE, seeds = [Stake::PREFIX_SEED, signer.to_account_info().key().as_ref(), args.name.as_bytes()], bump)]
-    pub stake: Box<Account<'info, Stake>>,
+    pub stake: Box<Account<'info, StakeV2>>,
 
     #[account(mut, constraint = is_mint_for_stake_vault(&stake_vault, &mint.key())?)]
     pub mint: Box<InterfaceAccount<'info, Mint>>,
@@ -51,28 +51,29 @@ pub fn stake_token(ctx: Context<StakeToken>, args: StakeTokenArgs) -> Result<()>
         return Err(TriadProtocolError::StakeVaultLocked.into());
     }
 
+    stake.bump = ctx.bumps.stake;
     stake.authority = *ctx.accounts.signer.key;
     stake.init_ts = Clock::get()?.unix_timestamp;
-    stake.bump = ctx.bumps.stake;
-    stake.mint = *mint.key;
-    stake.name = args.name;
-    stake.stake_vault = stake_vault.key();
     stake.withdraw_ts = 0;
-    stake.is_locked = true;
-    // stake.amount += args.amount;
+    stake.claimed_ts = 0;
+    stake.name = args.name;
+    stake.mint = *mint.key;
+    stake.boost = false;
+    stake.stake_vault = stake_vault.key();
+    stake.claimed = 0;
+    stake.available = 0;
+    stake.amount = args.amount;
 
     stake_vault.token_staked += args.amount;
 
-    let cpi_context = CpiContext::new(
-    ctx.accounts.token_program.to_account_info(),
-    TransferChecked {
-        from: ctx.accounts.from_ata.to_account_info(),
-        mint: ctx.accounts.mint.to_account_info(),
-        to: ctx.accounts.to_ata.to_account_info(),
-        authority: ctx.accounts.signer.to_account_info(),
-    });
-
-    transfer_checked(cpi_context, args.amount, ctx.accounts.mint.decimals)?;
+    transfer_checked(CpiContext::new(
+        ctx.accounts.token_program.to_account_info(),
+        TransferChecked {
+            from: ctx.accounts.from_ata.to_account_info(),
+            mint: ctx.accounts.mint.to_account_info(),
+            to: ctx.accounts.to_ata.to_account_info(),
+            authority: ctx.accounts.signer.to_account_info(),
+        }), args.amount, ctx.accounts.mint.decimals)?;
 
     Ok(())
 }

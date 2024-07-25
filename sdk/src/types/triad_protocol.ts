@@ -468,6 +468,96 @@ export type TriadProtocol = {
       ]
     },
     {
+      name: 'migrateStake'
+      discriminator: [178, 5, 26, 85, 56, 20, 153, 160]
+      accounts: [
+        {
+          name: 'signer'
+          writable: true
+          signer: true
+        },
+        {
+          name: 'stakeVault'
+          writable: true
+          pda: {
+            seeds: [
+              {
+                kind: 'const'
+                value: [115, 116, 97, 107, 101, 95, 118, 97, 117, 108, 116]
+              },
+              {
+                kind: 'arg'
+                path: 'args.stake_vault'
+              }
+            ]
+          }
+        },
+        {
+          name: 'stakeV1'
+          writable: true
+        },
+        {
+          name: 'stakeV2'
+          writable: true
+          pda: {
+            seeds: [
+              {
+                kind: 'const'
+                value: [115, 116, 97, 107, 101]
+              },
+              {
+                kind: 'account'
+                path: 'stake_v1.authority'
+                account: 'stake'
+              },
+              {
+                kind: 'arg'
+                path: 'args.name'
+              }
+            ]
+          }
+        },
+        {
+          name: 'mint'
+          writable: true
+        },
+        {
+          name: 'nftRewards'
+          writable: true
+        },
+        {
+          name: 'fromAta'
+          writable: true
+        },
+        {
+          name: 'toAta'
+          writable: true
+        },
+        {
+          name: 'tokenProgram'
+          address: 'TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb'
+        },
+        {
+          name: 'associatedTokenProgram'
+          address: 'ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL'
+        },
+        {
+          name: 'systemProgram'
+          address: '11111111111111111111111111111111'
+        }
+      ]
+      args: [
+        {
+          name: 'args'
+          type: {
+            defined: {
+              name: 'migrateStakeArgs'
+            }
+          }
+        }
+      ]
+    },
+    {
       name: 'openPosition'
       discriminator: [135, 128, 47, 77, 15, 152, 240, 49]
       accounts: [
@@ -572,10 +662,6 @@ export type TriadProtocol = {
         {
           name: 'tokenProgram'
           address: 'TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb'
-        },
-        {
-          name: 'associatedTokenProgram'
-          address: 'ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL'
         },
         {
           name: 'systemProgram'
@@ -747,51 +833,6 @@ export type TriadProtocol = {
       ]
     },
     {
-      name: 'updateStakeRewards'
-      discriminator: [39, 82, 38, 43, 234, 67, 69, 94]
-      accounts: [
-        {
-          name: 'signer'
-          writable: true
-          signer: true
-        },
-        {
-          name: 'stake'
-          writable: true
-        },
-        {
-          name: 'nftRewards'
-          writable: true
-          pda: {
-            seeds: [
-              {
-                kind: 'const'
-                value: [110, 102, 116, 95, 114, 101, 119, 97, 114, 100, 115]
-              },
-              {
-                kind: 'account'
-                path: 'stake'
-              }
-            ]
-          }
-        },
-        {
-          name: 'systemProgram'
-          address: '11111111111111111111111111111111'
-        }
-      ]
-      args: [
-        {
-          name: 'args'
-          type: {
-            defined: {
-              name: 'updateStakeRewardsArgs'
-            }
-          }
-        }
-      ]
-    },
-    {
       name: 'updateStakeVaultStatus'
       discriminator: [71, 64, 188, 150, 86, 254, 221, 65]
       accounts: [
@@ -910,6 +951,10 @@ export type TriadProtocol = {
     {
       name: 'stake'
       discriminator: [150, 197, 176, 29, 55, 132, 112, 149]
+    },
+    {
+      name: 'stakeV2'
+      discriminator: [207, 98, 130, 13, 118, 181, 238, 47]
     },
     {
       name: 'stakeVault'
@@ -1198,6 +1243,22 @@ export type TriadProtocol = {
       }
     },
     {
+      name: 'migrateStakeArgs'
+      type: {
+        kind: 'struct'
+        fields: [
+          {
+            name: 'name'
+            type: 'string'
+          },
+          {
+            name: 'stakeVault'
+            type: 'string'
+          }
+        ]
+      }
+    },
+    {
       name: 'nftRewards'
       type: {
         kind: 'struct'
@@ -1448,6 +1509,62 @@ export type TriadProtocol = {
       }
     },
     {
+      name: 'stakeV2'
+      type: {
+        kind: 'struct'
+        fields: [
+          {
+            name: 'bump'
+            type: 'u8'
+          },
+          {
+            name: 'authority'
+            type: 'pubkey'
+          },
+          {
+            name: 'initTs'
+            type: 'i64'
+          },
+          {
+            name: 'withdrawTs'
+            type: 'i64'
+          },
+          {
+            name: 'claimedTs'
+            type: 'i64'
+          },
+          {
+            name: 'name'
+            type: 'string'
+          },
+          {
+            name: 'mint'
+            type: 'pubkey'
+          },
+          {
+            name: 'boost'
+            type: 'bool'
+          },
+          {
+            name: 'stakeVault'
+            type: 'pubkey'
+          },
+          {
+            name: 'claimed'
+            type: 'u64'
+          },
+          {
+            name: 'available'
+            type: 'u64'
+          },
+          {
+            name: 'amount'
+            type: 'u64'
+          }
+        ]
+      }
+    },
+    {
       name: 'stakeVault'
       type: {
         kind: 'struct'
@@ -1581,26 +1698,6 @@ export type TriadProtocol = {
           {
             name: 'ticker'
             type: 'pubkey'
-          }
-        ]
-      }
-    },
-    {
-      name: 'updateStakeRewardsArgs'
-      type: {
-        kind: 'struct'
-        fields: [
-          {
-            name: 'day'
-            type: 'u8'
-          },
-          {
-            name: 'rewards'
-            type: 'u64'
-          },
-          {
-            name: 'apr'
-            type: 'f32'
           }
         ]
       }

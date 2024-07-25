@@ -16,6 +16,22 @@ pub struct Stake {
 }
 
 #[account]
+pub struct StakeV2 {
+    pub bump: u8,
+    pub authority: Pubkey,
+    pub init_ts: i64,
+    pub withdraw_ts: i64,
+    pub claimed_ts: i64,
+    pub name: String,
+    pub mint: Pubkey,
+    pub boost: bool,
+    pub stake_vault: Pubkey,
+    pub claimed: u64,
+    pub available: u64,
+    pub amount: u64,
+}
+
+#[account]
 pub struct NFTRewards {
     pub stake: Pubkey,
     pub daily_rewards: [u64; 30],
@@ -60,6 +76,12 @@ pub enum Collection {
     UNDEAD,
     ALLIGATORS,
     PYTH,
+}
+
+#[derive(AnchorSerialize, AnchorDeserialize, Clone)]
+pub struct MigrateStakeArgs {
+    pub name: String,
+    pub stake_vault: String,
 }
 
 #[derive(AnchorSerialize, AnchorDeserialize, Clone)]
@@ -129,6 +151,12 @@ impl StakeVault {
 
 impl NFTRewards {
     pub const PREFIX_SEED: &'static [u8] = b"nft_rewards";
+
+    pub const SPACE: usize = 8 + std::mem::size_of::<Self>();
+}
+
+impl StakeV2 {
+    pub const PREFIX_SEED: &'static [u8] = b"stake";
 
     pub const SPACE: usize = 8 + std::mem::size_of::<Self>();
 }

@@ -20,7 +20,7 @@ const requestWithdraw = async () => {
   const response = await triadProtocol.stake.requestWithdraw(
     {
       wallet: wallet.publicKey,
-      nftName: 'Triad 0',
+      name: 'Triad 0',
       mint: new PublicKey('FXRhaGeYue7bMCwcksNw4hJRY7jZ1YMwgmCu1Y8fyUNd'),
       stakeVault: 'Rev 1'
     },
@@ -54,7 +54,7 @@ const withdraw = async () => {
   const response = await triadProtocol.stake.withdrawStake(
     {
       wallet: wallet.publicKey,
-      nftName: 'Triad 2807',
+      name: 'Triad 2807',
       mint: new PublicKey('A4fu2s6bCbKAveVgACkxpMgtJUHqoRJsTyzRp1Jp8nuE'),
       stakeVault: STAKE_SEASON
     },
@@ -135,6 +135,12 @@ const stake = async () => {
       microLamports: 20000
     }
   )
+
+  console.log(response)
+}
+
+const getUsers = async () => {
+  const response = await triadProtocol.stake.getUsers()
 
   console.log(response)
 }

@@ -81,16 +81,20 @@ pub fn claim_stake_rewards(
         &[stake_vault.bump],
     ]];
 
-    let cpi_accounts = TransferChecked {
-        from: ctx.accounts.from_ata.to_account_info(),
-        mint: ctx.accounts.mint.to_account_info(),
-        to: ctx.accounts.to_ata.to_account_info(),
-        authority: stake_vault.to_account_info(),
-    };
-    let cpi_program = ctx.accounts.token_program.to_account_info();
-    let cpi_context = CpiContext::new_with_signer(cpi_program, cpi_accounts, signer);
-
-    transfer_checked(cpi_context, rewards, ctx.accounts.mint.decimals)?;
+    transfer_checked(
+        CpiContext::new_with_signer(
+            ctx.accounts.token_program.to_account_info(),
+            TransferChecked {
+                from: ctx.accounts.from_ata.to_account_info(),
+                mint: ctx.accounts.mint.to_account_info(),
+                to: ctx.accounts.to_ata.to_account_info(),
+                authority: stake_vault.to_account_info(),
+            },
+            signer,
+        ),
+        rewards,
+        ctx.accounts.mint.decimals,
+    )?;
 
     stake_vault.amount -= rewards;
     stake_vault.amount_paid += rewards;
