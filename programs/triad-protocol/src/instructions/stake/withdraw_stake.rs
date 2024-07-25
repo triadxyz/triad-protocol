@@ -37,9 +37,9 @@ pub struct WithdrawStake<'info> {
     #[account(
         init_if_needed,
         payer = signer,
+        constraint = to_ata.owner == *signer.key && to_ata.mint == mint.key(),
         associated_token::mint = mint,
         associated_token::authority = signer,
-        constraint = signer.key() == to_ata.owner && to_ata.mint == mint.key()
     )]
     pub to_ata: Box<InterfaceAccount<'info, TokenAccount>>,
 
@@ -95,7 +95,7 @@ pub fn withdraw_stake(ctx: Context<WithdrawStake>) -> Result<()> {
             ctx.accounts.token_program.to_account_info(),
             CloseAccount {
                 account: ctx.accounts.from_ata.to_account_info(),
-                destination: ctx.accounts.signer.to_account_info(),
+                destination: ctx.accounts.admin.to_account_info(),
                 authority: stake_vault.to_account_info(),
             },
             signer,

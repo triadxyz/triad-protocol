@@ -11,7 +11,7 @@ pub struct CreateUser<'info> {
     #[account(mut)]
     pub referral: Account<'info, User>,
 
-    #[account(init, payer = signer, space = User::SPACE, seeds = [User::PREFIX_SEED, signer.key().as_ref(), args.name.as_bytes()], bump)]
+    #[account(init, payer = signer, space = User::SPACE, seeds = [User::PREFIX_SEED, args.name.as_bytes()], bump)]
     pub user: Account<'info, User>,
 
     pub system_program: Program<'info, System>,
@@ -27,7 +27,7 @@ pub fn create_user(ctx: Context<CreateUser>, args: CreateUserArgs) -> Result<()>
     user.authority = *ctx.accounts.signer.key;
     user.referral = referral.key();
 
-    referral.referred.checked_add(1).unwrap();
+    referral.referred += 1;
 
     Ok(())
 }

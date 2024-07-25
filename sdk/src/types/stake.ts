@@ -3,7 +3,7 @@ import BN from 'bn.js'
 
 export type Collection = 'alligators' | 'coleta' | 'undead' | 'pyth'
 
-export type StakeArgs = {
+export type StakeNftArgsV1 = {
   name: string
   wallet: PublicKey
   stakeVault: string
@@ -16,6 +16,14 @@ export type StakeArgs = {
     | { epic: {} }
     | { legendary: {} }
     | { mythic: {} }
+}
+
+export type StakeTokenArgs = {
+  name: string
+  wallet: PublicKey
+  stakeVault: string
+  mint: PublicKey
+  amount: number
 }
 
 export type InitializeStakeArgs = {
@@ -34,14 +42,14 @@ export type DepositStakeRewardsArgs = {
 
 export type RequestWithdrawArgs = {
   wallet: PublicKey
-  nftName: string
+  name: string
   mint: PublicKey
   stakeVault: string
 }
 
 export type WithdrawArgs = {
   wallet: PublicKey
-  nftName: string
+  name: string
   mint: PublicKey
   stakeVault: string
 }
@@ -59,6 +67,12 @@ export type ClaimStakeRewardsArgs = {
   mint: PublicKey
   stakeVault: string
   nftName: string
+}
+
+export type CreateUserArgs = {
+  wallet: PublicKey
+  name: string
+  referral: string
 }
 
 export type UpdateStakeRewardsArgs = {
@@ -111,17 +125,23 @@ export type StakeResponse = {
   rarity: string
   stakeVault: string
   authority: string
-  amount: number
   initTs: number
   isLocked: boolean
   withdrawTs: number
   mint: string
   stakeRewards: string
-  rank: number
   apr?: number
   dailyRewards?: number[]
   weeklyRewardsPaid?: boolean[]
   weeklyRewards?: number
   rewardsToClaim?: number
   allRewards?: number
+}
+
+export type UserResponse = {
+  ts: number
+  authority: string
+  referral: string
+  referred: number
+  name: string
 }

@@ -1,7 +1,8 @@
 import {
   COLLECTION_MUlTIPLIER,
   StakeResponse,
-  StakeVaultResponse
+  StakeVaultResponse,
+  UserResponse
 } from './../types/stake'
 import { PublicKey } from '@solana/web3.js'
 import * as anchor from '@coral-xyz/anchor'
@@ -123,6 +124,15 @@ export const getATASync = (address: PublicKey, Mint: PublicKey) => {
   return ATA
 }
 
+export const getUserAddressSync = (programId: PublicKey, name: string) => {
+  const [StakePDA] = PublicKey.findProgramAddressSync(
+    [Buffer.from('user'), Buffer.from(name)],
+    programId
+  )
+
+  return StakePDA
+}
+
 export const formatNumber = (number: bigint | BN, decimals = 6) => {
   return Number(number.toString()) / 10 ** decimals
 }
@@ -150,17 +160,25 @@ export const formatStakeVault = (stakeVault: any): StakeVaultResponse => {
 export const formatStake = (stake: any): StakeResponse => {
   return {
     name: stake.name,
-    rank: stake.rank.toNumber(),
     collections: stake.collections,
-    rarity: stake.rarity,
+    rarity: Object.keys(stake.rarity)[0],
     stakeVault: stake.stakeVault.toBase58(),
     authority: stake.authority.toBase58(),
     initTs: stake.initTs.toNumber(),
-    amount: stake.amount.toNumber(),
     isLocked: stake.isLocked,
     withdrawTs: stake.withdrawTs.toNumber(),
     mint: stake.mint.toBase58(),
     stakeRewards: stake.stakeRewards.toBase58()
+  }
+}
+
+export const formatUser = (user: any): UserResponse => {
+  return {
+    ts: user.ts.toNumber(),
+    authority: user.authority.toBase58(),
+    referral: user.referral,
+    referred: user.referred.toNumber(),
+    name: user.name
   }
 }
 

@@ -1,4 +1,4 @@
-import { AnchorProvider, Program } from '@coral-xyz/anchor'
+import { AnchorProvider, BN, Program } from '@coral-xyz/anchor'
 import {
   ComputeBudgetProgram,
   PublicKey,
@@ -10,24 +10,28 @@ import { TriadProtocol } from './types/triad_protocol'
 import {
   formatStake,
   formatStakeVault,
+  formatUser,
   getATASync,
   getNFTRewardsAddressSync,
   getStakeAddressSync,
-  getStakeVaultAddressSync
+  getStakeVaultAddressSync,
+  getUserAddressSync
 } from './utils/helpers'
 import { RpcOptions } from './types'
 import {
   DepositStakeRewardsArgs,
   InitializeStakeArgs,
-  StakeArgs,
+  StakeNftArgsV1,
   RequestWithdrawArgs,
   WithdrawArgs,
   StakeResponse,
   UpdateStakeVaultStatusArgs,
   UpdateStakeRewardsArgs,
-  ClaimStakeRewardsArgs
+  ClaimStakeRewardsArgs,
+  CreateUserArgs,
+  StakeTokenArgs
 } from './types/stake'
-import { TTRIAD_DECIMALS, TTRIAD_FEE } from './utils/constants'
+import { TTRIAD_DECIMALS, TTRIAD_FEE, TTRIAD_MINT } from './utils/constants'
 
 export default class Stake {
   program: Program<TriadProtocol>
@@ -45,6 +49,15 @@ export default class Stake {
     const response = await this.program.account.stakeVault.all()
 
     return response.map((stakeVault) => formatStakeVault(stakeVault.account))
+  }
+
+  /**
+   * Get all Users
+   */
+  async getUsers() {
+    const response = await this.program.account.user.all()
+
+    return response.map((item) => formatUser(item.account))
   }
 
   /**
@@ -226,10 +239,15 @@ export default class Stake {
    *
    */
   public async stakeNft(
-    { name, wallet, mint, collections, rarity, stakeVault }: StakeArgs,
+    { name, wallet, mint, collections, rarity, stakeVault }: StakeNftArgsV1,
     options?: RpcOptions
   ) {
+    const StakeVault = getStakeVaultAddressSync(
+      this.program.programId,
+      stakeVault
+    )
     const FromAta = getATASync(wallet, mint)
+    const ToAta = getATASync(StakeVault, mint)
 
     let items = []
 
@@ -248,8 +266,53 @@ export default class Stake {
       })
       .accounts({
         signer: wallet,
+        toAta: ToAta,
         fromAta: FromAta,
         mint: mint
+      })
+
+    if (options?.microLamports) {
+      method.postInstructions([
+        ComputeBudgetProgram.setComputeUnitPrice({
+          microLamports: options.microLamports
+        })
+      ])
+    }
+
+    return method.rpc({ skipPreflight: options?.skipPreflight })
+  }
+
+  /**
+   *  Stake NFT
+   *  @param wallet - User wallet
+   *  @param mint - NFT mint
+   *  @param collections - NFT collections
+   *  @param rarity - NFT rarity
+   *
+   */
+  public async stakeToken(
+    { name, wallet, stakeVault, amount }: StakeTokenArgs,
+    options?: RpcOptions
+  ) {
+    const StakeVault = getStakeVaultAddressSync(
+      this.program.programId,
+      stakeVault
+    )
+    const ttriad = new PublicKey(TTRIAD_MINT)
+    const FromAta = getATASync(wallet, ttriad)
+    const ToAta = getATASync(StakeVault, ttriad)
+
+    const method = this.program.methods
+      .stakeToken({
+        name,
+        amount: new BN(amount * 10 ** 6),
+        stakeVault
+      })
+      .accounts({
+        signer: wallet,
+        toAta: ToAta,
+        fromAta: FromAta,
+        mint: ttriad
       })
 
     if (options?.microLamports) {
@@ -307,6 +370,11 @@ export default class Stake {
     { wallet, mint, amount, stakeVault }: DepositStakeRewardsArgs,
     options?: RpcOptions
   ) {
+    const StakeVault = getStakeVaultAddressSync(
+      this.program.programId,
+      stakeVault
+    )
+    const ToAta = getATASync(StakeVault, mint)
     const FromAta = getATASync(wallet, mint)
 
     const method = this.program.methods
@@ -317,6 +385,7 @@ export default class Stake {
       .accounts({
         signer: wallet,
         fromAta: FromAta,
+        toAta: ToAta,
         mint: mint
       })
 
@@ -334,19 +403,19 @@ export default class Stake {
   /**
    *  Request Withdraw
    *  @param wallet - User wallet
-   *  @param nftName - NFT name
+   *  @param name - Stake name
    *  @param stakeVault - Name of the stake vault
    *
    */
   public async requestWithdraw(
-    { wallet, nftName, mint, stakeVault }: RequestWithdrawArgs,
+    { wallet, name, mint, stakeVault }: RequestWithdrawArgs,
     options?: RpcOptions
   ) {
     const stakeVaultPDA = getStakeVaultAddressSync(
       this.program.programId,
       stakeVault
     )
-    const stakePDA = getStakeAddressSync(this.program.programId, nftName)
+    const stakePDA = getStakeAddressSync(this.program.programId, name)
 
     const method = this.program.methods.requestWithdrawStake().accounts({
       signer: wallet,
@@ -369,13 +438,13 @@ export default class Stake {
   /**
    *  Withdraw Stake
    *  @param wallet - User wallet
-   *  @param nftName - Stake name
+   *  @param name - Stake name
    *  @param mint - NFT mint
    *  @param stakeVault - Name of the stake vault
    *
    */
   public async withdrawStake(
-    { wallet, nftName, mint, stakeVault }: WithdrawArgs,
+    { wallet, name, mint, stakeVault }: WithdrawArgs,
     options?: RpcOptions
   ) {
     const stakeVaultPDA = getStakeVaultAddressSync(
@@ -384,7 +453,8 @@ export default class Stake {
     )
 
     const FromAta = getATASync(stakeVaultPDA, mint)
-    const stakePDA = getStakeAddressSync(this.program.programId, nftName)
+    const ToAta = getATASync(wallet, mint)
+    const stakePDA = getStakeAddressSync(this.program.programId, name)
     const NFTRewards = getNFTRewardsAddressSync(
       this.program.programId,
       stakePDA
@@ -395,6 +465,7 @@ export default class Stake {
       fromAta: FromAta,
       nftRewards: NFTRewards,
       stake: stakePDA,
+      toAta: ToAta,
       stakeVault: stakeVaultPDA,
       admin: new PublicKey('82ppCojm3yrEKgdpH8B5AmBJTU1r1uAWXFWhxvPs9UCR'),
       mint: mint
@@ -524,6 +595,7 @@ export default class Stake {
     )
     const Stake = getStakeAddressSync(this.program.programId, nftName)
     const NFTRewards = getNFTRewardsAddressSync(this.program.programId, Stake)
+    const ToATA = getATASync(wallet, mint)
     const FromAta = getATASync(StakeVault, mint)
 
     let ixs: TransactionInstruction[] = []
@@ -537,6 +609,7 @@ export default class Stake {
           .accounts({
             signer: wallet,
             fromAta: FromAta,
+            toAta: ToATA,
             mint: mint,
             nftRewards: NFTRewards,
             stake: Stake,
@@ -567,5 +640,38 @@ export default class Stake {
       skipPreflight: options?.skipPreflight,
       commitment: 'confirmed'
     })
+  }
+
+  /**
+   *  Create User
+   *  @param wallet - User wallet
+   *  @param name - user name
+   *  @param referral - user referral
+   *
+   */
+  public async createUser(
+    { wallet, name, referral }: CreateUserArgs,
+    options?: RpcOptions
+  ) {
+    const referralPDA = getUserAddressSync(this.program.programId, referral)
+
+    const method = this.program.methods
+      .createUser({
+        name
+      })
+      .accounts({
+        signer: wallet,
+        referral: referralPDA
+      })
+
+    if (options?.microLamports) {
+      method.postInstructions([
+        ComputeBudgetProgram.setComputeUnitPrice({
+          microLamports: options.microLamports
+        })
+      ])
+    }
+
+    return method.rpc({ skipPreflight: options?.skipPreflight })
   }
 }

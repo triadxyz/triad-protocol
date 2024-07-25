@@ -318,10 +318,6 @@
                 "value": [117, 115, 101, 114]
               },
               {
-                "kind": "account",
-                "path": "signer"
-              },
-              {
                 "kind": "arg",
                 "path": "args.name"
               }
