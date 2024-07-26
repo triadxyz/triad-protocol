@@ -2,7 +2,7 @@ use std::str::FromStr;
 
 use crate::{
     constants::{ADMIN, TTRIAD_MINT},
-    Stake, StakeVault, Ticker, UserPosition,
+    StakeV2, StakeVault, Ticker, UserPosition,
 };
 
 use anchor_lang::prelude::*;
@@ -37,7 +37,7 @@ pub fn is_token_mint_for_vault(
 }
 
 pub fn is_authority_for_stake(
-    stake: &Account<Stake>,
+    stake: &Account<StakeV2>,
     signer: &Signer,
 ) -> anchor_lang::Result<bool> {
     Ok(stake.authority.eq(signer.key))

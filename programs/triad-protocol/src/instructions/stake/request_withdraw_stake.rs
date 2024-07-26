@@ -1,5 +1,6 @@
 use crate::constraints::is_authority_for_stake;
-use crate::{errors::TriadProtocolError, state::Stake, StakeVault};
+use crate::StakeV2;
+use crate::{errors::TriadProtocolError, StakeVault};
 use anchor_lang::prelude::*;
 use anchor_spl::token_2022::Token2022;
 use anchor_spl::token_interface::Mint;
@@ -13,7 +14,7 @@ pub struct RequestWithdrawStake<'info> {
     pub stake_vault: Box<Account<'info, StakeVault>>,
 
     #[account(mut, constraint = is_authority_for_stake(&stake, &signer)?)]
-    pub stake: Box<Account<'info, Stake>>,
+    pub stake: Box<Account<'info, StakeV2>>,
 
     #[account(mut)]
     pub mint: Box<InterfaceAccount<'info, Mint>>,

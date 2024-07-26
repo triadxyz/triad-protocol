@@ -18,6 +18,13 @@ export type StakeNftArgsV1 = {
     | { mythic: {} }
 }
 
+export type MigrateStakeArgs = {
+  wallet: PublicKey
+  name: string
+  mint: PublicKey
+  stakeVault: string
+}
+
 export type StakeTokenArgs = {
   name: string
   wallet: PublicKey
@@ -121,21 +128,16 @@ export type StakeVaultResponse = {
 
 export type StakeResponse = {
   name: string
-  collections: Record<Collection, {}>
-  rarity: string
   stakeVault: string
   authority: string
   initTs: number
-  isLocked: boolean
   withdrawTs: number
   mint: string
-  stakeRewards: string
-  apr?: number
-  dailyRewards?: number[]
-  weeklyRewardsPaid?: boolean[]
-  weeklyRewards?: number
-  rewardsToClaim?: number
-  allRewards?: number
+  claimedTs: number
+  boost: boolean
+  claimed: number
+  available: number
+  amount: number
 }
 
 export type UserResponse = {

@@ -94,9 +94,25 @@ export const getStakeVaultAddressSync = (
   return StakeVaultPDA
 }
 
-export const getStakeAddressSync = (programId: PublicKey, nftName: string) => {
+export const getStakeV1AddressSync = (
+  programId: PublicKey,
+  nftName: string
+) => {
   const [StakePDA] = PublicKey.findProgramAddressSync(
     [Buffer.from('stake'), Buffer.from(nftName)],
+    programId
+  )
+
+  return StakePDA
+}
+
+export const getStakeAddressSync = (
+  programId: PublicKey,
+  wallet: PublicKey,
+  name: string
+) => {
+  const [StakePDA] = PublicKey.findProgramAddressSync(
+    [Buffer.from('stake'), wallet.toBuffer(), Buffer.from(name)],
     programId
   )
 
@@ -160,15 +176,16 @@ export const formatStakeVault = (stakeVault: any): StakeVaultResponse => {
 export const formatStake = (stake: any): StakeResponse => {
   return {
     name: stake.name,
-    collections: stake.collections,
-    rarity: Object.keys(stake.rarity)[0],
     stakeVault: stake.stakeVault.toBase58(),
     authority: stake.authority.toBase58(),
     initTs: stake.initTs.toNumber(),
-    isLocked: stake.isLocked,
     withdrawTs: stake.withdrawTs.toNumber(),
     mint: stake.mint.toBase58(),
-    stakeRewards: stake.stakeRewards.toBase58()
+    claimedTs: stake.claimedTs.toNumber(),
+    boost: stake.boost,
+    claimed: stake.claimed.toNumber(),
+    available: stake.available.toNumber(),
+    amount: stake.amount.toNumber()
   }
 }
 

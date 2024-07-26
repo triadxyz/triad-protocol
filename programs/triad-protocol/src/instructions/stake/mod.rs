@@ -1,4 +1,3 @@
-mod claim_rewards;
 mod claim_stake_rewards;
 mod deposit_stake_rewards;
 mod initialize_stake_vault;
@@ -9,7 +8,6 @@ mod stake_token;
 mod update_stake_vault_status;
 mod withdraw_stake;
 
-pub use claim_rewards::*;
 pub use claim_stake_rewards::*;
 pub use deposit_stake_rewards::*;
 pub use initialize_stake_vault::*;

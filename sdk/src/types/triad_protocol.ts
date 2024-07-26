@@ -13,8 +13,8 @@ export type TriadProtocol = {
   }
   instructions: [
     {
-      name: 'claimRewards'
-      discriminator: [4, 144, 132, 71, 116, 23, 151, 80]
+      name: 'claimStakeRewards'
+      discriminator: [107, 91, 233, 196, 211, 47, 218, 21]
       accounts: [
         {
           name: 'signer'
@@ -55,63 +55,6 @@ export type TriadProtocol = {
         }
       ]
       args: []
-    },
-    {
-      name: 'claimStakeRewards'
-      discriminator: [107, 91, 233, 196, 211, 47, 218, 21]
-      accounts: [
-        {
-          name: 'signer'
-          writable: true
-          signer: true
-        },
-        {
-          name: 'stakeVault'
-          writable: true
-        },
-        {
-          name: 'stake'
-          writable: true
-        },
-        {
-          name: 'nftRewards'
-          writable: true
-        },
-        {
-          name: 'mint'
-          writable: true
-        },
-        {
-          name: 'fromAta'
-          writable: true
-        },
-        {
-          name: 'toAta'
-          writable: true
-        },
-        {
-          name: 'tokenProgram'
-          address: 'TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb'
-        },
-        {
-          name: 'associatedTokenProgram'
-          address: 'ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL'
-        },
-        {
-          name: 'systemProgram'
-          address: '11111111111111111111111111111111'
-        }
-      ]
-      args: [
-        {
-          name: 'args'
-          type: {
-            defined: {
-              name: 'claimStakeRewardsArgs'
-            }
-          }
-        }
-      ]
     },
     {
       name: 'closePosition'
@@ -526,14 +469,6 @@ export type TriadProtocol = {
           writable: true
         },
         {
-          name: 'fromAta'
-          writable: true
-        },
-        {
-          name: 'toAta'
-          writable: true
-        },
-        {
           name: 'tokenProgram'
           address: 'TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb'
         },
@@ -912,10 +847,6 @@ export type TriadProtocol = {
           writable: true
         },
         {
-          name: 'nftRewards'
-          writable: true
-        },
-        {
           name: 'mint'
           writable: true
         },
@@ -1094,18 +1025,6 @@ export type TriadProtocol = {
     }
   ]
   types: [
-    {
-      name: 'claimStakeRewardsArgs'
-      type: {
-        kind: 'struct'
-        fields: [
-          {
-            name: 'week'
-            type: 'u8'
-          }
-        ]
-      }
-    },
     {
       name: 'closePositionArgs'
       type: {

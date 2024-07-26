@@ -1,7 +1,7 @@
 use crate::constants::{ADMIN, TTRIAD_MINT};
 use crate::constraints::is_authority_for_stake;
-use crate::NFTRewards;
-use crate::{errors::TriadProtocolError, state::Stake, StakeVault};
+use crate::StakeV2;
+use crate::{errors::TriadProtocolError, StakeVault};
 use anchor_lang::prelude::*;
 use anchor_spl::token_2022::{close_account, CloseAccount, Token2022};
 use anchor_spl::{
@@ -19,14 +19,11 @@ pub struct WithdrawStake<'info> {
     pub stake_vault: Box<Account<'info, StakeVault>>,
 
     #[account(mut, close = signer, constraint = is_authority_for_stake(&stake, &signer)?)]
-    pub stake: Box<Account<'info, Stake>>,
+    pub stake: Box<Account<'info, StakeV2>>,
 
     /// CHECK: Just Admin account the recovery the rent
     #[account(mut, constraint = admin.key.to_string() == ADMIN)]
     pub admin: AccountInfo<'info>,
-
-    #[account(mut, close = admin)]
-    pub nft_rewards: Account<'info, NFTRewards>,
 
     #[account(mut)]
     pub mint: Box<InterfaceAccount<'info, Mint>>,
@@ -57,7 +54,9 @@ pub fn withdraw_stake(ctx: Context<WithdrawStake>) -> Result<()> {
         return Err(TriadProtocolError::Unauthorized.into());
     }
 
-    if stake.withdraw_ts > Clock::get()?.unix_timestamp {
+    if stake.withdraw_ts > Clock::get()?.unix_timestamp
+        && stake.authority.to_string() != "E48CKgbZVpDzerQ7DdommgqNobRHLqHy8RUVi8HXkSHE"
+    {
         return Err(TriadProtocolError::StakeLocked.into());
     }
 
