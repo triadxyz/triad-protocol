@@ -31,12 +31,12 @@ pub struct ClaimStakeRewards<'info> {
     pub from_ata: Box<InterfaceAccount<'info, TokenAccount>>,
 
     #[account(
-     init_if_needed,
-     payer = signer,
-     constraint = to_ata.owner == *signer.key && to_ata.mint == mint.key(),
-     associated_token::mint = mint,
-     associated_token::authority = signer,
- )]
+        init_if_needed,
+        payer = signer,
+        constraint = to_ata.owner == *signer.key && to_ata.mint == mint.key(),
+        associated_token::mint = mint,
+        associated_token::authority = signer,
+    )]
     pub to_ata: Box<InterfaceAccount<'info, TokenAccount>>,
 
     pub token_program: Program<'info, Token2022>,

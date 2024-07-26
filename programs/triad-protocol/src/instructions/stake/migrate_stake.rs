@@ -64,23 +64,21 @@ pub fn migrate_stake(ctx: Context<MigrateStake>, _args: MigrateStakeArgs) -> Res
     stake_v2.claimed = 0;
 
     let mut week = 0;
-    let mut available = 0;
 
     for i in 0..5 {
-        if nft_rewards.weekly_rewards_paid[i] {
-            week = i;
-            continue;
-        }
-
         let start = week * 7;
         let end = if week == 4 { 30 } else { start + 7 };
 
         let rewards: u64 = nft_rewards.daily_rewards[start..end].iter().sum();
 
-        available += rewards;
-    }
+        if !nft_rewards.weekly_rewards_paid[i] {
+            stake_v2.available += rewards;
+        } else {
+            stake_v2.claimed += rewards;
+        }
 
-    stake_v2.available = available;
+        week = i;
+    }
 
     Ok(())
 }
