@@ -432,88 +432,6 @@
       ]
     },
     {
-      "name": "migrate_stake",
-      "discriminator": [178, 5, 26, 85, 56, 20, 153, 160],
-      "accounts": [
-        {
-          "name": "signer",
-          "writable": true,
-          "signer": true
-        },
-        {
-          "name": "stake_vault",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [115, 116, 97, 107, 101, 95, 118, 97, 117, 108, 116]
-              },
-              {
-                "kind": "arg",
-                "path": "args.stake_vault"
-              }
-            ]
-          }
-        },
-        {
-          "name": "stake_v1",
-          "writable": true
-        },
-        {
-          "name": "stake_v2",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [115, 116, 97, 107, 101]
-              },
-              {
-                "kind": "account",
-                "path": "stake_v1.authority",
-                "account": "Stake"
-              },
-              {
-                "kind": "arg",
-                "path": "args.name"
-              }
-            ]
-          }
-        },
-        {
-          "name": "mint",
-          "writable": true
-        },
-        {
-          "name": "nft_rewards",
-          "writable": true
-        },
-        {
-          "name": "token_program",
-          "address": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb"
-        },
-        {
-          "name": "associated_token_program",
-          "address": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"
-        },
-        {
-          "name": "system_program",
-          "address": "11111111111111111111111111111111"
-        }
-      ],
-      "args": [
-        {
-          "name": "args",
-          "type": {
-            "defined": {
-              "name": "MigrateStakeArgs"
-            }
-          }
-        }
-      ]
-    },
-    {
       "name": "open_position",
       "discriminator": [135, 128, 47, 77, 15, 152, 240, 49],
       "accounts": [
@@ -964,14 +882,6 @@
   ],
   "accounts": [
     {
-      "name": "NFTRewards",
-      "discriminator": [210, 99, 18, 65, 58, 128, 167, 91]
-    },
-    {
-      "name": "Stake",
-      "discriminator": [150, 197, 176, 29, 55, 132, 112, 149]
-    },
-    {
       "name": "StakeV2",
       "discriminator": [207, 98, 130, 13, 118, 181, 238, 47]
     },
@@ -1162,26 +1072,6 @@
       }
     },
     {
-      "name": "Collection",
-      "type": {
-        "kind": "enum",
-        "variants": [
-          {
-            "name": "COLETA"
-          },
-          {
-            "name": "UNDEAD"
-          },
-          {
-            "name": "ALLIGATORS"
-          },
-          {
-            "name": "PYTH"
-          }
-        ]
-      }
-    },
-    {
       "name": "CreateTickerArgs",
       "type": {
         "kind": "struct",
@@ -1249,50 +1139,6 @@
           {
             "name": "amount",
             "type": "u64"
-          }
-        ]
-      }
-    },
-    {
-      "name": "MigrateStakeArgs",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "name",
-            "type": "string"
-          },
-          {
-            "name": "stake_vault",
-            "type": "string"
-          }
-        ]
-      }
-    },
-    {
-      "name": "NFTRewards",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "stake",
-            "type": "pubkey"
-          },
-          {
-            "name": "daily_rewards",
-            "type": {
-              "array": ["u64", 30]
-            }
-          },
-          {
-            "name": "weekly_rewards_paid",
-            "type": {
-              "array": ["bool", 5]
-            }
-          },
-          {
-            "name": "apr",
-            "type": "f32"
           }
         ]
       }
@@ -1373,94 +1219,6 @@
           {
             "name": "pnl",
             "type": "i64"
-          }
-        ]
-      }
-    },
-    {
-      "name": "Rarity",
-      "type": {
-        "kind": "enum",
-        "variants": [
-          {
-            "name": "COMMON"
-          },
-          {
-            "name": "UNCOMMON"
-          },
-          {
-            "name": "RARE"
-          },
-          {
-            "name": "EPIC"
-          },
-          {
-            "name": "LEGENDARY"
-          },
-          {
-            "name": "MYTHIC"
-          }
-        ]
-      }
-    },
-    {
-      "name": "Stake",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "bump",
-            "type": "u8"
-          },
-          {
-            "name": "authority",
-            "type": "pubkey"
-          },
-          {
-            "name": "init_ts",
-            "type": "i64"
-          },
-          {
-            "name": "is_locked",
-            "type": "bool"
-          },
-          {
-            "name": "withdraw_ts",
-            "type": "i64"
-          },
-          {
-            "name": "name",
-            "type": "string"
-          },
-          {
-            "name": "collections",
-            "type": {
-              "vec": {
-                "defined": {
-                  "name": "Collection"
-                }
-              }
-            }
-          },
-          {
-            "name": "rarity",
-            "type": {
-              "defined": {
-                "name": "Rarity"
-              }
-            }
-          },
-          {
-            "name": "mint",
-            "type": "pubkey"
-          },
-          {
-            "name": "stake_vault",
-            "type": "pubkey"
-          },
-          {
-            "name": "stake_rewards",
-            "type": "pubkey"
           }
         ]
       }
@@ -1703,10 +1461,6 @@
           {
             "name": "is_locked",
             "type": "bool"
-          },
-          {
-            "name": "week",
-            "type": "u8"
           }
         ]
       }

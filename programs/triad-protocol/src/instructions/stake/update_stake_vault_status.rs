@@ -26,7 +26,6 @@ pub fn update_stake_vault_status(
 
     let stake_vault = &mut ctx.accounts.stake_vault;
 
-    stake_vault.week = args.week;
     stake_vault.is_locked = args.is_locked;
 
     Ok(())

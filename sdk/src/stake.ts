@@ -167,14 +167,7 @@ export default class Stake {
     { name, wallet, mint, stakeVault }: StakeNftArgs,
     options?: RpcOptions
   ) {
-    const StakeVault = getStakeVaultAddressSync(
-      this.program.programId,
-      stakeVault
-    )
     const FromAta = getATASync(wallet, mint)
-    const ToAta = getATASync(StakeVault, mint)
-
-    let items = []
 
     const method = this.program.methods
       .stakeNft({
@@ -183,7 +176,6 @@ export default class Stake {
       })
       .accounts({
         signer: wallet,
-        toAta: ToAta,
         fromAta: FromAta,
         mint: mint
       })
@@ -211,13 +203,8 @@ export default class Stake {
     { name, wallet, stakeVault, amount }: StakeTokenArgs,
     options?: RpcOptions
   ) {
-    const StakeVault = getStakeVaultAddressSync(
-      this.program.programId,
-      stakeVault
-    )
     const ttriad = new PublicKey(TTRIAD_MINT)
     const FromAta = getATASync(wallet, ttriad)
-    const ToAta = getATASync(StakeVault, ttriad)
 
     const method = this.program.methods
       .stakeToken({
@@ -227,7 +214,6 @@ export default class Stake {
       })
       .accounts({
         signer: wallet,
-        toAta: ToAta,
         fromAta: FromAta,
         mint: ttriad
       })
@@ -287,11 +273,6 @@ export default class Stake {
     { wallet, mint, amount, stakeVault }: DepositStakeRewardsArgs,
     options?: RpcOptions
   ) {
-    const StakeVault = getStakeVaultAddressSync(
-      this.program.programId,
-      stakeVault
-    )
-    const ToAta = getATASync(StakeVault, mint)
     const FromAta = getATASync(wallet, mint)
 
     const method = this.program.methods
@@ -302,7 +283,6 @@ export default class Stake {
       .accounts({
         signer: wallet,
         fromAta: FromAta,
-        toAta: ToAta,
         mint: mint
       })
 
@@ -370,14 +350,12 @@ export default class Stake {
     )
 
     const FromAta = getATASync(stakeVaultPDA, mint)
-    const ToAta = getATASync(wallet, mint)
     const stakePDA = getStakeAddressSync(this.program.programId, wallet, name)
 
     const method = this.program.methods.withdrawStake().accounts({
       signer: wallet,
       fromAta: FromAta,
       stake: stakePDA,
-      toAta: ToAta,
       stakeVault: stakeVaultPDA,
       admin: new PublicKey('82ppCojm3yrEKgdpH8B5AmBJTU1r1uAWXFWhxvPs9UCR'),
       mint: mint
@@ -413,8 +391,7 @@ export default class Stake {
 
     const method = this.program.methods
       .updateStakeVaultStatus({
-        isLocked,
-        week
+        isLocked
       })
       .accounts({
         signer: wallet,
@@ -449,13 +426,11 @@ export default class Stake {
       stakeVault
     )
     const Stake = getStakeAddressSync(this.program.programId, wallet, nftName)
-    const ToATA = getATASync(wallet, mint)
     const FromAta = getATASync(StakeVault, mint)
 
     const method = this.program.methods.claimStake().accounts({
       signer: wallet,
       fromAta: FromAta,
-      toAta: ToATA,
       mint: mint,
       stake: Stake,
       stakeVault: StakeVault

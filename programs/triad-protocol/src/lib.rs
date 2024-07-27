@@ -82,8 +82,4 @@ pub mod triad_protocol {
     pub fn create_user(ctx: Context<CreateUser>, args: CreateUserArgs) -> Result<()> {
         instructions::create_user(ctx, args)
     }
-
-    pub fn migrate_stake(ctx: Context<MigrateStake>, args: MigrateStakeArgs) -> Result<()> {
-        instructions::migrate_stake(ctx, args)
-    }
 }
