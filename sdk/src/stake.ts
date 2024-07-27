@@ -1,5 +1,12 @@
 import { AnchorProvider, BN, Program } from '@coral-xyz/anchor'
-import { ComputeBudgetProgram, PublicKey } from '@solana/web3.js'
+import {
+  ComputeBudgetProgram,
+  PublicKey,
+  Transaction,
+  TransactionInstruction,
+  TransactionMessage,
+  VersionedTransaction
+} from '@solana/web3.js'
 import { TriadProtocol } from './types/triad_protocol'
 import {
   formatStake,
@@ -64,26 +71,17 @@ export default class Stake {
    *
    */
   async getStakes(stakeVault: string) {
-    const response1 = await this.program.account.stake.all()
     const response = await this.program.account.stakeV2.all()
     const StakeVault = getStakeVaultAddressSync(
       this.program.programId,
       stakeVault
     )
 
-    const data = response
+    return response
       .filter(
         (item) => item.account.stakeVault.toBase58() === StakeVault.toBase58()
       )
       .map((stake) => formatStake(stake.account))
-
-    const data1 = response1
-      .filter(
-        (item) => item.account.stakeVault.toBase58() === StakeVault.toBase58()
-      )
-      .map((stake) => formatStake(stake.account))
-
-    return [...data, ...data1]
   }
 
   /**
@@ -472,43 +470,6 @@ export default class Stake {
       stake: Stake,
       stakeVault: StakeVault
     })
-
-    if (options?.microLamports) {
-      method.postInstructions([
-        ComputeBudgetProgram.setComputeUnitPrice({
-          microLamports: options.microLamports
-        })
-      ])
-    }
-
-    return method.rpc({ skipPreflight: options?.skipPreflight })
-  }
-
-  /**
-   *  Migrate Stake
-   *  @param name - NFT name
-   *  @param wallet - User wallet
-   *  @param mint - NFT mint
-   *
-   */
-  public async migrateStake(
-    { name, wallet, mint, stakeVault }: MigrateStakeArgs,
-    options?: RpcOptions
-  ) {
-    const stakeV1 = getStakeV1AddressSync(this.program.programId, name)
-    const NFTRewards = getNFTRewardsAddressSync(this.program.programId, stakeV1)
-
-    const method = this.program.methods
-      .migrateStake({
-        name,
-        stakeVault
-      })
-      .accounts({
-        signer: wallet,
-        stakeV1,
-        nftRewards: NFTRewards,
-        mint: mint
-      })
 
     if (options?.microLamports) {
       method.postInstructions([

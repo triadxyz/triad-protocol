@@ -12,9 +12,11 @@ export type StakeNftArgs = {
 
 export type MigrateStakeArgs = {
   wallet: PublicKey
-  name: string
-  mint: PublicKey
   stakeVault: string
+  items: {
+    mint: PublicKey
+    name: string
+  }[]
 }
 
 export type StakeTokenArgs = {

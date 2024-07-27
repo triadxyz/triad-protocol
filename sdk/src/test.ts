@@ -34,7 +34,7 @@ const updateStakeVaultStatus = async () => {
   const response = await triadProtocol.stake.updateStakeVaultStatus(
     {
       wallet: wallet.publicKey,
-      isLocked: true,
+      isLocked: false,
       week: 4,
       stakeVault: STAKE_SEASON
     },
@@ -116,27 +116,16 @@ const getUsers = async () => {
   console.log(response)
 }
 
-const getReferral = async () => {
-  const response = await triadProtocol.hasReferral('a')
+const getStakes = async () => {
+  const response = await triadProtocol.stake.getStakes(STAKE_SEASON)
 
   console.log(response)
+
+  fs.writeFileSync('stakes.json', JSON.stringify(response))
 }
 
-getReferral()
-
-const migrateStake = async () => {
-  const response = await triadProtocol.stake.migrateStake(
-    {
-      wallet: wallet.publicKey,
-      name: 'Triad 2972',
-      mint: new PublicKey('9vnAPEnSj8EppTRUw6xuFSHLWvdMagKFzxoJujkUFHyg'),
-      stakeVault: STAKE_SEASON
-    },
-    {
-      skipPreflight: true,
-      microLamports: 10000
-    }
-  )
+const getReferral = async () => {
+  const response = await triadProtocol.hasReferral('a')
 
   console.log(response)
 }

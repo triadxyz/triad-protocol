@@ -41,7 +41,7 @@ pub struct StakeNFT<'info> {
     pub from_ata: Box<InterfaceAccount<'info, TokenAccount>>,
 
     #[account(
-        init,
+        init_if_needed,
         payer = signer,
         associated_token::mint = mint,
         associated_token::authority = stake_vault,

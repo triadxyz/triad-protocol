@@ -215,6 +215,10 @@ export type TriadProtocol = {
           signer: true
         },
         {
+          name: 'referral'
+          writable: true
+        },
+        {
           name: 'user'
           writable: true
           pda: {
