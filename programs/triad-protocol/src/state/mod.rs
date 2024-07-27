@@ -1,11 +1,11 @@
-mod ticker;
 mod position;
-mod vault;
-mod events;
 mod stake;
+mod ticker;
+mod user;
+mod vault;
 
-pub use stake::*;
-pub use events::*;
-pub use ticker::*;
 pub use position::*;
+pub use stake::*;
+pub use ticker::*;
+pub use user::*;
 pub use vault::*;

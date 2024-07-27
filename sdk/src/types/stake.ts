@@ -3,19 +3,28 @@ import BN from 'bn.js'
 
 export type Collection = 'alligators' | 'coleta' | 'undead' | 'pyth'
 
-export type StakeArgs = {
+export type StakeNftArgs = {
   name: string
   wallet: PublicKey
   stakeVault: string
   mint: PublicKey
-  collections: Record<Collection, boolean>
-  rarity:
-    | { common: {} }
-    | { uncommon: {} }
-    | { rare: {} }
-    | { epic: {} }
-    | { legendary: {} }
-    | { mythic: {} }
+}
+
+export type MigrateStakeArgs = {
+  wallet: PublicKey
+  stakeVault: string
+  items: {
+    mint: PublicKey
+    name: string
+  }[]
+}
+
+export type StakeTokenArgs = {
+  name: string
+  wallet: PublicKey
+  stakeVault: string
+  mint: PublicKey
+  amount: number
 }
 
 export type InitializeStakeArgs = {
@@ -34,14 +43,14 @@ export type DepositStakeRewardsArgs = {
 
 export type RequestWithdrawArgs = {
   wallet: PublicKey
-  nftName: string
+  name: string
   mint: PublicKey
   stakeVault: string
 }
 
 export type WithdrawArgs = {
   wallet: PublicKey
-  nftName: string
+  name: string
   mint: PublicKey
   stakeVault: string
 }
@@ -55,7 +64,6 @@ export type UpdateStakeVaultStatusArgs = {
 
 export type ClaimStakeRewardsArgs = {
   wallet: PublicKey
-  week: number[]
   mint: PublicKey
   stakeVault: string
   nftName: string
@@ -91,13 +99,15 @@ export enum COLLECTION_MUlTIPLIER {
 export type StakeVaultResponse = {
   name: string
   collection: string
+  authority: string
   slots: number
   amount: number
   isLocked: boolean
-  usersPaid: PublicKey
+  tokenMint: string
   amountPaid: number
-  amountUsers: number
-  apr: number
+  nftStaked: number
+  tokenDecimals: number
+  tokenStaked: number
   week: number
   initTs: number
   endTs: number
@@ -105,19 +115,22 @@ export type StakeVaultResponse = {
 
 export type StakeResponse = {
   name: string
-  collections: Record<Collection, {}>
-  rarity: string
   stakeVault: string
   authority: string
   initTs: number
-  isLocked: boolean
   withdrawTs: number
   mint: string
-  stakeRewards: string
-  apr?: number
-  dailyRewards?: number[]
-  weeklyRewardsPaid?: boolean[]
-  weeklyRewards?: number
-  rewardsToClaim?: number
-  allRewards?: number
+  claimedTs: number
+  boost: boolean
+  claimed: number
+  available: number
+  amount: number
+}
+
+export type UserResponse = {
+  ts: number
+  authority: string
+  referral: string
+  referred: number
+  name: string
 }

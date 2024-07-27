@@ -1,7 +1,8 @@
 import {
   COLLECTION_MUlTIPLIER,
   StakeResponse,
-  StakeVaultResponse
+  StakeVaultResponse,
+  UserResponse
 } from './../types/stake'
 import { PublicKey } from '@solana/web3.js'
 import * as anchor from '@coral-xyz/anchor'
@@ -93,9 +94,25 @@ export const getStakeVaultAddressSync = (
   return StakeVaultPDA
 }
 
-export const getStakeAddressSync = (programId: PublicKey, nftName: string) => {
+export const getStakeV1AddressSync = (
+  programId: PublicKey,
+  nftName: string
+) => {
   const [StakePDA] = PublicKey.findProgramAddressSync(
     [Buffer.from('stake'), Buffer.from(nftName)],
+    programId
+  )
+
+  return StakePDA
+}
+
+export const getStakeAddressSync = (
+  programId: PublicKey,
+  wallet: PublicKey,
+  name: string
+) => {
+  const [StakePDA] = PublicKey.findProgramAddressSync(
+    [Buffer.from('stake'), wallet.toBuffer(), Buffer.from(name)],
     programId
   )
 
@@ -123,6 +140,15 @@ export const getATASync = (address: PublicKey, Mint: PublicKey) => {
   return ATA
 }
 
+export const getUserAddressSync = (programId: PublicKey, name: string) => {
+  const [StakePDA] = PublicKey.findProgramAddressSync(
+    [Buffer.from('user'), Buffer.from(name)],
+    programId
+  )
+
+  return StakePDA
+}
+
 export const formatNumber = (number: bigint | BN, decimals = 6) => {
   return Number(number.toString()) / 10 ** decimals
 }
@@ -134,28 +160,42 @@ export const formatStakeVault = (stakeVault: any): StakeVaultResponse => {
     slots: stakeVault.slots.toNumber(),
     amount: stakeVault.amount.toNumber(),
     isLocked: stakeVault.isLocked,
-    usersPaid: stakeVault.usersPaid.toBase58(),
+    tokenMint: stakeVault.tokenMint.toBase58(),
+    tokenDecimals: stakeVault.tokenDecimals,
     amountPaid: stakeVault.amountPaid.toNumber(),
-    amountUsers: stakeVault.amountUsers.toNumber(),
+    nftStaked: stakeVault.nftStaked.toNumber(),
     week: stakeVault.week,
-    apr: stakeVault.apr,
     initTs: stakeVault.initTs.toNumber(),
-    endTs: stakeVault.endTs.toNumber()
+    endTs: stakeVault.endTs.toNumber(),
+    authority: stakeVault.authority.toBase58(),
+    tokenStaked:
+      stakeVault.tokenStaked.toNumber() / 10 ** stakeVault.tokenDecimals
   }
 }
 
 export const formatStake = (stake: any): StakeResponse => {
   return {
     name: stake.name,
-    collections: stake.collections,
-    rarity: Object.keys(stake.rarity)[0],
     stakeVault: stake.stakeVault.toBase58(),
     authority: stake.authority.toBase58(),
     initTs: stake.initTs.toNumber(),
-    isLocked: stake.isLocked,
     withdrawTs: stake.withdrawTs.toNumber(),
     mint: stake.mint.toBase58(),
-    stakeRewards: stake.stakeRewards.toBase58()
+    claimedTs: stake?.claimedTs?.toNumber(),
+    boost: stake?.boost,
+    claimed: (stake?.claimed?.toNumber() || 0) / 10 ** 6,
+    available: (stake?.available?.toNumber() || 0) / 10 ** 6,
+    amount: stake?.amount?.toNumber() || 1
+  }
+}
+
+export const formatUser = (user: any): UserResponse => {
+  return {
+    ts: user.ts.toNumber(),
+    authority: user.authority.toBase58(),
+    referral: user.referral,
+    referred: user.referred.toNumber(),
+    name: user.name
   }
 }
 

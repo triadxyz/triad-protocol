@@ -1,9 +1,8 @@
 use crate::constraints::{is_authority_for_user_position, is_token_mint_for_vault};
-use crate::cpi::TokenTransferCPI;
-use crate::emit;
 use crate::errors::TriadProtocolError;
+use crate::events::OpenPositionRecord;
 use crate::state::Vault;
-use crate::{OpenPositionArgs, OpenPositionRecord, UserPosition};
+use crate::{OpenPositionArgs, UserPosition};
 use crate::{Position, Ticker};
 
 use anchor_lang::prelude::*;
@@ -47,18 +46,25 @@ pub struct OpenPosition<'info> {
     pub token_program: Program<'info, Token>,
 }
 
-pub fn open_position<'info>(
-    ctx: Context<'_, '_, '_, 'info, OpenPosition<'info>>,
-    args: OpenPositionArgs,
-) -> Result<()> {
-    let transfer = ctx.token_transfer(args.amount);
-
-    let user_position = &mut ctx.accounts.user_position;
-    let vault = &mut ctx.accounts.vault;
+pub fn open_position(ctx: Context<OpenPosition>, args: OpenPositionArgs) -> Result<()> {
+    let transfer = token::transfer(
+        CpiContext::new(
+            ctx.accounts.token_program.to_account_info(),
+            Transfer {
+                from: ctx.accounts.user_token_account.to_account_info(),
+                to: ctx.accounts.vault_token_account.to_account_info(),
+                authority: ctx.accounts.signer.to_account_info(),
+            },
+        ),
+        args.amount,
+    );
 
     if transfer.is_err() {
         return Err(TriadProtocolError::DepositFailed.into());
     }
+
+    let user_position = &mut ctx.accounts.user_position;
+    let vault = &mut ctx.accounts.vault;
 
     let position = Position {
         amount: args.amount,
@@ -83,20 +89,20 @@ pub fn open_position<'info>(
         return Err(TriadProtocolError::InvalidTickerPosition.into());
     }
 
-    user_position.total_deposited = user_position.total_deposited.saturating_add(args.amount);
-    user_position.total_positions = user_position.total_positions.saturating_add(1);
-    user_position.lp_share = user_position.lp_share.saturating_add(args.amount);
+    user_position.total_deposited += args.amount;
+    user_position.total_positions += 1;
+    user_position.lp_share += args.amount;
 
     if args.is_long {
-        vault.long_positions_opened = vault.long_positions_opened.saturating_add(1);
-        vault.long_balance = vault.long_balance.saturating_add(args.amount);
+        vault.long_positions_opened += 1;
+        vault.long_balance += args.amount;
     } else {
-        vault.short_positions_opened = vault.short_positions_opened.saturating_add(1);
-        vault.short_balance = vault.short_balance.saturating_add(args.amount);
+        vault.short_positions_opened += 1;
+        vault.short_balance += args.amount;
     }
 
-    vault.total_deposited = vault.total_deposited.saturating_add(args.amount);
-    vault.net_deposits = vault.net_deposits.saturating_add(1);
+    vault.total_deposited += args.amount;
+    vault.net_deposits += 1;
 
     emit!(OpenPositionRecord {
         ticker: vault.ticker_address,
@@ -108,20 +114,4 @@ pub fn open_position<'info>(
     });
 
     Ok(())
-}
-
-impl<'info> TokenTransferCPI for Context<'_, '_, '_, 'info, OpenPosition<'info>> {
-    fn token_transfer(&self, amount: u64) -> Result<()> {
-        let cpi_accounts = Transfer {
-            from: self.accounts.user_token_account.to_account_info().clone(),
-            to: self.accounts.vault_token_account.to_account_info().clone(),
-            authority: self.accounts.signer.to_account_info().clone(),
-        };
-        let token_program = self.accounts.token_program.to_account_info().clone();
-        let cpi_context = CpiContext::new(token_program, cpi_accounts);
-
-        token::transfer(cpi_context, amount)?;
-
-        Ok(())
-    }
 }

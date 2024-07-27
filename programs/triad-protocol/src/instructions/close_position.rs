@@ -1,9 +1,8 @@
 use crate::constraints::{is_authority_for_user_position, is_token_mint_for_vault};
-use crate::cpi::TokenTransferCPI;
 use crate::errors::TriadProtocolError;
+use crate::events::ClosePositionRecord;
 use crate::state::Vault;
-use crate::{ClosePositionArgs, ClosePositionRecord, Position, Ticker, UserPosition};
-
+use crate::{ClosePositionArgs, Position, Ticker, UserPosition};
 use anchor_lang::prelude::*;
 use anchor_spl::token::{self, Token, TokenAccount, Transfer};
 
@@ -41,14 +40,7 @@ pub struct ClosePosition<'info> {
     pub token_program: Program<'info, Token>,
 }
 
-pub fn close_position<'info>(
-    ctx: Context<'_, '_, '_, 'info, ClosePosition<'info>>,
-    args: ClosePositionArgs,
-) -> Result<()> {
-    if ctx.accounts.user_position.authority != *ctx.accounts.signer.key {
-        return Err(TriadProtocolError::InvalidAccount.into());
-    }
-
+pub fn close_position(ctx: Context<ClosePosition>, args: ClosePositionArgs) -> Result<()> {
     let user_position_cloned = ctx.accounts.user_position.clone();
 
     let current_pubkey_position = user_position_cloned.positions[args.position_index as usize];
@@ -62,41 +54,46 @@ pub fn close_position<'info>(
 
     let new_amount = current_pubkey_position.amount + pnl;
 
-    let amount_sub_fee = new_amount - (new_amount * 5 / 1000);
+    let seeds: &[&[&[u8]]] = &[&[
+        b"vault",
+        ctx.accounts.vault.ticker_address.as_ref(),
+        &[ctx.accounts.vault.bump],
+    ]];
 
-    let transfer = ctx.token_transfer(amount_sub_fee);
+    let transfer = token::transfer(
+        CpiContext::new_with_signer(
+            ctx.accounts.token_program.to_account_info(),
+            Transfer {
+                from: ctx.accounts.vault_token_account.to_account_info(),
+                to: ctx.accounts.user_token_account.to_account_info(),
+                authority: ctx.accounts.vault.to_account_info(),
+            },
+            seeds,
+        ),
+        new_amount - (new_amount * 5 / 1000),
+    );
 
     if transfer.is_err() {
         return Err(TriadProtocolError::InvalidWithdrawAmount.into());
     }
 
-    let vault: &mut Account<'info, Vault> = &mut ctx.accounts.vault;
+    let vault = &mut ctx.accounts.vault;
 
     if current_pubkey_position.is_long {
-        vault.long_balance = vault
-            .long_balance
-            .saturating_sub(current_pubkey_position.amount);
-        vault.long_positions_opened = vault.long_positions_opened.saturating_sub(1);
+        vault.long_balance -= current_pubkey_position.amount;
+        vault.long_positions_opened -= 1;
     } else {
-        vault.short_balance = vault
-            .short_balance
-            .saturating_sub(current_pubkey_position.amount);
-        vault.short_positions_opened = vault.short_positions_opened.saturating_sub(1);
+        vault.short_balance -= current_pubkey_position.amount;
+        vault.short_positions_opened -= 1;
     }
 
     let user_position = &mut ctx.accounts.user_position;
 
-    vault.total_withdrawn = vault
-        .total_withdrawn
-        .saturating_add(current_pubkey_position.amount);
-    vault.net_withdraws = vault.net_withdraws.saturating_add(1);
+    vault.total_withdrawn += current_pubkey_position.amount;
+    vault.net_withdraws += 1;
 
-    user_position.total_withdrawn = user_position
-        .total_withdrawn
-        .saturating_add(current_pubkey_position.amount);
-    user_position.lp_share = user_position
-        .lp_share
-        .saturating_sub(current_pubkey_position.amount);
+    user_position.total_withdrawn += current_pubkey_position.amount;
+    user_position.lp_share -= current_pubkey_position.amount;
 
     user_position.positions[args.position_index as usize] = Position {
         amount: 0,
@@ -118,25 +115,4 @@ pub fn close_position<'info>(
     });
 
     Ok(())
-}
-
-impl<'info> TokenTransferCPI for Context<'_, '_, '_, 'info, ClosePosition<'info>> {
-    fn token_transfer(&self, amount: u64) -> Result<()> {
-        let ticker_key = self.accounts.vault.ticker_address.as_ref();
-        let bump_bytes = &[self.accounts.vault.bump];
-
-        let seeds: &[&[&[u8]]] = &[&[b"vault", ticker_key, bump_bytes]];
-
-        let cpi_accounts = Transfer {
-            from: self.accounts.vault_token_account.to_account_info().clone(),
-            to: self.accounts.user_token_account.to_account_info().clone(),
-            authority: self.accounts.vault.to_account_info().clone(),
-        };
-        let token_program = self.accounts.token_program.to_account_info().clone();
-        let cpi_context = CpiContext::new_with_signer(token_program, cpi_accounts, seeds);
-
-        token::transfer(cpi_context, amount)?;
-
-        Ok(())
-    }
 }

@@ -1,9 +1,7 @@
 use crate::{
-    constants::ADMIN,
     constraints::is_authority_for_ticker,
-    errors::TriadProtocolError,
+    events::TickerPriceUpdateRecord,
     state::{Ticker, UpdateTickerPriceArgs},
-    TickerPriceUpdateRecord,
 };
 
 use anchor_lang::prelude::*;
@@ -24,10 +22,6 @@ pub fn update_ticker_price(
     ctx: Context<UpdateTickerPrice>,
     args: UpdateTickerPriceArgs,
 ) -> Result<()> {
-    if ctx.accounts.signer.key.to_string() != ADMIN {
-        return Err(TriadProtocolError::Unauthorized.into());
-    }
-
     let ticker = &mut ctx.accounts.ticker;
 
     ticker.updated_ts = Clock::get()?.unix_timestamp;

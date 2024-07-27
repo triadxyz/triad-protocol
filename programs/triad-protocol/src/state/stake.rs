@@ -16,6 +16,22 @@ pub struct Stake {
 }
 
 #[account]
+pub struct StakeV2 {
+    pub bump: u8,
+    pub authority: Pubkey,
+    pub init_ts: i64,
+    pub withdraw_ts: i64,
+    pub claimed_ts: i64,
+    pub name: String,
+    pub mint: Pubkey,
+    pub boost: bool,
+    pub stake_vault: Pubkey,
+    pub claimed: u64,
+    pub available: u64,
+    pub amount: u64,
+}
+
+#[account]
 pub struct NFTRewards {
     pub stake: Pubkey,
     pub daily_rewards: [u64; 30],
@@ -31,15 +47,17 @@ pub struct StakeVault {
     pub end_ts: i64,
     pub amount: u64,
     pub amount_paid: u64,
-    pub apr: u8,
-    pub amount_users: u64,
+    pub token_decimals: u8,
+    pub nft_staked: u64,
     pub slots: u64,
     pub is_locked: bool,
     pub name: String,
     pub collection: String,
-    pub users_paid: Pubkey,
+    pub token_mint: Pubkey,
     pub week: u8,
-    pub padding: [u8; 56],
+    pub token_staked: u64,
+    pub sum_all_users: f64,
+    pub padding: [u8; 32],
 }
 
 #[derive(Clone, AnchorSerialize, AnchorDeserialize)]
@@ -61,11 +79,22 @@ pub enum Collection {
 }
 
 #[derive(AnchorSerialize, AnchorDeserialize, Clone)]
+pub struct MigrateStakeArgs {
+    pub name: String,
+    pub stake_vault: String,
+}
+
+#[derive(AnchorSerialize, AnchorDeserialize, Clone)]
 pub struct StakeNFTArgs {
     pub name: String,
-    pub rarity: Rarity,
     pub stake_vault: String,
-    pub collections: Vec<Collection>,
+}
+
+#[derive(AnchorSerialize, AnchorDeserialize, Clone)]
+pub struct StakeTokenArgs {
+    pub stake_vault: String,
+    pub name: String,
+    pub amount: u64,
 }
 
 #[derive(AnchorSerialize, AnchorDeserialize, Clone)]
@@ -89,20 +118,9 @@ pub struct WithdrawNFTArgs {
 }
 
 #[derive(AnchorSerialize, AnchorDeserialize, Clone)]
-pub struct RequestWithdrawNFTArgs {
-    pub stake_vault: String,
-    pub nft_name: String,
-}
-
-#[derive(AnchorSerialize, AnchorDeserialize, Clone)]
 pub struct DepositStakeRewardsArgs {
     pub amount: u64,
     pub stake_vault: String,
-}
-
-#[derive(AnchorSerialize, AnchorDeserialize, Clone)]
-pub struct ClaimStakeRewardsArgs {
-    pub week: u8,
 }
 
 #[derive(AnchorSerialize, AnchorDeserialize, Clone)]
@@ -126,6 +144,12 @@ impl StakeVault {
 
 impl NFTRewards {
     pub const PREFIX_SEED: &'static [u8] = b"nft_rewards";
+
+    pub const SPACE: usize = 8 + std::mem::size_of::<Self>();
+}
+
+impl StakeV2 {
+    pub const PREFIX_SEED: &'static [u8] = b"stake";
 
     pub const SPACE: usize = 8 + std::mem::size_of::<Self>();
 }

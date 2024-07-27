@@ -1,5 +1,6 @@
 use crate::{
-    constants::ADMIN, errors::TriadProtocolError, state::UpdateStakeVaultStatusArgs, StakeVault,
+    constants::ADMIN, constraints::is_admin, errors::TriadProtocolError,
+    state::UpdateStakeVaultStatusArgs, StakeVault,
 };
 use anchor_lang::prelude::*;
 
@@ -9,7 +10,7 @@ pub struct UpdateStakeVaultStatus<'info> {
     #[account(mut)]
     pub signer: Signer<'info>,
 
-    #[account(mut)]
+    #[account(mut, constraint = is_admin(&signer)?)]
     pub stake_vault: Box<Account<'info, StakeVault>>,
 
     pub system_program: Program<'info, System>,

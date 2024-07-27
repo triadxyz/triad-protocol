@@ -2,7 +2,7 @@ use std::str::FromStr;
 use crate::{
     constants::{MYSTERY_BOX_PROGRAM, TRIAD_MYSTERY_BOX},
     errors::TriadProtocolError,
-    state::{Stake, StakeNFTArgs, StakeVault},
+    state::{StakeNFTArgs, StakeVault}, StakeV2,
 };
 use anchor_lang::prelude::*;
 use anchor_spl::token_2022::spl_token_2022::extension::BaseStateWithExtensions;
@@ -25,8 +25,8 @@ pub struct StakeNFT<'info> {
     #[account(mut, seeds = [StakeVault::PREFIX_SEED, args.stake_vault.as_bytes()], bump)]
     pub stake_vault: Box<Account<'info, StakeVault>>,
 
-    #[account(init_if_needed, payer = signer, space = Stake::SPACE, seeds = [Stake::PREFIX_SEED, args.name.as_ref()], bump)]
-    pub stake: Box<Account<'info, Stake>>,
+    #[account(init_if_needed, payer = signer, space = StakeV2::SPACE, seeds = [StakeV2::PREFIX_SEED, signer.to_account_info().key().as_ref(), args.name.as_bytes()], bump)]
+    pub stake: Box<Account<'info, StakeV2>>,
 
     #[account(
         mut,
@@ -41,7 +41,7 @@ pub struct StakeNFT<'info> {
     pub from_ata: Box<InterfaceAccount<'info, TokenAccount>>,
 
     #[account(
-        init,
+        init_if_needed,
         payer = signer,
         associated_token::mint = mint,
         associated_token::authority = stake_vault,
@@ -75,37 +75,31 @@ pub fn stake_nft(ctx: Context<StakeNFT>, args: StakeNFTArgs) -> Result<()> {
     let stake = &mut ctx.accounts.stake;
     let stake_vault = &mut ctx.accounts.stake_vault;
 
-    if stake_vault.amount_users > stake_vault.slots {
-        return Err(TriadProtocolError::StakeVaultFull.into());
-    }
-
     if stake_vault.is_locked {
         return Err(TriadProtocolError::StakeVaultLocked.into());
     }
 
+    stake.bump = ctx.bumps.stake;
     stake.authority = *ctx.accounts.signer.key;
     stake.init_ts = Clock::get()?.unix_timestamp;
     stake.withdraw_ts = 0;
-    stake.is_locked = true;
-    stake.collections = args.collections;
-    stake.bump = ctx.bumps.stake;
-    stake.rarity = args.rarity;
+    stake.claimed_ts = 0;
+    stake.name = args.name;
     stake.mint = *mint.key;
-    stake.name = token_metadata.name;
+    stake.boost = false;
     stake.stake_vault = stake_vault.key();
+    stake.claimed = 0;
+    stake.available = 0;
+    stake.amount = 1;
 
-    stake_vault.amount_users += 1;
+    stake_vault.nft_staked += 1;
 
-    let cpi_accounts = TransferChecked {
+    transfer_checked(CpiContext::new(ctx.accounts.token_program.to_account_info(), TransferChecked {
         from: ctx.accounts.from_ata.to_account_info(),
         mint: ctx.accounts.mint.to_account_info(),
         to: ctx.accounts.to_ata.to_account_info(),
         authority: ctx.accounts.signer.to_account_info(),
-    };
-    let cpi_program = ctx.accounts.token_program.to_account_info();
-    let cpi_context = CpiContext::new(cpi_program, cpi_accounts);
-
-    transfer_checked(cpi_context, 1, ctx.accounts.mint.decimals)?;
+    }), 1, ctx.accounts.mint.decimals)?;
 
     Ok(())
 }

@@ -7,11 +7,7 @@ import {
   VersionedTransaction
 } from '@solana/web3.js'
 import { TriadProtocol } from './types/triad_protocol'
-import {
-  getTickerAddressSync,
-  getTokenVaultAddressSync,
-  getVaultAddressSync
-} from './utils/helpers'
+import { getTickerAddressSync } from './utils/helpers'
 import { BN } from 'bn.js'
 
 export default class Ticker {

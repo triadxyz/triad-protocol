@@ -13,8 +13,8 @@ export type TriadProtocol = {
   }
   instructions: [
     {
-      name: 'claimStakeRewards'
-      discriminator: [107, 91, 233, 196, 211, 47, 218, 21]
+      name: 'claimStake'
+      discriminator: [62, 145, 133, 242, 244, 59, 53, 139]
       accounts: [
         {
           name: 'signer'
@@ -27,10 +27,6 @@ export type TriadProtocol = {
         },
         {
           name: 'stake'
-          writable: true
-        },
-        {
-          name: 'nftRewards'
           writable: true
         },
         {
@@ -58,16 +54,7 @@ export type TriadProtocol = {
           address: '11111111111111111111111111111111'
         }
       ]
-      args: [
-        {
-          name: 'args'
-          type: {
-            defined: {
-              name: 'claimStakeRewardsArgs'
-            }
-          }
-        }
-      ]
+      args: []
     },
     {
       name: 'closePosition'
@@ -213,6 +200,51 @@ export type TriadProtocol = {
           type: {
             defined: {
               name: 'createTickerArgs'
+            }
+          }
+        }
+      ]
+    },
+    {
+      name: 'createUser'
+      discriminator: [108, 227, 130, 130, 252, 109, 75, 218]
+      accounts: [
+        {
+          name: 'signer'
+          writable: true
+          signer: true
+        },
+        {
+          name: 'referral'
+          writable: true
+        },
+        {
+          name: 'user'
+          writable: true
+          pda: {
+            seeds: [
+              {
+                kind: 'const'
+                value: [117, 115, 101, 114]
+              },
+              {
+                kind: 'arg'
+                path: 'args.name'
+              }
+            ]
+          }
+        },
+        {
+          name: 'systemProgram'
+          address: '11111111111111111111111111111111'
+        }
+      ]
+      args: [
+        {
+          name: 'args'
+          type: {
+            defined: {
+              name: 'createUserArgs'
             }
           }
         }
@@ -379,17 +411,70 @@ export type TriadProtocol = {
       ]
     },
     {
-      name: 'jupiterSwap'
-      discriminator: [116, 207, 0, 196, 252, 120, 243, 18]
+      name: 'migrateStake'
+      discriminator: [178, 5, 26, 85, 56, 20, 153, 160]
       accounts: [
         {
-          name: 'userAccount'
+          name: 'signer'
           writable: true
           signer: true
         },
         {
-          name: 'jupiterProgram'
-          address: 'JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4'
+          name: 'stakeVault'
+          writable: true
+          pda: {
+            seeds: [
+              {
+                kind: 'const'
+                value: [115, 116, 97, 107, 101, 95, 118, 97, 117, 108, 116]
+              },
+              {
+                kind: 'arg'
+                path: 'args.stake_vault'
+              }
+            ]
+          }
+        },
+        {
+          name: 'stakeV1'
+          writable: true
+        },
+        {
+          name: 'stakeV2'
+          writable: true
+          pda: {
+            seeds: [
+              {
+                kind: 'const'
+                value: [115, 116, 97, 107, 101]
+              },
+              {
+                kind: 'account'
+                path: 'stake_v1.authority'
+                account: 'stake'
+              },
+              {
+                kind: 'arg'
+                path: 'args.name'
+              }
+            ]
+          }
+        },
+        {
+          name: 'mint'
+          writable: true
+        },
+        {
+          name: 'nftRewards'
+          writable: true
+        },
+        {
+          name: 'tokenProgram'
+          address: 'TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb'
+        },
+        {
+          name: 'associatedTokenProgram'
+          address: 'ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL'
         },
         {
           name: 'systemProgram'
@@ -398,8 +483,12 @@ export type TriadProtocol = {
       ]
       args: [
         {
-          name: 'data'
-          type: 'bytes'
+          name: 'args'
+          type: {
+            defined: {
+              name: 'migrateStakeArgs'
+            }
+          }
         }
       ]
     },
@@ -485,8 +574,8 @@ export type TriadProtocol = {
       ]
     },
     {
-      name: 'requestWithdrawNft'
-      discriminator: [132, 52, 242, 121, 178, 147, 240, 223]
+      name: 'requestWithdrawStake'
+      discriminator: [175, 9, 77, 31, 145, 136, 30, 207]
       accounts: [
         {
           name: 'signer'
@@ -496,34 +585,10 @@ export type TriadProtocol = {
         {
           name: 'stakeVault'
           writable: true
-          pda: {
-            seeds: [
-              {
-                kind: 'const'
-                value: [115, 116, 97, 107, 101, 95, 118, 97, 117, 108, 116]
-              },
-              {
-                kind: 'arg'
-                path: 'args.stake_vault'
-              }
-            ]
-          }
         },
         {
           name: 'stake'
           writable: true
-          pda: {
-            seeds: [
-              {
-                kind: 'const'
-                value: [115, 116, 97, 107, 101]
-              },
-              {
-                kind: 'arg'
-                path: 'args.nft_name'
-              }
-            ]
-          }
         },
         {
           name: 'mint'
@@ -534,28 +599,15 @@ export type TriadProtocol = {
           address: 'TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb'
         },
         {
-          name: 'associatedTokenProgram'
-          address: 'ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL'
-        },
-        {
           name: 'systemProgram'
           address: '11111111111111111111111111111111'
         }
       ]
-      args: [
-        {
-          name: 'args'
-          type: {
-            defined: {
-              name: 'requestWithdrawNftArgs'
-            }
-          }
-        }
-      ]
+      args: []
     },
     {
-      name: 'stake'
-      discriminator: [206, 176, 202, 18, 200, 209, 179, 108]
+      name: 'stakeNft'
+      discriminator: [38, 27, 66, 46, 69, 65, 151, 219]
       accounts: [
         {
           name: 'signer'
@@ -586,6 +638,10 @@ export type TriadProtocol = {
               {
                 kind: 'const'
                 value: [115, 116, 97, 107, 101]
+              },
+              {
+                kind: 'account'
+                path: 'signer'
               },
               {
                 kind: 'arg'
@@ -631,8 +687,8 @@ export type TriadProtocol = {
       ]
     },
     {
-      name: 'updateStakeRewards'
-      discriminator: [39, 82, 38, 43, 234, 67, 69, 94]
+      name: 'stakeToken'
+      discriminator: [191, 127, 193, 101, 37, 96, 87, 211]
       accounts: [
         {
           name: 'signer'
@@ -640,24 +696,60 @@ export type TriadProtocol = {
           signer: true
         },
         {
-          name: 'stake'
-          writable: true
-        },
-        {
-          name: 'nftRewards'
+          name: 'stakeVault'
           writable: true
           pda: {
             seeds: [
               {
                 kind: 'const'
-                value: [110, 102, 116, 95, 114, 101, 119, 97, 114, 100, 115]
+                value: [115, 116, 97, 107, 101, 95, 118, 97, 117, 108, 116]
               },
               {
-                kind: 'account'
-                path: 'stake'
+                kind: 'arg'
+                path: 'args.stake_vault'
               }
             ]
           }
+        },
+        {
+          name: 'stake'
+          writable: true
+          pda: {
+            seeds: [
+              {
+                kind: 'const'
+                value: [115, 116, 97, 107, 101]
+              },
+              {
+                kind: 'account'
+                path: 'signer'
+              },
+              {
+                kind: 'arg'
+                path: 'args.name'
+              }
+            ]
+          }
+        },
+        {
+          name: 'mint'
+          writable: true
+        },
+        {
+          name: 'fromAta'
+          writable: true
+        },
+        {
+          name: 'toAta'
+          writable: true
+        },
+        {
+          name: 'tokenProgram'
+          address: 'TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb'
+        },
+        {
+          name: 'associatedTokenProgram'
+          address: 'ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL'
         },
         {
           name: 'systemProgram'
@@ -669,7 +761,7 @@ export type TriadProtocol = {
           name: 'args'
           type: {
             defined: {
-              name: 'updateStakeRewardsArgs'
+              name: 'stakeTokenArgs'
             }
           }
         }
@@ -734,8 +826,8 @@ export type TriadProtocol = {
       ]
     },
     {
-      name: 'withdrawNft'
-      discriminator: [142, 181, 191, 149, 82, 175, 216, 100]
+      name: 'withdrawStake'
+      discriminator: [153, 8, 22, 138, 105, 176, 87, 66]
       accounts: [
         {
           name: 'signer'
@@ -745,41 +837,13 @@ export type TriadProtocol = {
         {
           name: 'stakeVault'
           writable: true
-          pda: {
-            seeds: [
-              {
-                kind: 'const'
-                value: [115, 116, 97, 107, 101, 95, 118, 97, 117, 108, 116]
-              },
-              {
-                kind: 'arg'
-                path: 'args.stake_vault'
-              }
-            ]
-          }
         },
         {
           name: 'stake'
           writable: true
-          pda: {
-            seeds: [
-              {
-                kind: 'const'
-                value: [115, 116, 97, 107, 101]
-              },
-              {
-                kind: 'arg'
-                path: 'args.nft_name'
-              }
-            ]
-          }
         },
         {
           name: 'admin'
-          writable: true
-        },
-        {
-          name: 'nftRewards'
           writable: true
         },
         {
@@ -807,16 +871,7 @@ export type TriadProtocol = {
           address: '11111111111111111111111111111111'
         }
       ]
-      args: [
-        {
-          name: 'args'
-          type: {
-            defined: {
-              name: 'withdrawNftArgs'
-            }
-          }
-        }
-      ]
+      args: []
     }
   ]
   accounts: [
@@ -829,12 +884,20 @@ export type TriadProtocol = {
       discriminator: [150, 197, 176, 29, 55, 132, 112, 149]
     },
     {
+      name: 'stakeV2'
+      discriminator: [207, 98, 130, 13, 118, 181, 238, 47]
+    },
+    {
       name: 'stakeVault'
       discriminator: [192, 112, 65, 125, 129, 151, 173, 226]
     },
     {
       name: 'ticker'
       discriminator: [214, 74, 184, 188, 214, 64, 251, 53]
+    },
+    {
+      name: 'user'
+      discriminator: [159, 117, 95, 227, 239, 151, 58, 236]
     },
     {
       name: 'userPosition'
@@ -878,17 +941,17 @@ export type TriadProtocol = {
     {
       code: 6003
       name: 'invalidOwnerAuthority'
-      msg: 'Invalid Owner authority'
+      msg: 'Invalid owner authority'
     },
     {
       code: 6004
       name: 'invalidPosition'
-      msg: 'Invalid Position'
+      msg: 'Invalid position'
     },
     {
       code: 6005
       name: 'invalidTickerPosition'
-      msg: 'Invalid Ticker position'
+      msg: 'Invalid ticker position'
     },
     {
       code: 6006
@@ -898,42 +961,42 @@ export type TriadProtocol = {
     {
       code: 6007
       name: 'invalidMintAddress'
-      msg: 'Invalid Mint address'
+      msg: 'Invalid mint address'
     },
     {
       code: 6008
       name: 'invalidProfitShare'
-      msg: 'Invalid Profit Share'
+      msg: 'Invalid profit share'
     },
     {
       code: 6009
       name: 'invalidDepositAmount'
-      msg: 'Invalid Deposit Amount'
+      msg: 'Invalid deposit amount'
     },
     {
       code: 6010
       name: 'invalidWithdrawAmount'
-      msg: 'Invalid Withdraw Amount'
+      msg: 'Invalid withdraw amount'
     },
     {
       code: 6011
       name: 'invalidStakeVault'
-      msg: 'Invalid Stake Vault'
+      msg: 'Invalid stake vault'
     },
     {
       code: 6012
       name: 'invalidStakeVaultAuthority'
-      msg: 'Invalid Stake Vault Authority'
+      msg: 'Invalid stake vault authority'
     },
     {
       code: 6013
       name: 'invalidStakeVaultAmount'
-      msg: 'Invalid Stake Vault Amount'
+      msg: 'Invalid stake vault amount'
     },
     {
       code: 6014
       name: 'stakeVaultLocked'
-      msg: 'Stake Vault Available'
+      msg: 'Stake vault locked'
     },
     {
       code: 6015
@@ -943,32 +1006,25 @@ export type TriadProtocol = {
     {
       code: 6016
       name: 'stakeVaultFull'
-      msg: 'Stake Vault Full'
+      msg: 'Stake vault full'
     },
     {
       code: 6017
       name: 'invalidMint'
-      msg: 'Invalid Mint'
+      msg: 'Invalid mint'
     },
     {
       code: 6018
       name: 'invalidStakeVaultWeek'
-      msg: 'Invalid Stake Vault Week'
+      msg: 'Invalid stake vault week'
+    },
+    {
+      code: 6019
+      name: 'rewardsAlreadyClaimed'
+      msg: 'Rewards already claimed'
     }
   ]
   types: [
-    {
-      name: 'claimStakeRewardsArgs'
-      type: {
-        kind: 'struct'
-        fields: [
-          {
-            name: 'week'
-            type: 'u8'
-          }
-        ]
-      }
-    },
     {
       name: 'closePositionArgs'
       type: {
@@ -1054,6 +1110,22 @@ export type TriadProtocol = {
       }
     },
     {
+      name: 'createUserArgs'
+      type: {
+        kind: 'struct'
+        fields: [
+          {
+            name: 'name'
+            type: 'string'
+          },
+          {
+            name: 'referral'
+            type: 'pubkey'
+          }
+        ]
+      }
+    },
+    {
       name: 'depositStakeRewardsArgs'
       type: {
         kind: 'struct'
@@ -1089,6 +1161,22 @@ export type TriadProtocol = {
           {
             name: 'amount'
             type: 'u64'
+          }
+        ]
+      }
+    },
+    {
+      name: 'migrateStakeArgs'
+      type: {
+        kind: 'struct'
+        fields: [
+          {
+            name: 'name'
+            type: 'string'
+          },
+          {
+            name: 'stakeVault'
+            type: 'string'
           }
         ]
       }
@@ -1228,22 +1316,6 @@ export type TriadProtocol = {
       }
     },
     {
-      name: 'requestWithdrawNftArgs'
-      type: {
-        kind: 'struct'
-        fields: [
-          {
-            name: 'stakeVault'
-            type: 'string'
-          },
-          {
-            name: 'nftName'
-            type: 'string'
-          }
-        ]
-      }
-    },
-    {
       name: 'stake'
       type: {
         kind: 'struct'
@@ -1315,26 +1387,84 @@ export type TriadProtocol = {
             type: 'string'
           },
           {
-            name: 'rarity'
-            type: {
-              defined: {
-                name: 'rarity'
-              }
-            }
-          },
+            name: 'stakeVault'
+            type: 'string'
+          }
+        ]
+      }
+    },
+    {
+      name: 'stakeTokenArgs'
+      type: {
+        kind: 'struct'
+        fields: [
           {
             name: 'stakeVault'
             type: 'string'
           },
           {
-            name: 'collections'
-            type: {
-              vec: {
-                defined: {
-                  name: 'collection'
-                }
-              }
-            }
+            name: 'name'
+            type: 'string'
+          },
+          {
+            name: 'amount'
+            type: 'u64'
+          }
+        ]
+      }
+    },
+    {
+      name: 'stakeV2'
+      type: {
+        kind: 'struct'
+        fields: [
+          {
+            name: 'bump'
+            type: 'u8'
+          },
+          {
+            name: 'authority'
+            type: 'pubkey'
+          },
+          {
+            name: 'initTs'
+            type: 'i64'
+          },
+          {
+            name: 'withdrawTs'
+            type: 'i64'
+          },
+          {
+            name: 'claimedTs'
+            type: 'i64'
+          },
+          {
+            name: 'name'
+            type: 'string'
+          },
+          {
+            name: 'mint'
+            type: 'pubkey'
+          },
+          {
+            name: 'boost'
+            type: 'bool'
+          },
+          {
+            name: 'stakeVault'
+            type: 'pubkey'
+          },
+          {
+            name: 'claimed'
+            type: 'u64'
+          },
+          {
+            name: 'available'
+            type: 'u64'
+          },
+          {
+            name: 'amount'
+            type: 'u64'
           }
         ]
       }
@@ -1369,11 +1499,11 @@ export type TriadProtocol = {
             type: 'u64'
           },
           {
-            name: 'apr'
+            name: 'tokenDecimals'
             type: 'u8'
           },
           {
-            name: 'amountUsers'
+            name: 'nftStaked'
             type: 'u64'
           },
           {
@@ -1393,7 +1523,7 @@ export type TriadProtocol = {
             type: 'string'
           },
           {
-            name: 'usersPaid'
+            name: 'tokenMint'
             type: 'pubkey'
           },
           {
@@ -1401,9 +1531,17 @@ export type TriadProtocol = {
             type: 'u8'
           },
           {
+            name: 'tokenStaked'
+            type: 'u64'
+          },
+          {
+            name: 'sumAllUsers'
+            type: 'f64'
+          },
+          {
             name: 'padding'
             type: {
-              array: ['u8', 56]
+              array: ['u8', 32]
             }
           }
         ]
@@ -1416,44 +1554,34 @@ export type TriadProtocol = {
         fields: [
           {
             name: 'initTs'
-            docs: ['timestamp of the creation of the ticker']
             type: 'i64'
           },
           {
             name: 'updatedTs'
-            docs: ['timestamp of the last update of the ticker']
             type: 'i64'
           },
           {
             name: 'bump'
-            docs: ['The bump for the ticker pda']
             type: 'u8'
           },
           {
             name: 'authority'
-            docs: ['authority for the ticker']
             type: 'pubkey'
           },
           {
             name: 'name'
-            docs: ['name of the ticekt']
             type: 'string'
           },
           {
             name: 'protocolProgramId'
-            docs: [
-              'protocol program id like dRiftyHA39MWEi3m9aunc5MzRF1JYuBsbn6VPcn33UH to get data info'
-            ]
             type: 'pubkey'
           },
           {
             name: 'price'
-            docs: ['ticker price']
             type: 'u64'
           },
           {
             name: 'vault'
-            docs: ['Vault PDA']
             type: 'pubkey'
           }
         ]
@@ -1475,26 +1603,6 @@ export type TriadProtocol = {
           {
             name: 'ticker'
             type: 'pubkey'
-          }
-        ]
-      }
-    },
-    {
-      name: 'updateStakeRewardsArgs'
-      type: {
-        kind: 'struct'
-        fields: [
-          {
-            name: 'day'
-            type: 'u8'
-          },
-          {
-            name: 'rewards'
-            type: 'u64'
-          },
-          {
-            name: 'apr'
-            type: 'f32'
           }
         ]
       }
@@ -1528,53 +1636,76 @@ export type TriadProtocol = {
       }
     },
     {
+      name: 'user'
+      type: {
+        kind: 'struct'
+        fields: [
+          {
+            name: 'ts'
+            type: 'i64'
+          },
+          {
+            name: 'authority'
+            type: 'pubkey'
+          },
+          {
+            name: 'bump'
+            type: 'u8'
+          },
+          {
+            name: 'referral'
+            type: 'pubkey'
+          },
+          {
+            name: 'referred'
+            type: 'i64'
+          },
+          {
+            name: 'name'
+            type: 'string'
+          }
+        ]
+      }
+    },
+    {
       name: 'userPosition'
       type: {
         kind: 'struct'
         fields: [
           {
             name: 'ts'
-            docs: ['timestamp']
             type: 'i64'
           },
           {
             name: 'bump'
-            docs: ['bump seed']
             type: 'u8'
           },
           {
             name: 'totalDeposited'
-            docs: ['total deposited']
             type: 'u64'
           },
           {
             name: 'totalWithdrawn'
-            docs: ['total withdrawn']
             type: 'u64'
           },
           {
             name: 'lpShare'
-            docs: ['total liquidity provided']
             type: 'u64'
           },
           {
             name: 'totalPositions'
-            docs: ['total positions']
             type: 'u16'
           },
           {
             name: 'ticker'
-            docs: ['ticker account']
             type: 'pubkey'
           },
           {
             name: 'authority'
-            docs: ["user's authority"]
             type: 'pubkey'
           },
           {
             name: 'positions'
-            docs: ["user's position"]
             type: {
               array: [
                 {
@@ -1596,89 +1727,59 @@ export type TriadProtocol = {
         fields: [
           {
             name: 'bump'
-            docs: ['The bump for the vault pda']
             type: 'u8'
           },
           {
             name: 'authority'
-            docs: ['authority for the vault']
             type: 'pubkey'
           },
           {
             name: 'name'
-            docs: ['name of the vault']
             type: 'string'
           },
           {
             name: 'tokenAccount'
-            docs: ['token account for the vault e.g. tDRIFT']
             type: 'pubkey'
           },
           {
             name: 'tickerAddress'
-            docs: ['ticker address']
             type: 'pubkey'
           },
           {
             name: 'totalDeposited'
-            docs: ['lifetime total deposited']
             type: 'u64'
           },
           {
             name: 'totalWithdrawn'
-            docs: ['lifetime total withdrawn']
             type: 'u64'
           },
           {
             name: 'initTs'
-            docs: ['timestamp vault initialized']
             type: 'i64'
           },
           {
             name: 'netDeposits'
-            docs: ['lifetime net deposits']
             type: 'u128'
           },
           {
             name: 'netWithdraws'
-            docs: ['lifetime net withdraws']
             type: 'u128'
           },
           {
             name: 'longBalance'
-            docs: ['Long bet balance']
             type: 'u64'
           },
           {
             name: 'shortBalance'
-            docs: ['Short bet balance']
             type: 'u64'
           },
           {
             name: 'longPositionsOpened'
-            docs: ['Opened long positions']
             type: 'u64'
           },
           {
             name: 'shortPositionsOpened'
-            docs: ['Opened short positions']
             type: 'u64'
-          }
-        ]
-      }
-    },
-    {
-      name: 'withdrawNftArgs'
-      type: {
-        kind: 'struct'
-        fields: [
-          {
-            name: 'stakeVault'
-            type: 'string'
-          },
-          {
-            name: 'nftName'
-            type: 'string'
           }
         ]
       }
