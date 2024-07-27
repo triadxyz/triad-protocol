@@ -3,19 +3,11 @@ import BN from 'bn.js'
 
 export type Collection = 'alligators' | 'coleta' | 'undead' | 'pyth'
 
-export type StakeNftArgsV1 = {
+export type StakeNftArgs = {
   name: string
   wallet: PublicKey
   stakeVault: string
   mint: PublicKey
-  collections: Record<Collection, boolean>
-  rarity:
-    | { common: {} }
-    | { uncommon: {} }
-    | { rare: {} }
-    | { epic: {} }
-    | { legendary: {} }
-    | { mythic: {} }
 }
 
 export type MigrateStakeArgs = {
@@ -70,16 +62,9 @@ export type UpdateStakeVaultStatusArgs = {
 
 export type ClaimStakeRewardsArgs = {
   wallet: PublicKey
-  week: number[]
   mint: PublicKey
   stakeVault: string
   nftName: string
-}
-
-export type CreateUserArgs = {
-  wallet: PublicKey
-  name: string
-  referral: string
 }
 
 export type UpdateStakeRewardsArgs = {

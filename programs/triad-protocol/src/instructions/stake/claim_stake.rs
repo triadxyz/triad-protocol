@@ -1,9 +1,7 @@
-use crate::constraints::is_admin;
-use crate::errors::TriadProtocolError;
 use crate::StakeV2;
 use crate::{
     constraints::{is_authority_for_stake, is_ttriad_mint},
-    state::{ClaimStakeRewardsArgs, StakeVault},
+    state::StakeVault,
 };
 use anchor_lang::prelude::*;
 use anchor_spl::token_2022::Token2022;
@@ -13,8 +11,7 @@ use anchor_spl::{
 };
 
 #[derive(Accounts)]
-#[instruction(args: ClaimStakeRewardsArgs)]
-pub struct ClaimStakeRewards<'info> {
+pub struct ClaimStake<'info> {
     #[account(mut)]
     pub signer: Signer<'info>,
 
@@ -44,11 +41,7 @@ pub struct ClaimStakeRewards<'info> {
     pub system_program: Program<'info, System>,
 }
 
-pub fn claim_stake_rewards(ctx: Context<ClaimStakeRewards>) -> Result<()> {
-    if !is_admin(&ctx.accounts.signer)? {
-        return Err(TriadProtocolError::Unauthorized.into());
-    }
-
+pub fn claim_stake(ctx: Context<ClaimStake>) -> Result<()> {
     let stake_vault = &mut ctx.accounts.stake_vault;
     let stake = &mut ctx.accounts.stake;
 

@@ -4,25 +4,22 @@ import { TriadProtocol } from './types/triad_protocol'
 import {
   formatStake,
   formatStakeVault,
-  formatUser,
   getATASync,
   getNFTRewardsAddressSync,
   getStakeAddressSync,
   getStakeVaultAddressSync,
-  getStakeV1AddressSync,
-  getUserAddressSync
+  getStakeV1AddressSync
 } from './utils/helpers'
 import { RpcOptions } from './types'
 import {
   DepositStakeRewardsArgs,
   InitializeStakeArgs,
-  StakeNftArgsV1,
+  StakeNftArgs,
   RequestWithdrawArgs,
   WithdrawArgs,
   StakeResponse,
   UpdateStakeVaultStatusArgs,
   ClaimStakeRewardsArgs,
-  CreateUserArgs,
   StakeTokenArgs,
   MigrateStakeArgs
 } from './types/stake'
@@ -47,15 +44,6 @@ export default class Stake {
   }
 
   /**
-   * Get all Users
-   */
-  async getUsers() {
-    const response = await this.program.account.user.all()
-
-    return response.map((item) => formatUser(item.account))
-  }
-
-  /**
    * Get Stake Vault by name
    * @param stakeVault - Stake Vault name
    */
@@ -76,17 +64,26 @@ export default class Stake {
    *
    */
   async getStakes(stakeVault: string) {
+    const response1 = await this.program.account.stake.all()
     const response = await this.program.account.stakeV2.all()
     const StakeVault = getStakeVaultAddressSync(
       this.program.programId,
       stakeVault
     )
 
-    return response
+    const data = response
       .filter(
         (item) => item.account.stakeVault.toBase58() === StakeVault.toBase58()
       )
       .map((stake) => formatStake(stake.account))
+
+    const data1 = response1
+      .filter(
+        (item) => item.account.stakeVault.toBase58() === StakeVault.toBase58()
+      )
+      .map((stake) => formatStake(stake.account))
+
+    return [...data, ...data1]
   }
 
   /**
@@ -176,12 +173,10 @@ export default class Stake {
    *  @param name - NFT name
    *  @param wallet - User wallet
    *  @param mint - NFT mint
-   *  @param collections - NFT collections
-   *  @param rarity - NFT rarity
    *
    */
   public async stakeNft(
-    { name, wallet, mint, collections, rarity, stakeVault }: StakeNftArgsV1,
+    { name, wallet, mint, stakeVault }: StakeNftArgs,
     options?: RpcOptions
   ) {
     const StakeVault = getStakeVaultAddressSync(
@@ -193,17 +188,9 @@ export default class Stake {
 
     let items = []
 
-    Object.keys(collections).forEach((key) => {
-      if (collections[key]) {
-        items.push({ [key]: {} })
-      }
-    })
-
     const method = this.program.methods
       .stakeNft({
         name,
-        collections: items,
-        rarity,
         stakeVault
       })
       .accounts({
@@ -461,7 +448,6 @@ export default class Stake {
    *  Claim Stake Rewards
    *  @param wallet - User wallet
    *  @param mint - NFT mint
-   *  @param week - Week rewards
    *  @param stakeVault - Name of the stake vault
    *  @param nftName - Name of the nft
    *
@@ -478,7 +464,7 @@ export default class Stake {
     const ToATA = getATASync(wallet, mint)
     const FromAta = getATASync(StakeVault, mint)
 
-    const method = this.program.methods.claimStakeRewards().accounts({
+    const method = this.program.methods.claimStake().accounts({
       signer: wallet,
       fromAta: FromAta,
       toAta: ToATA,
@@ -486,39 +472,6 @@ export default class Stake {
       stake: Stake,
       stakeVault: StakeVault
     })
-
-    if (options?.microLamports) {
-      method.postInstructions([
-        ComputeBudgetProgram.setComputeUnitPrice({
-          microLamports: options.microLamports
-        })
-      ])
-    }
-
-    return method.rpc({ skipPreflight: options?.skipPreflight })
-  }
-
-  /**
-   *  Create User
-   *  @param wallet - User wallet
-   *  @param name - user name
-   *  @param referral - user referral
-   *
-   */
-  public async createUser(
-    { wallet, name, referral }: CreateUserArgs,
-    options?: RpcOptions
-  ) {
-    const referralPDA = getUserAddressSync(this.program.programId, referral)
-
-    const method = this.program.methods
-      .createUser({
-        name
-      })
-      .accounts({
-        signer: wallet,
-        referral: referralPDA
-      })
 
     if (options?.microLamports) {
       method.postInstructions([

@@ -13,6 +13,7 @@ pub struct User {
 #[derive(AnchorSerialize, AnchorDeserialize)]
 pub struct CreateUserArgs {
     pub name: String,
+    pub referral: Pubkey,
 }
 
 impl User {

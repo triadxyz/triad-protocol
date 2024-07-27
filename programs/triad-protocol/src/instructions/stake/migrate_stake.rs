@@ -54,7 +54,7 @@ pub fn migrate_stake(ctx: Context<MigrateStake>, _args: MigrateStakeArgs) -> Res
     stake_v2.bump = ctx.bumps.stake_v2;
     stake_v2.authority = stake_v1.authority;
     stake_v2.init_ts = Clock::get()?.unix_timestamp;
-    stake_v2.withdraw_ts = 0;
+    stake_v2.withdraw_ts = stake_v1.withdraw_ts;
     stake_v2.claimed_ts = 0;
     stake_v2.name = stake_v1.name.clone();
     stake_v2.boost = true;

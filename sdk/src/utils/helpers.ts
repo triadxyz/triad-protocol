@@ -181,11 +181,11 @@ export const formatStake = (stake: any): StakeResponse => {
     initTs: stake.initTs.toNumber(),
     withdrawTs: stake.withdrawTs.toNumber(),
     mint: stake.mint.toBase58(),
-    claimedTs: stake.claimedTs.toNumber(),
-    boost: stake.boost,
-    claimed: stake.claimed.toNumber(),
-    available: stake.available.toNumber(),
-    amount: stake.amount.toNumber()
+    claimedTs: stake?.claimedTs?.toNumber(),
+    boost: stake?.boost,
+    claimed: (stake?.claimed?.toNumber() || 0) / 10 ** 6,
+    available: (stake?.available?.toNumber() || 0) / 10 ** 6,
+    amount: stake?.amount?.toNumber() || 1
   }
 }
 

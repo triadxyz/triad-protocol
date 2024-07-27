@@ -76,14 +76,11 @@ const getStake = async () => {
   console.log(stakeVaults)
 }
 
-getStake()
-
 const claimStakeRewardsV1 = async () => {
   const response = await triadProtocol.stake.claimStakeRewards(
     {
       wallet: wallet.publicKey,
       mint: new PublicKey('t3DohmswhKk94PPbPYwA6ZKACyY3y5kbcqeQerAJjmV'),
-      week: [4],
       stakeVault: STAKE_SEASON,
       nftName: 'Triad 2807'
     },
@@ -102,13 +99,6 @@ const stake = async () => {
       name: 'Triad 0',
       wallet: wallet.publicKey,
       stakeVault: 'Rev 1',
-      rarity: { mythic: {} },
-      collections: {
-        coleta: false,
-        undead: false,
-        alligators: false,
-        pyth: false
-      },
       mint: new PublicKey('FXRhaGeYue7bMCwcksNw4hJRY7jZ1YMwgmCu1Y8fyUNd')
     },
     {
@@ -121,17 +111,25 @@ const stake = async () => {
 }
 
 const getUsers = async () => {
-  const response = await triadProtocol.stake.getUsers()
+  const response = await triadProtocol.getUsers()
 
   console.log(response)
 }
+
+const getReferral = async () => {
+  const response = await triadProtocol.hasReferral('a')
+
+  console.log(response)
+}
+
+getReferral()
 
 const migrateStake = async () => {
   const response = await triadProtocol.stake.migrateStake(
     {
       wallet: wallet.publicKey,
-      name: 'Triad 190',
-      mint: new PublicKey('7zEm9fzrRVAooEBWgCkt4gxvtsbpKRLaoPjB7SvCtvKM'),
+      name: 'Triad 2972',
+      mint: new PublicKey('9vnAPEnSj8EppTRUw6xuFSHLWvdMagKFzxoJujkUFHyg'),
       stakeVault: STAKE_SEASON
     },
     {

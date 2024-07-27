@@ -87,9 +87,7 @@ pub struct MigrateStakeArgs {
 #[derive(AnchorSerialize, AnchorDeserialize, Clone)]
 pub struct StakeNFTArgs {
     pub name: String,
-    pub rarity: Rarity,
     pub stake_vault: String,
-    pub collections: Vec<Collection>,
 }
 
 #[derive(AnchorSerialize, AnchorDeserialize, Clone)]
@@ -123,11 +121,6 @@ pub struct WithdrawNFTArgs {
 pub struct DepositStakeRewardsArgs {
     pub amount: u64,
     pub stake_vault: String,
-}
-
-#[derive(AnchorSerialize, AnchorDeserialize, Clone)]
-pub struct ClaimStakeRewardsArgs {
-    pub week: u8,
 }
 
 #[derive(AnchorSerialize, AnchorDeserialize, Clone)]

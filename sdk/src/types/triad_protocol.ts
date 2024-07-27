@@ -13,8 +13,8 @@ export type TriadProtocol = {
   }
   instructions: [
     {
-      name: 'claimStakeRewards'
-      discriminator: [107, 91, 233, 196, 211, 47, 218, 21]
+      name: 'claimStake'
+      discriminator: [62, 145, 133, 242, 244, 59, 53, 139]
       accounts: [
         {
           name: 'signer'
@@ -213,10 +213,6 @@ export type TriadProtocol = {
           name: 'signer'
           writable: true
           signer: true
-        },
-        {
-          name: 'referral'
-          writable: true
         },
         {
           name: 'user'
@@ -1117,6 +1113,10 @@ export type TriadProtocol = {
           {
             name: 'name'
             type: 'string'
+          },
+          {
+            name: 'referral'
+            type: 'pubkey'
           }
         ]
       }
@@ -1383,26 +1383,8 @@ export type TriadProtocol = {
             type: 'string'
           },
           {
-            name: 'rarity'
-            type: {
-              defined: {
-                name: 'rarity'
-              }
-            }
-          },
-          {
             name: 'stakeVault'
             type: 'string'
-          },
-          {
-            name: 'collections'
-            type: {
-              vec: {
-                defined: {
-                  name: 'collection'
-                }
-              }
-            }
           }
         ]
       }

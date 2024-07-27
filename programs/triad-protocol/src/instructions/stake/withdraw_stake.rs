@@ -46,17 +46,10 @@ pub struct WithdrawStake<'info> {
 }
 
 pub fn withdraw_stake(ctx: Context<WithdrawStake>) -> Result<()> {
-    let mint = &ctx.accounts.mint.to_account_info();
     let stake = &mut ctx.accounts.stake;
     let stake_vault = &mut ctx.accounts.stake_vault;
 
-    if stake.mint != *mint.key {
-        return Err(TriadProtocolError::Unauthorized.into());
-    }
-
-    if stake.withdraw_ts > Clock::get()?.unix_timestamp
-        && stake.authority.to_string() != "E48CKgbZVpDzerQ7DdommgqNobRHLqHy8RUVi8HXkSHE"
-    {
+    if stake.withdraw_ts > Clock::get()?.unix_timestamp {
         return Err(TriadProtocolError::StakeLocked.into());
     }
 

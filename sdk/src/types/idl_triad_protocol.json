@@ -7,8 +7,8 @@
   },
   "instructions": [
     {
-      "name": "claim_stake_rewards",
-      "discriminator": [107, 91, 233, 196, 211, 47, 218, 21],
+      "name": "claim_stake",
+      "discriminator": [62, 145, 133, 242, 244, 59, 53, 139],
       "accounts": [
         {
           "name": "signer",
@@ -218,10 +218,6 @@
           "name": "signer",
           "writable": true,
           "signer": true
-        },
-        {
-          "name": "referral",
-          "writable": true
         },
         {
           "name": "user",
@@ -1205,6 +1201,10 @@
           {
             "name": "name",
             "type": "string"
+          },
+          {
+            "name": "referral",
+            "type": "pubkey"
           }
         ]
       }
@@ -1471,26 +1471,8 @@
             "type": "string"
           },
           {
-            "name": "rarity",
-            "type": {
-              "defined": {
-                "name": "Rarity"
-              }
-            }
-          },
-          {
             "name": "stake_vault",
             "type": "string"
-          },
-          {
-            "name": "collections",
-            "type": {
-              "vec": {
-                "defined": {
-                  "name": "Collection"
-                }
-              }
-            }
           }
         ]
       }
