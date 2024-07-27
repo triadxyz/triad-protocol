@@ -1,21 +1,12 @@
 import { AnchorProvider, BN, Program } from '@coral-xyz/anchor'
-import {
-  ComputeBudgetProgram,
-  PublicKey,
-  Transaction,
-  TransactionInstruction,
-  TransactionMessage,
-  VersionedTransaction
-} from '@solana/web3.js'
+import { ComputeBudgetProgram, PublicKey } from '@solana/web3.js'
 import { TriadProtocol } from './types/triad_protocol'
 import {
   formatStake,
   formatStakeVault,
   getATASync,
-  getNFTRewardsAddressSync,
   getStakeAddressSync,
-  getStakeVaultAddressSync,
-  getStakeV1AddressSync
+  getStakeVaultAddressSync
 } from './utils/helpers'
 import { RpcOptions } from './types'
 import {
@@ -27,8 +18,7 @@ import {
   StakeResponse,
   UpdateStakeVaultStatusArgs,
   ClaimStakeRewardsArgs,
-  StakeTokenArgs,
-  MigrateStakeArgs
+  StakeTokenArgs
 } from './types/stake'
 import { TTRIAD_DECIMALS, TTRIAD_FEE, TTRIAD_MINT } from './utils/constants'
 
