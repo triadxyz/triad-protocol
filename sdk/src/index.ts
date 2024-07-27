@@ -105,7 +105,8 @@ export default class TriadProtocolClient {
         referral: referralPDA
       })
       .accounts({
-        signer: wallet
+        signer: wallet,
+        referral: referralPDA
       })
 
     if (options?.microLamports) {
