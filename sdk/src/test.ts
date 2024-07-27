@@ -34,7 +34,7 @@ const updateStakeVaultStatus = async () => {
   const response = await triadProtocol.stake.updateStakeVaultStatus(
     {
       wallet: wallet.publicKey,
-      isLocked: false,
+      isLocked: true,
       week: 4,
       stakeVault: STAKE_SEASON
     },
