@@ -10,7 +10,8 @@ pub struct User {
     pub name: String,
     pub swaps: i16,
     pub swaps_made: i16,
-    pub padding: [u8; 48],
+    pub staked: u64,
+    pub padding: [u8; 40],
 }
 
 #[derive(AnchorSerialize, AnchorDeserialize)]

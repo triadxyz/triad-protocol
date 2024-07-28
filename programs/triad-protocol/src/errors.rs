@@ -61,4 +61,7 @@ pub enum TriadProtocolError {
 
     #[msg("Rewards already claimed")]
     RewardsAlreadyClaimed,
+
+    #[msg("Stake overflow")]
+    StakeOverflow,
 }

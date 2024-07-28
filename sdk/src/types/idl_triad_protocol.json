@@ -662,6 +662,10 @@
           }
         },
         {
+          "name": "user",
+          "writable": true
+        },
+        {
           "name": "stake",
           "writable": true,
           "pda": {
@@ -814,6 +818,10 @@
         },
         {
           "name": "stake_vault",
+          "writable": true
+        },
+        {
+          "name": "user",
           "writable": true
         },
         {
@@ -1020,6 +1028,11 @@
       "code": 6019,
       "name": "RewardsAlreadyClaimed",
       "msg": "Rewards already claimed"
+    },
+    {
+      "code": 6020,
+      "name": "StakeOverflow",
+      "msg": "Stake overflow"
     }
   ],
   "types": [
@@ -1515,9 +1528,13 @@
             "type": "i16"
           },
           {
+            "name": "staked",
+            "type": "u64"
+          },
+          {
             "name": "padding",
             "type": {
-              "array": ["u8", 48]
+              "array": ["u8", 40]
             }
           }
         ]

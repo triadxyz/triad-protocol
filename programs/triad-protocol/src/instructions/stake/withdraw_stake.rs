@@ -1,7 +1,7 @@
 use crate::constants::{ADMIN, TTRIAD_MINT};
 use crate::constraints::is_authority_for_stake;
-use crate::StakeV2;
 use crate::{errors::TriadProtocolError, StakeVault};
+use crate::{StakeV2, User};
 use anchor_lang::prelude::*;
 use anchor_spl::token_2022::{close_account, CloseAccount, Token2022};
 use anchor_spl::{
@@ -17,6 +17,9 @@ pub struct WithdrawStake<'info> {
 
     #[account(mut)]
     pub stake_vault: Box<Account<'info, StakeVault>>,
+
+    #[account(mut, constraint = user.authority == *signer.key)]
+    pub user: Box<Account<'info, User>>,
 
     #[account(mut, close = signer, constraint = is_authority_for_stake(&stake, &signer)?)]
     pub stake: Box<Account<'info, StakeV2>>,
@@ -48,6 +51,7 @@ pub struct WithdrawStake<'info> {
 pub fn withdraw_stake(ctx: Context<WithdrawStake>) -> Result<()> {
     let stake = &mut ctx.accounts.stake;
     let stake_vault = &mut ctx.accounts.stake_vault;
+    let user = &mut ctx.accounts.user;
 
     if stake.withdraw_ts > Clock::get()?.unix_timestamp {
         return Err(TriadProtocolError::StakeLocked.into());
@@ -82,6 +86,15 @@ pub fn withdraw_stake(ctx: Context<WithdrawStake>) -> Result<()> {
 
     if is_token_stake {
         stake_vault.token_staked -= stake.amount;
+        user.staked -= stake.amount;
+
+        let result = (user.staked / 10u64.pow(stake_vault.token_decimals as u32)) / 10000;
+
+        if result > i16::MAX as u64 {
+            return Err(TriadProtocolError::StakeOverflow.into());
+        } else {
+            user.swaps = result as i16;
+        }
     } else {
         close_account(CpiContext::new_with_signer(
             ctx.accounts.token_program.to_account_info(),

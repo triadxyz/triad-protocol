@@ -51,7 +51,7 @@ const getUsers = async () => {
 getUsers()
 
 const getReferral = async () => {
-  const response = await triadProtocol.hasReferral('a')
+  const response = await triadProtocol.hasUser('a')
 
   console.log(response)
 }

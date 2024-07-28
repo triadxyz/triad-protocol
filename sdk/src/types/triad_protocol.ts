@@ -888,6 +888,10 @@ export type TriadProtocol = {
           }
         },
         {
+          name: 'user'
+          writable: true
+        },
+        {
           name: 'stake'
           writable: true
           pda: {
@@ -1098,6 +1102,10 @@ export type TriadProtocol = {
         },
         {
           name: 'stakeVault'
+          writable: true
+        },
+        {
+          name: 'user'
           writable: true
         },
         {
@@ -1362,6 +1370,11 @@ export type TriadProtocol = {
       code: 6019
       name: 'rewardsAlreadyClaimed'
       msg: 'Rewards already claimed'
+    },
+    {
+      code: 6020
+      name: 'stakeOverflow'
+      msg: 'Stake overflow'
     }
   ]
   types: [
@@ -1857,9 +1870,13 @@ export type TriadProtocol = {
             type: 'i16'
           },
           {
+            name: 'staked'
+            type: 'u64'
+          },
+          {
             name: 'padding'
             type: {
-              array: ['u8', 48]
+              array: ['u8', 40]
             }
           }
         ]

@@ -12,7 +12,8 @@ import {
   formatStakeVault,
   getATASync,
   getStakeAddressSync,
-  getStakeVaultAddressSync
+  getStakeVaultAddressSync,
+  getUserAddressSync
 } from './utils/helpers'
 import { RpcOptions } from './types'
 import {
@@ -228,11 +229,12 @@ export default class Stake {
    *
    */
   public async stakeToken(
-    { name, wallet, stakeVault, amount }: StakeTokenArgs,
+    { name, wallet, stakeVault, amount, userName }: StakeTokenArgs,
     options?: RpcOptions
   ) {
     const ttriad = new PublicKey(TTRIAD_MINT)
     const FromAta = getATASync(wallet, ttriad)
+    const userPDA = getUserAddressSync(this.program.programId, userName)
 
     const method = this.program.methods
       .stakeToken({
@@ -243,7 +245,8 @@ export default class Stake {
       .accounts({
         signer: wallet,
         fromAta: FromAta,
-        mint: ttriad
+        mint: ttriad,
+        user: userPDA
       })
 
     if (options?.microLamports) {
@@ -369,13 +372,15 @@ export default class Stake {
    *
    */
   public async withdrawStake(
-    { wallet, name, mint, stakeVault }: WithdrawArgs,
+    { wallet, name, mint, userName, stakeVault }: WithdrawArgs,
     options?: RpcOptions
   ) {
     const stakeVaultPDA = getStakeVaultAddressSync(
       this.program.programId,
       stakeVault
     )
+
+    const userPDA = getUserAddressSync(this.program.programId, userName)
 
     const FromAta = getATASync(stakeVaultPDA, mint)
     const stakePDA = getStakeAddressSync(this.program.programId, wallet, name)
@@ -386,7 +391,8 @@ export default class Stake {
       stake: stakePDA,
       stakeVault: stakeVaultPDA,
       admin: new PublicKey('82ppCojm3yrEKgdpH8B5AmBJTU1r1uAWXFWhxvPs9UCR'),
-      mint: mint
+      mint: mint,
+      user: userPDA
     })
 
     if (options?.microLamports) {

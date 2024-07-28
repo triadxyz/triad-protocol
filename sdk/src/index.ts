@@ -44,13 +44,13 @@ export default class TriadProtocolClient {
   }
 
   /**
-   * Check if user has referral
-   * @param referral - User referral
+   * Check if user exists
+   * @param username - User name
    */
-  hasReferral = async (referral: string) => {
+  hasUser = async (username: string) => {
     try {
       await this.program.account.user.fetch(
-        getUserAddressSync(this.program.programId, referral)
+        getUserAddressSync(this.program.programId, username)
       )
 
       return true
