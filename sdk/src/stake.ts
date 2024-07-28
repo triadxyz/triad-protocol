@@ -1,5 +1,11 @@
 import { AnchorProvider, BN, Program } from '@coral-xyz/anchor'
-import { ComputeBudgetProgram, PublicKey } from '@solana/web3.js'
+import {
+  ComputeBudgetProgram,
+  PublicKey,
+  TransactionInstruction,
+  TransactionMessage,
+  VersionedTransaction
+} from '@solana/web3.js'
 import { TriadProtocol } from './types/triad_protocol'
 import {
   formatStake,
@@ -158,45 +164,66 @@ export default class Stake {
 
   /**
    *  Stake NFT
-   *  @param name - NFT name
-   *  @param wallet - User wallet
    *  @param mint - NFT mint
+   *  @param stakeVault - Name of the stake vault
+   *  @param items - NFT items
    *
    */
   public async stakeNft(
-    { name, wallet, mint, stakeVault }: StakeNftArgs,
+    { wallet, stakeVault, items }: StakeNftArgs,
     options?: RpcOptions
   ) {
     const StakeVault = getStakeVaultAddressSync(
       this.program.programId,
       stakeVault
     )
-    const FromAta = getATASync(wallet, mint)
-    const ToAta = getATASync(StakeVault, mint)
 
-    let items = []
+    let ixs: TransactionInstruction[] = []
 
-    const method = this.program.methods
-      .stakeNft({
-        name,
-        stakeVault
-      })
-      .accounts({
-        signer: wallet,
-        toAta: ToAta,
-        fromAta: FromAta,
-        mint: mint
-      })
+    for (let i = 0; i < items.length; i++) {
+      let item = items[i]
+
+      const FromAta = getATASync(wallet, item.mint)
+      const ToAta = getATASync(StakeVault, item.mint)
+
+      ixs.push(
+        await this.program.methods
+          .stakeNft({
+            name: item.name,
+            stakeVault
+          })
+          .accounts({
+            signer: wallet,
+            toAta: ToAta,
+            fromAta: FromAta,
+            mint: item.mint
+          })
+          .instruction()
+      )
+    }
 
     if (options?.microLamports) {
-      method.postInstructions([
+      ixs.push(
         ComputeBudgetProgram.setComputeUnitPrice({
           microLamports: options.microLamports
         })
-      ])
+      )
     }
 
-    return method.rpc({ skipPreflight: options?.skipPreflight })
+    const { blockhash } = await this.provider.connection.getLatestBlockhash()
+
+    const messageV0 = new TransactionMessage({
+      instructions: ixs,
+      recentBlockhash: blockhash,
+      payerKey: wallet
+    }).compileToV0Message()
+
+    const tx = new VersionedTransaction(messageV0)
+
+    return this.provider.sendAndConfirm(tx, [], {
+      skipPreflight: options?.skipPreflight,
+      commitment: 'confirmed'
+    })
   }
 
   /**

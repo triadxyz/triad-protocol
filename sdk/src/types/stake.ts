@@ -4,10 +4,12 @@ import BN from 'bn.js'
 export type Collection = 'alligators' | 'coleta' | 'undead' | 'pyth'
 
 export type StakeNftArgs = {
-  name: string
   wallet: PublicKey
   stakeVault: string
-  mint: PublicKey
+  items: {
+    mint: PublicKey
+    name: string
+  }[]
 }
 
 export type MigrateStakeArgs = {

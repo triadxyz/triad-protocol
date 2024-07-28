@@ -17,7 +17,7 @@ const updateStakeVaultStatus = async () => {
   const response = await triadProtocol.stake.updateStakeVaultStatus(
     {
       wallet: wallet.publicKey,
-      isLocked: true,
+      isLocked: false,
       week: 4,
       stakeVault: STAKE_SEASON
     },
@@ -30,6 +30,8 @@ const updateStakeVaultStatus = async () => {
   console.log(response)
 }
 
+updateStakeVaultStatus()
+
 const getStake = async () => {
   const response = await triadProtocol.stake.getStakeByWallet(
     new PublicKey('BCTdjdcjMiECGFbF5Ps15yjLRPzy5YZGJNa4VdGRbhjB'),
@@ -40,23 +42,6 @@ const getStake = async () => {
 
   console.log(response)
   console.log(stakeVaults)
-}
-
-const stake = async () => {
-  const response = await triadProtocol.stake.stakeNft(
-    {
-      name: 'Triad 0',
-      wallet: wallet.publicKey,
-      stakeVault: 'Rev 1',
-      mint: new PublicKey('FXRhaGeYue7bMCwcksNw4hJRY7jZ1YMwgmCu1Y8fyUNd')
-    },
-    {
-      skipPreflight: true,
-      microLamports: 20000
-    }
-  )
-
-  console.log(response)
 }
 
 const getUsers = async () => {
