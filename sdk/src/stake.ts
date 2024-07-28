@@ -175,11 +175,16 @@ export default class Stake {
     options?: RpcOptions
   ) {
     let ixs: TransactionInstruction[] = []
+    const stakeVaultPDA = getStakeVaultAddressSync(
+      this.program.programId,
+      stakeVault
+    )
 
     for (let i = 0; i < items.length; i++) {
       let item = items[i]
 
       const FromAta = getATASync(wallet, item.mint)
+      const toAta = getATASync(stakeVaultPDA, item.mint)
 
       ixs.push(
         await this.program.methods
@@ -190,7 +195,8 @@ export default class Stake {
           .accounts({
             signer: wallet,
             fromAta: FromAta,
-            mint: item.mint
+            mint: item.mint,
+            toAta: toAta
           })
           .instruction()
       )
@@ -232,9 +238,14 @@ export default class Stake {
     { name, wallet, stakeVault, amount }: StakeTokenArgs,
     options?: RpcOptions
   ) {
+    const stakeVaultPDA = getStakeVaultAddressSync(
+      this.program.programId,
+      stakeVault
+    )
     const ttriad = new PublicKey(TTRIAD_MINT)
     const FromAta = getATASync(wallet, ttriad)
     const userPDA = getUserAddressSync(this.program.programId, wallet)
+    const toAta = getATASync(stakeVaultPDA, ttriad)
 
     const method = this.program.methods
       .stakeToken({
@@ -246,7 +257,8 @@ export default class Stake {
         signer: wallet,
         fromAta: FromAta,
         mint: ttriad,
-        user: userPDA
+        user: userPDA,
+        toAta: toAta
       })
 
     if (options?.microLamports) {

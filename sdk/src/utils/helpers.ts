@@ -183,6 +183,9 @@ export const formatUser = (user: any): UserResponse => {
     authority: user.authority.toBase58(),
     referral: user.referral,
     referred: user.referred.toNumber(),
+    swapsMade: user.swapsMade,
+    swaps: user.swaps,
+    staked: user.staked.toNumber(),
     name: user.name
   }
 }
