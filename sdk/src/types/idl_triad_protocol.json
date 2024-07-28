@@ -1095,10 +1095,6 @@
           {
             "name": "name",
             "type": "string"
-          },
-          {
-            "name": "referral",
-            "type": "pubkey"
           }
         ]
       }
@@ -1461,6 +1457,10 @@
           {
             "name": "is_locked",
             "type": "bool"
+          },
+          {
+            "name": "init_ts",
+            "type": "i64"
           }
         ]
       }
@@ -1491,7 +1491,7 @@
             "type": "pubkey"
           },
           {
-            "name": "swaps",
+            "name": "bump",
             "type": "u8"
           },
           {
@@ -1505,6 +1505,20 @@
           {
             "name": "name",
             "type": "string"
+          },
+          {
+            "name": "swaps",
+            "type": "i16"
+          },
+          {
+            "name": "swaps_made",
+            "type": "i16"
+          },
+          {
+            "name": "padding",
+            "type": {
+              "array": ["u8", 48]
+            }
           }
         ]
       }

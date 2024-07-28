@@ -4,10 +4,10 @@ use crate::{
     state::StakeVault,
 };
 use anchor_lang::prelude::*;
-use anchor_spl::token_2022::Token2022;
+use anchor_spl::token_2022::{transfer_checked, Token2022, TransferChecked};
 use anchor_spl::{
     associated_token::AssociatedToken,
-    token_interface::{transfer_checked, Mint, TokenAccount, TransferChecked},
+    token_interface::{Mint, TokenAccount},
 };
 
 #[derive(Accounts)]
@@ -84,6 +84,7 @@ pub fn claim_stake(ctx: Context<ClaimStake>) -> Result<()> {
 
     stake_vault.amount -= rewards;
     stake_vault.amount_paid += rewards;
+
     stake.claimed += rewards;
     stake.available = 0;
 

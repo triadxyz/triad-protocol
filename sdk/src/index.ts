@@ -43,6 +43,10 @@ export default class TriadProtocolClient {
       .sort((a, b) => b.referred - a.referred)
   }
 
+  /**
+   * Check if user has referral
+   * @param referral - User referral
+   */
   hasReferral = async (referral: string) => {
     try {
       await this.program.account.user.fetch(
@@ -103,8 +107,7 @@ export default class TriadProtocolClient {
 
     const method = this.program.methods
       .createUser({
-        name,
-        referral: referralPDA
+        name
       })
       .accounts({
         signer: wallet,

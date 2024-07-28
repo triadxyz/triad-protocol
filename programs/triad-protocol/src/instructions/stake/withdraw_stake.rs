@@ -64,7 +64,7 @@ pub fn withdraw_stake(ctx: Context<WithdrawStake>) -> Result<()> {
     let mut amount = 1;
 
     if is_token_stake {
-        amount = ctx.accounts.from_ata.amount;
+        amount = stake.amount;
     }
 
     let cpi_context = CpiContext::new_with_signer(
@@ -81,7 +81,7 @@ pub fn withdraw_stake(ctx: Context<WithdrawStake>) -> Result<()> {
     transfer_checked(cpi_context, amount, ctx.accounts.mint.decimals)?;
 
     if is_token_stake {
-        stake_vault.token_staked -= ctx.accounts.from_ata.amount;
+        stake_vault.token_staked -= stake.amount;
     } else {
         close_account(CpiContext::new_with_signer(
             ctx.accounts.token_program.to_account_info(),

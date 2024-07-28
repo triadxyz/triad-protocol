@@ -18,7 +18,6 @@ const updateStakeVaultStatus = async () => {
     {
       wallet: wallet.publicKey,
       isLocked: false,
-      week: 4,
       stakeVault: STAKE_SEASON
     },
     {
@@ -29,8 +28,6 @@ const updateStakeVaultStatus = async () => {
 
   console.log(response)
 }
-
-updateStakeVaultStatus()
 
 const getStake = async () => {
   const response = await triadProtocol.stake.getStakeByWallet(
@@ -44,23 +41,6 @@ const getStake = async () => {
   console.log(stakeVaults)
 }
 
-const stake = async () => {
-  const response = await triadProtocol.stake.stakeNft(
-    {
-      name: 'Triad 0',
-      wallet: wallet.publicKey,
-      stakeVault: 'Rev 1',
-      mint: new PublicKey('FXRhaGeYue7bMCwcksNw4hJRY7jZ1YMwgmCu1Y8fyUNd')
-    },
-    {
-      skipPreflight: true,
-      microLamports: 20000
-    }
-  )
-
-  console.log(response)
-}
-
 const getUsers = async () => {
   const response = await triadProtocol.getUsers()
 
@@ -68,14 +48,6 @@ const getUsers = async () => {
 }
 
 getUsers()
-
-const getStakes = async () => {
-  const response = await triadProtocol.stake.getStakes(STAKE_SEASON)
-
-  console.log(response)
-
-  fs.writeFileSync('stakes.json', JSON.stringify(response))
-}
 
 const getReferral = async () => {
   const response = await triadProtocol.hasReferral('a')

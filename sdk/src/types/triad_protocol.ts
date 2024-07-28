@@ -1437,10 +1437,6 @@ export type TriadProtocol = {
           {
             name: 'name'
             type: 'string'
-          },
-          {
-            name: 'referral'
-            type: 'pubkey'
           }
         ]
       }
@@ -1803,6 +1799,10 @@ export type TriadProtocol = {
           {
             name: 'isLocked'
             type: 'bool'
+          },
+          {
+            name: 'initTs'
+            type: 'i64'
           }
         ]
       }
@@ -1833,7 +1833,7 @@ export type TriadProtocol = {
             type: 'pubkey'
           },
           {
-            name: 'swaps'
+            name: 'bump'
             type: 'u8'
           },
           {
@@ -1847,6 +1847,20 @@ export type TriadProtocol = {
           {
             name: 'name'
             type: 'string'
+          },
+          {
+            name: 'swaps'
+            type: 'i16'
+          },
+          {
+            name: 'swapsMade'
+            type: 'i16'
+          },
+          {
+            name: 'padding'
+            type: {
+              array: ['u8', 48]
+            }
           }
         ]
       }

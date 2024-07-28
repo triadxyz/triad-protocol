@@ -1,5 +1,11 @@
 import { AnchorProvider, BN, Program } from '@coral-xyz/anchor'
-import { ComputeBudgetProgram, PublicKey } from '@solana/web3.js'
+import {
+  ComputeBudgetProgram,
+  PublicKey,
+  TransactionInstruction,
+  TransactionMessage,
+  VersionedTransaction
+} from '@solana/web3.js'
 import { TriadProtocol } from './types/triad_protocol'
 import {
   formatStake,
@@ -158,37 +164,59 @@ export default class Stake {
 
   /**
    *  Stake NFT
-   *  @param name - NFT name
-   *  @param wallet - User wallet
    *  @param mint - NFT mint
+   *  @param stakeVault - Name of the stake vault
+   *  @param items - NFT items
    *
    */
   public async stakeNft(
-    { name, wallet, mint, stakeVault }: StakeNftArgs,
+    { wallet, stakeVault, items }: StakeNftArgs,
     options?: RpcOptions
   ) {
-    const FromAta = getATASync(wallet, mint)
+    let ixs: TransactionInstruction[] = []
 
-    const method = this.program.methods
-      .stakeNft({
-        name,
-        stakeVault
-      })
-      .accounts({
-        signer: wallet,
-        fromAta: FromAta,
-        mint: mint
-      })
+    for (let i = 0; i < items.length; i++) {
+      let item = items[i]
+
+      const FromAta = getATASync(wallet, item.mint)
+
+      ixs.push(
+        await this.program.methods
+          .stakeNft({
+            name: item.name,
+            stakeVault
+          })
+          .accounts({
+            signer: wallet,
+            fromAta: FromAta,
+            mint: item.mint
+          })
+          .instruction()
+      )
+    }
 
     if (options?.microLamports) {
-      method.postInstructions([
+      ixs.push(
         ComputeBudgetProgram.setComputeUnitPrice({
           microLamports: options.microLamports
         })
-      ])
+      )
     }
 
-    return method.rpc({ skipPreflight: options?.skipPreflight })
+    const { blockhash } = await this.provider.connection.getLatestBlockhash()
+
+    const messageV0 = new TransactionMessage({
+      instructions: ixs,
+      recentBlockhash: blockhash,
+      payerKey: wallet
+    }).compileToV0Message()
+
+    const tx = new VersionedTransaction(messageV0)
+
+    return this.provider.sendAndConfirm(tx, [], {
+      skipPreflight: options?.skipPreflight,
+      commitment: 'confirmed'
+    })
   }
 
   /**
@@ -381,7 +409,7 @@ export default class Stake {
    *
    */
   public async updateStakeVaultStatus(
-    { wallet, isLocked, week, stakeVault }: UpdateStakeVaultStatusArgs,
+    { wallet, isLocked, stakeVault }: UpdateStakeVaultStatusArgs,
     options?: RpcOptions
   ) {
     const StakeVault = getStakeVaultAddressSync(
@@ -391,7 +419,10 @@ export default class Stake {
 
     const method = this.program.methods
       .updateStakeVaultStatus({
-        isLocked
+        isLocked,
+        tokenDecimals: TTRIAD_DECIMALS,
+        tokenMint: new PublicKey(TTRIAD_MINT),
+        amount: new BN(65474.55 * 10 ** TTRIAD_DECIMALS)
       })
       .accounts({
         signer: wallet,

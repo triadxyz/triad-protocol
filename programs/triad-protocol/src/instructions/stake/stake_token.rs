@@ -2,10 +2,10 @@ use crate::{
     constraints::is_mint_for_stake_vault, errors::TriadProtocolError, state::{StakeTokenArgs, StakeVault}, StakeV2
 };
 use anchor_lang::prelude::*;
-use anchor_spl::token_2022::Token2022;
+use anchor_spl::token_2022::{Token2022, transfer_checked, TransferChecked};
 use anchor_spl::{
     associated_token::AssociatedToken,
-    token_interface::{transfer_checked, Mint, TokenAccount, TransferChecked},
+    token_interface::{Mint, TokenAccount},
 };
 
 #[derive(Accounts)]

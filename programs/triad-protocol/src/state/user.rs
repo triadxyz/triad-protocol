@@ -8,12 +8,14 @@ pub struct User {
     pub referral: Pubkey,
     pub referred: i64,
     pub name: String,
+    pub swaps: i16,
+    pub swaps_made: i16,
+    pub padding: [u8; 48],
 }
 
 #[derive(AnchorSerialize, AnchorDeserialize)]
 pub struct CreateUserArgs {
     pub name: String,
-    pub referral: Pubkey,
 }
 
 impl User {
