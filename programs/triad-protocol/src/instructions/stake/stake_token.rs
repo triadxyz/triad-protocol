@@ -17,7 +17,7 @@ pub struct StakeToken<'info> {
     #[account(mut, seeds = [StakeVault::PREFIX_SEED, args.stake_vault.as_bytes()], bump)]
     pub stake_vault: Box<Account<'info, StakeVault>>,
 
-    #[account(init_if_needed, payer = signer, space = StakeV2::SPACE, seeds = [StakeV2::PREFIX_SEED, signer.to_account_info().key().as_ref(), args.name.as_bytes()], bump)]
+    #[account(init, payer = signer, space = StakeV2::SPACE, seeds = [StakeV2::PREFIX_SEED, signer.to_account_info().key().as_ref(), args.name.as_bytes()], bump)]
     pub stake: Box<Account<'info, StakeV2>>,
 
     #[account(mut, constraint = is_mint_for_stake_vault(&stake_vault, &mint.key())?)]

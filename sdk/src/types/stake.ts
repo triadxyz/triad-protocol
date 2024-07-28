@@ -61,6 +61,7 @@ export type UpdateStakeVaultStatusArgs = {
   wallet: PublicKey
   isLocked: boolean
   stakeVault: string
+  initTs: number
 }
 
 export type ClaimStakeRewardsArgs = {

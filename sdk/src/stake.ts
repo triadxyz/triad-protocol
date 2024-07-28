@@ -409,7 +409,7 @@ export default class Stake {
    *
    */
   public async updateStakeVaultStatus(
-    { wallet, isLocked, stakeVault }: UpdateStakeVaultStatusArgs,
+    { wallet, isLocked, stakeVault, initTs }: UpdateStakeVaultStatusArgs,
     options?: RpcOptions
   ) {
     const StakeVault = getStakeVaultAddressSync(
@@ -420,9 +420,7 @@ export default class Stake {
     const method = this.program.methods
       .updateStakeVaultStatus({
         isLocked,
-        tokenDecimals: TTRIAD_DECIMALS,
-        tokenMint: new PublicKey(TTRIAD_MINT),
-        amount: new BN(65474.55 * 10 ** TTRIAD_DECIMALS)
+        initTs: new BN(initTs)
       })
       .accounts({
         signer: wallet,

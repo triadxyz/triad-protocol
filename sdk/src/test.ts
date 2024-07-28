@@ -18,7 +18,8 @@ const updateStakeVaultStatus = async () => {
     {
       wallet: wallet.publicKey,
       isLocked: false,
-      stakeVault: STAKE_SEASON
+      stakeVault: STAKE_SEASON,
+      initTs: 0
     },
     {
       skipPreflight: true,
