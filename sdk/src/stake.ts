@@ -229,12 +229,12 @@ export default class Stake {
    *
    */
   public async stakeToken(
-    { name, wallet, stakeVault, amount, userName }: StakeTokenArgs,
+    { name, wallet, stakeVault, amount }: StakeTokenArgs,
     options?: RpcOptions
   ) {
     const ttriad = new PublicKey(TTRIAD_MINT)
     const FromAta = getATASync(wallet, ttriad)
-    const userPDA = getUserAddressSync(this.program.programId, userName)
+    const userPDA = getUserAddressSync(this.program.programId, wallet)
 
     const method = this.program.methods
       .stakeToken({
@@ -372,7 +372,7 @@ export default class Stake {
    *
    */
   public async withdrawStake(
-    { wallet, name, mint, userName, stakeVault }: WithdrawArgs,
+    { wallet, name, mint, stakeVault }: WithdrawArgs,
     options?: RpcOptions
   ) {
     const stakeVaultPDA = getStakeVaultAddressSync(
@@ -380,7 +380,7 @@ export default class Stake {
       stakeVault
     )
 
-    const userPDA = getUserAddressSync(this.program.programId, userName)
+    const userPDA = getUserAddressSync(this.program.programId, wallet)
 
     const FromAta = getATASync(stakeVaultPDA, mint)
     const stakePDA = getStakeAddressSync(this.program.programId, wallet, name)

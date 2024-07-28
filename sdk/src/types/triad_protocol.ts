@@ -314,8 +314,8 @@ export type TriadProtocol = {
                 value: [117, 115, 101, 114]
               },
               {
-                kind: 'arg'
-                path: 'args.name'
+                kind: 'account'
+                path: 'signer'
               }
             ]
           }

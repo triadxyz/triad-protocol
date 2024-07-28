@@ -27,7 +27,6 @@ export type StakeTokenArgs = {
   stakeVault: string
   mint: PublicKey
   amount: number
-  userName: string
 }
 
 export type InitializeStakeArgs = {
@@ -56,7 +55,6 @@ export type WithdrawArgs = {
   name: string
   mint: PublicKey
   stakeVault: string
-  userName: string
 }
 
 export type UpdateStakeVaultStatusArgs = {

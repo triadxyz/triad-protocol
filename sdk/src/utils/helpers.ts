@@ -128,9 +128,9 @@ export const getATASync = (address: PublicKey, Mint: PublicKey) => {
   return ATA
 }
 
-export const getUserAddressSync = (programId: PublicKey, name: string) => {
+export const getUserAddressSync = (programId: PublicKey, wallet: PublicKey) => {
   const [StakePDA] = PublicKey.findProgramAddressSync(
-    [Buffer.from('user'), Buffer.from(name)],
+    [Buffer.from('user'), wallet.toBuffer()],
     programId
   )
 
