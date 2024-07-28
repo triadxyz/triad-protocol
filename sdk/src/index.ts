@@ -38,7 +38,9 @@ export default class TriadProtocolClient {
   getUsers = async () => {
     const response = await this.program.account.user.all()
 
-    return response.map((item) => formatUser(item.account))
+    return response
+      .map((item) => formatUser(item.account))
+      .sort((a, b) => b.referred - a.referred)
   }
 
   hasReferral = async (referral: string) => {

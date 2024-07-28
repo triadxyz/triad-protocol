@@ -1,3 +1,4 @@
+use crate::constants::TTRIAD_MINT;
 use crate::constraints::is_authority_for_stake;
 use crate::StakeV2;
 use crate::{errors::TriadProtocolError, StakeVault};
@@ -31,7 +32,13 @@ pub fn request_withdraw_stake(ctx: Context<RequestWithdrawStake>) -> Result<()> 
         return Err(TriadProtocolError::Unauthorized.into());
     }
 
-    stake.withdraw_ts = Clock::get()?.unix_timestamp + 3 * 24 * 60 * 60;
+    let mut days = 3;
+
+    if stake.mint.to_string() == TTRIAD_MINT {
+        days = 7;
+    }
+
+    stake.withdraw_ts = Clock::get()?.unix_timestamp + days * 24 * 60 * 60;
 
     Ok(())
 }

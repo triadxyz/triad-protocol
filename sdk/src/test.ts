@@ -17,7 +17,7 @@ const updateStakeVaultStatus = async () => {
   const response = await triadProtocol.stake.updateStakeVaultStatus(
     {
       wallet: wallet.publicKey,
-      isLocked: true,
+      isLocked: false,
       week: 4,
       stakeVault: STAKE_SEASON
     },
@@ -29,6 +29,8 @@ const updateStakeVaultStatus = async () => {
 
   console.log(response)
 }
+
+updateStakeVaultStatus()
 
 const getStake = async () => {
   const response = await triadProtocol.stake.getStakeByWallet(
@@ -64,6 +66,8 @@ const getUsers = async () => {
 
   console.log(response)
 }
+
+getUsers()
 
 const getStakes = async () => {
   const response = await triadProtocol.stake.getStakes(STAKE_SEASON)

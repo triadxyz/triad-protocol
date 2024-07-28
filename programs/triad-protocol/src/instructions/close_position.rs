@@ -70,7 +70,7 @@ pub fn close_position(ctx: Context<ClosePosition>, args: ClosePositionArgs) -> R
             },
             seeds,
         ),
-        new_amount - (new_amount * 5 / 1000),
+        new_amount - (new_amount * 10 / 1000),
     );
 
     if transfer.is_err() {

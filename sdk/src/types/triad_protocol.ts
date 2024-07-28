@@ -1833,7 +1833,7 @@ export type TriadProtocol = {
             type: 'pubkey'
           },
           {
-            name: 'bump'
+            name: 'swaps'
             type: 'u8'
           },
           {

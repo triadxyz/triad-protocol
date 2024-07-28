@@ -4,7 +4,7 @@ use anchor_lang::prelude::*;
 #[derive(Accounts)]
 #[instruction(args: CreateUserArgs)]
 
-pub struct CreateUser<'info> {
+pub struct BurnUser<'info> {
     #[account(mut)]
     pub signer: Signer<'info>,
 
@@ -14,7 +14,7 @@ pub struct CreateUser<'info> {
     pub system_program: Program<'info, System>,
 }
 
-pub fn create_user(ctx: Context<CreateUser>, args: CreateUserArgs) -> Result<()> {
+pub fn burn_user(ctx: Context<CreateUser>, args: CreateUserArgs) -> Result<()> {
     let user: &mut Account<User> = &mut ctx.accounts.user;
 
     user.ts = Clock::get()?.unix_timestamp;
