@@ -396,6 +396,7 @@ export default class Stake {
 
     const FromAta = getATASync(stakeVaultPDA, mint)
     const stakePDA = getStakeAddressSync(this.program.programId, wallet, name)
+    const ToAta = getATASync(wallet, mint)
 
     const method = this.program.methods.withdrawStake().accounts({
       signer: wallet,
@@ -404,6 +405,7 @@ export default class Stake {
       stakeVault: stakeVaultPDA,
       admin: new PublicKey('82ppCojm3yrEKgdpH8B5AmBJTU1r1uAWXFWhxvPs9UCR'),
       mint: mint,
+      toAta: ToAta,
       user: userPDA
     })
 
@@ -474,11 +476,13 @@ export default class Stake {
     )
     const Stake = getStakeAddressSync(this.program.programId, wallet, nftName)
     const FromAta = getATASync(StakeVault, mint)
+    const ToAta = getATASync(wallet, mint)
 
     const method = this.program.methods.claimStake().accounts({
       signer: wallet,
       fromAta: FromAta,
       mint: mint,
+      toAta: ToAta,
       stake: Stake,
       stakeVault: StakeVault
     })
