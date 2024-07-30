@@ -1,10 +1,10 @@
-use crate::constraints::{is_authority_for_user_position, is_token_mint_for_vault};
+use crate::constraints::{ is_authority_for_user_position, is_token_mint_for_vault };
 use crate::errors::TriadProtocolError;
 use crate::events::ClosePositionRecord;
 use crate::state::Vault;
-use crate::{ClosePositionArgs, Position, Ticker, UserPosition};
+use crate::{ ClosePositionArgs, Position, Ticker, UserPosition };
 use anchor_lang::prelude::*;
-use anchor_spl::token::{self, Token, TokenAccount, Transfer};
+use anchor_spl::token::{ self, Token, TokenAccount, Transfer };
 
 #[derive(Accounts)]
 #[instruction(args: ClosePositionArgs)]
@@ -49,16 +49,15 @@ pub fn close_position(ctx: Context<ClosePosition>, args: ClosePositionArgs) -> R
         return Err(TriadProtocolError::InvalidPosition.into());
     }
 
-    let pnl = (ctx.accounts.ticker.price - current_pubkey_position.entry_price)
-        * current_pubkey_position.amount;
+    let pnl =
+        (ctx.accounts.ticker.price - current_pubkey_position.entry_price) *
+        current_pubkey_position.amount;
 
     let new_amount = current_pubkey_position.amount + pnl;
 
-    let seeds: &[&[&[u8]]] = &[&[
-        b"vault",
-        ctx.accounts.vault.ticker_address.as_ref(),
-        &[ctx.accounts.vault.bump],
-    ]];
+    let seeds: &[&[&[u8]]] = &[
+        &[b"vault", ctx.accounts.vault.ticker_address.as_ref(), &[ctx.accounts.vault.bump]],
+    ];
 
     let transfer = token::transfer(
         CpiContext::new_with_signer(
@@ -68,9 +67,9 @@ pub fn close_position(ctx: Context<ClosePosition>, args: ClosePositionArgs) -> R
                 to: ctx.accounts.user_token_account.to_account_info(),
                 authority: ctx.accounts.vault.to_account_info(),
             },
-            seeds,
+            seeds
         ),
-        new_amount - (new_amount * 10 / 1000),
+        new_amount - (new_amount * 10) / 1000
     );
 
     if transfer.is_err() {
@@ -108,7 +107,7 @@ pub fn close_position(ctx: Context<ClosePosition>, args: ClosePositionArgs) -> R
         ticker: ctx.accounts.vault.ticker_address,
         close_price: ctx.accounts.ticker.price,
         ts: Clock::get()?.unix_timestamp,
-        pnl: ctx.accounts.ticker.price as i64 - current_pubkey_position.entry_price as i64,
+        pnl: (ctx.accounts.ticker.price as i64) - (current_pubkey_position.entry_price as i64),
         user: user_position.authority,
         amount: current_pubkey_position.amount,
         is_long: current_pubkey_position.is_long,

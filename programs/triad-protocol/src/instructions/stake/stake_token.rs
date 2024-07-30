@@ -1,12 +1,13 @@
 use crate::{
-    constraints::is_mint_for_stake_vault, errors::TriadProtocolError, state::{StakeTokenArgs, StakeVault}, StakeV2, User
+    constraints::is_mint_for_stake_vault,
+    errors::TriadProtocolError,
+    state::{ StakeTokenArgs, StakeVault },
+    StakeV2,
+    User,
 };
 use anchor_lang::prelude::*;
-use anchor_spl::token_2022::{Token2022, transfer_checked, TransferChecked};
-use anchor_spl::{
-    associated_token::AssociatedToken,
-    token_interface::{Mint, TokenAccount},
-};
+use anchor_spl::token_2022::{ Token2022, transfer_checked, TransferChecked };
+use anchor_spl::{ associated_token::AssociatedToken, token_interface::{ Mint, TokenAccount } };
 
 #[derive(Accounts)]
 #[instruction(args: StakeTokenArgs)]
@@ -20,7 +21,17 @@ pub struct StakeToken<'info> {
     #[account(mut, constraint = user.authority == *signer.key)]
     pub user: Box<Account<'info, User>>,
 
-    #[account(init, payer = signer, space = StakeV2::SPACE, seeds = [StakeV2::PREFIX_SEED, signer.to_account_info().key().as_ref(), args.name.as_bytes()], bump)]
+    #[account(
+        init,
+        payer = signer,
+        space = StakeV2::SPACE,
+        seeds = [
+            StakeV2::PREFIX_SEED,
+            signer.to_account_info().key().as_ref(),
+            args.name.as_bytes(),
+        ],
+        bump
+    )]
     pub stake: Box<Account<'info, StakeV2>>,
 
     #[account(mut, constraint = is_mint_for_stake_vault(&stake_vault, &mint.key())?)]
@@ -36,7 +47,7 @@ pub struct StakeToken<'info> {
         init_if_needed,
         payer = signer,
         associated_token::mint = mint,
-        associated_token::authority = stake_vault,
+        associated_token::authority = stake_vault
     )]
     pub to_ata: Box<InterfaceAccount<'info, TokenAccount>>,
 
@@ -72,22 +83,24 @@ pub fn stake_token(ctx: Context<StakeToken>, args: StakeTokenArgs) -> Result<()>
 
     user.staked += args.amount;
 
-    let result = (user.staked / 10u64.pow(stake_vault.token_decimals as u32)) / 10000;
+    let result = user.staked / (10u64).pow(stake_vault.token_decimals as u32) / 10000;
 
-    if result > i16::MAX as u64 {
+    if result > (i16::MAX as u64) {
         return Err(TriadProtocolError::StakeOverflow.into());
     } else {
         user.swaps = result as i16;
     }
 
-    transfer_checked(CpiContext::new(
-        ctx.accounts.token_program.to_account_info(),
-        TransferChecked {
+    transfer_checked(
+        CpiContext::new(ctx.accounts.token_program.to_account_info(), TransferChecked {
             from: ctx.accounts.from_ata.to_account_info(),
             mint: ctx.accounts.mint.to_account_info(),
             to: ctx.accounts.to_ata.to_account_info(),
             authority: ctx.accounts.signer.to_account_info(),
-        }), args.amount, ctx.accounts.mint.decimals)?;
+        }),
+        args.amount,
+        ctx.accounts.mint.decimals
+    )?;
 
     Ok(())
 }

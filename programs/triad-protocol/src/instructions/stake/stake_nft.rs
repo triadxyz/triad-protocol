@@ -1,18 +1,19 @@
 use std::str::FromStr;
 use crate::{
-    constants::{MYSTERY_BOX_PROGRAM, TRIAD_MYSTERY_BOX},
+    constants::{ MYSTERY_BOX_PROGRAM, TRIAD_MYSTERY_BOX },
     errors::TriadProtocolError,
-    state::{StakeNFTArgs, StakeVault}, StakeV2,
+    state::{ StakeNFTArgs, StakeVault },
+    StakeV2,
 };
 use anchor_lang::prelude::*;
 use anchor_spl::token_2022::spl_token_2022::extension::BaseStateWithExtensions;
 use anchor_spl::token_2022::{
-    spl_token_2022::{extension::PodStateWithExtensions, pod::PodMint},
+    spl_token_2022::{ extension::PodStateWithExtensions, pod::PodMint },
     Token2022,
 };
 use anchor_spl::{
     associated_token::AssociatedToken,
-    token_interface::{transfer_checked, Mint, TokenAccount, TransferChecked},
+    token_interface::{ transfer_checked, Mint, TokenAccount, TransferChecked },
 };
 use spl_token_metadata_interface::state::TokenMetadata;
 
@@ -25,7 +26,17 @@ pub struct StakeNFT<'info> {
     #[account(mut, seeds = [StakeVault::PREFIX_SEED, args.stake_vault.as_bytes()], bump)]
     pub stake_vault: Box<Account<'info, StakeVault>>,
 
-    #[account(init_if_needed, payer = signer, space = StakeV2::SPACE, seeds = [StakeV2::PREFIX_SEED, signer.to_account_info().key().as_ref(), args.name.as_bytes()], bump)]
+    #[account(
+        init_if_needed,
+        payer = signer,
+        space = StakeV2::SPACE,
+        seeds = [
+            StakeV2::PREFIX_SEED,
+            signer.to_account_info().key().as_ref(),
+            args.name.as_bytes(),
+        ],
+        bump
+    )]
     pub stake: Box<Account<'info, StakeV2>>,
 
     #[account(
@@ -44,7 +55,7 @@ pub struct StakeNFT<'info> {
         init_if_needed,
         payer = signer,
         associated_token::mint = mint,
-        associated_token::authority = stake_vault,
+        associated_token::authority = stake_vault
     )]
     pub to_ata: Box<InterfaceAccount<'info, TokenAccount>>,
 
@@ -65,7 +76,7 @@ pub fn stake_nft(ctx: Context<StakeNFT>, args: StakeNFTArgs) -> Result<()> {
 
     let (mint_seed, _bump) = Pubkey::find_program_address(
         &[b"mint", args.name.as_bytes()],
-        &Pubkey::from_str(MYSTERY_BOX_PROGRAM).unwrap(),
+        &Pubkey::from_str(MYSTERY_BOX_PROGRAM).unwrap()
     );
 
     if mint_seed != *mint.key {
@@ -94,12 +105,16 @@ pub fn stake_nft(ctx: Context<StakeNFT>, args: StakeNFTArgs) -> Result<()> {
 
     stake_vault.nft_staked += 1;
 
-    transfer_checked(CpiContext::new(ctx.accounts.token_program.to_account_info(), TransferChecked {
-        from: ctx.accounts.from_ata.to_account_info(),
-        mint: ctx.accounts.mint.to_account_info(),
-        to: ctx.accounts.to_ata.to_account_info(),
-        authority: ctx.accounts.signer.to_account_info(),
-    }), 1, ctx.accounts.mint.decimals)?;
+    transfer_checked(
+        CpiContext::new(ctx.accounts.token_program.to_account_info(), TransferChecked {
+            from: ctx.accounts.from_ata.to_account_info(),
+            mint: ctx.accounts.mint.to_account_info(),
+            to: ctx.accounts.to_ata.to_account_info(),
+            authority: ctx.accounts.signer.to_account_info(),
+        }),
+        1,
+        ctx.accounts.mint.decimals
+    )?;
 
     Ok(())
 }

@@ -1,6 +1,9 @@
 use crate::{
-    constants::ADMIN, constraints::is_admin, errors::TriadProtocolError,
-    state::UpdateStakeVaultStatusArgs, StakeVault,
+    constants::ADMIN,
+    constraints::is_admin,
+    errors::TriadProtocolError,
+    state::UpdateStakeVaultStatusArgs,
+    StakeVault,
 };
 use anchor_lang::prelude::*;
 
@@ -18,7 +21,7 @@ pub struct UpdateStakeVaultStatus<'info> {
 
 pub fn update_stake_vault_status(
     ctx: Context<UpdateStakeVaultStatus>,
-    args: UpdateStakeVaultStatusArgs,
+    args: UpdateStakeVaultStatusArgs
 ) -> Result<()> {
     if ctx.accounts.signer.key.to_string() != ADMIN {
         return Err(TriadProtocolError::Unauthorized.into());

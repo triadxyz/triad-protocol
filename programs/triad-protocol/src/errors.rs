@@ -64,4 +64,7 @@ pub enum TriadProtocolError {
 
     #[msg("Stake overflow")]
     StakeOverflow,
+
+    #[msg("Swaps reached limit")]
+    SwapsReachedLimit,
 }

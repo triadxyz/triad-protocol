@@ -25,7 +25,7 @@ pub mod triad_protocol {
 
     pub fn update_ticker_price(
         ctx: Context<UpdateTickerPrice>,
-        args: UpdateTickerPriceArgs,
+        args: UpdateTickerPriceArgs
     ) -> Result<()> {
         instructions::update_ticker_price(ctx, args)
     }
@@ -48,7 +48,7 @@ pub mod triad_protocol {
 
     pub fn initialize_stake_vault(
         ctx: Context<InitializeStakeVault>,
-        args: InitializeStakeVaultArgs,
+        args: InitializeStakeVaultArgs
     ) -> Result<()> {
         instructions::initialize_stake_vault(ctx, args)
     }
@@ -63,14 +63,14 @@ pub mod triad_protocol {
 
     pub fn deposit_stake_rewards(
         ctx: Context<DepositStakeRewards>,
-        args: DepositStakeRewardsArgs,
+        args: DepositStakeRewardsArgs
     ) -> Result<()> {
         instructions::deposit_stake_rewards(ctx, args)
     }
 
     pub fn update_stake_vault_status(
         ctx: Context<UpdateStakeVaultStatus>,
-        args: UpdateStakeVaultStatusArgs,
+        args: UpdateStakeVaultStatusArgs
     ) -> Result<()> {
         instructions::update_stake_vault_status(ctx, args)
     }
@@ -81,5 +81,9 @@ pub mod triad_protocol {
 
     pub fn create_user(ctx: Context<CreateUser>, args: CreateUserArgs) -> Result<()> {
         instructions::create_user(ctx, args)
+    }
+
+    pub fn swap_404(ctx: Context<Swap404>) -> Result<()> {
+        instructions::swap_404(ctx)
     }
 }

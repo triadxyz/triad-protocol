@@ -1,4 +1,4 @@
-use crate::{state::User, CreateUserArgs};
+use crate::{ state::User, CreateUserArgs };
 use anchor_lang::prelude::*;
 
 #[derive(Accounts)]
@@ -10,7 +10,13 @@ pub struct CreateUser<'info> {
     #[account(mut)]
     pub referral: Account<'info, User>,
 
-    #[account(init, payer = signer, space = User::SPACE, seeds = [User::PREFIX_SEED, signer.key().as_ref()], bump)]
+    #[account(
+        init,
+        payer = signer,
+        space = User::SPACE,
+        seeds = [User::PREFIX_SEED, signer.key().as_ref()],
+        bump
+    )]
     pub user: Account<'info, User>,
 
     pub system_program: Program<'info, System>,

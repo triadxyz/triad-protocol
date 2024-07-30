@@ -1,12 +1,12 @@
-use crate::constants::{ADMIN, TTRIAD_MINT};
-use crate::constraints::is_authority_for_stake;
-use crate::{errors::TriadProtocolError, StakeVault};
-use crate::{StakeV2, User};
+use crate::constants::{ ADMIN, TTRIAD_MINT };
+use crate::constraints::{ is_authority_for_stake, is_mint_for_stake };
+use crate::{ errors::TriadProtocolError, StakeVault };
+use crate::{ StakeV2, User };
 use anchor_lang::prelude::*;
-use anchor_spl::token_2022::{close_account, CloseAccount, Token2022};
+use anchor_spl::token_2022::{ close_account, CloseAccount, Token2022 };
 use anchor_spl::{
     associated_token::AssociatedToken,
-    token_interface::{transfer_checked, Mint, TokenAccount, TransferChecked},
+    token_interface::{ transfer_checked, Mint, TokenAccount, TransferChecked },
 };
 use std::str::FromStr;
 
@@ -28,7 +28,7 @@ pub struct WithdrawStake<'info> {
     #[account(mut, constraint = admin.key.to_string() == ADMIN)]
     pub admin: AccountInfo<'info>,
 
-    #[account(mut)]
+    #[account(mut, constraint = is_mint_for_stake(&stake, &mint.key())?)]
     pub mint: Box<InterfaceAccount<'info, Mint>>,
 
     #[account(mut)]
@@ -39,7 +39,7 @@ pub struct WithdrawStake<'info> {
         payer = signer,
         constraint = to_ata.owner == *signer.key && to_ata.mint == mint.key(),
         associated_token::mint = mint,
-        associated_token::authority = signer,
+        associated_token::authority = signer
     )]
     pub to_ata: Box<InterfaceAccount<'info, TokenAccount>>,
 
@@ -57,11 +57,9 @@ pub fn withdraw_stake(ctx: Context<WithdrawStake>) -> Result<()> {
         return Err(TriadProtocolError::StakeLocked.into());
     }
 
-    let signer: &[&[&[u8]]] = &[&[
-        b"stake_vault",
-        stake_vault.name.as_bytes(),
-        &[stake_vault.bump],
-    ]];
+    let signer: &[&[&[u8]]] = &[
+        &[b"stake_vault", stake_vault.name.as_bytes(), &[stake_vault.bump]],
+    ];
 
     let is_token_stake = stake.mint.eq(&Pubkey::from_str(TTRIAD_MINT).unwrap());
 
@@ -79,7 +77,7 @@ pub fn withdraw_stake(ctx: Context<WithdrawStake>) -> Result<()> {
             to: ctx.accounts.to_ata.to_account_info().clone(),
             authority: stake_vault.to_account_info(),
         },
-        signer,
+        signer
     );
 
     transfer_checked(cpi_context, amount, ctx.accounts.mint.decimals)?;
@@ -87,24 +85,18 @@ pub fn withdraw_stake(ctx: Context<WithdrawStake>) -> Result<()> {
     if is_token_stake {
         stake_vault.token_staked -= stake.amount;
         user.staked -= stake.amount;
-
-        let result = (user.staked / 10u64.pow(stake_vault.token_decimals as u32)) / 10000;
-
-        if result > i16::MAX as u64 {
-            return Err(TriadProtocolError::StakeOverflow.into());
-        } else {
-            user.swaps = result as i16;
-        }
     } else {
-        close_account(CpiContext::new_with_signer(
-            ctx.accounts.token_program.to_account_info(),
-            CloseAccount {
-                account: ctx.accounts.from_ata.to_account_info(),
-                destination: ctx.accounts.admin.to_account_info(),
-                authority: stake_vault.to_account_info(),
-            },
-            signer,
-        ))?;
+        close_account(
+            CpiContext::new_with_signer(
+                ctx.accounts.token_program.to_account_info(),
+                CloseAccount {
+                    account: ctx.accounts.from_ata.to_account_info(),
+                    destination: ctx.accounts.admin.to_account_info(),
+                    authority: stake_vault.to_account_info(),
+                },
+                signer
+            )
+        )?;
 
         stake_vault.nft_staked -= 1;
     }

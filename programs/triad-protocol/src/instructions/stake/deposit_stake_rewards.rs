@@ -1,11 +1,12 @@
 use crate::{
-    constraints::is_authority_for_stake_vault, state::{DepositStakeRewardsArgs, StakeVault}
+    constraints::is_authority_for_stake_vault,
+    state::{ DepositStakeRewardsArgs, StakeVault },
 };
 use anchor_lang::prelude::*;
 use anchor_spl::token_2022::Token2022;
 use anchor_spl::{
     associated_token::AssociatedToken,
-    token_interface::{transfer_checked, Mint, TokenAccount, TransferChecked},
+    token_interface::{ transfer_checked, Mint, TokenAccount, TransferChecked },
 };
 
 #[derive(Accounts)]
@@ -35,7 +36,7 @@ pub struct DepositStakeRewards<'info> {
         init_if_needed,
         payer = signer,
         associated_token::mint = mint,
-        associated_token::authority = stake_vault,
+        associated_token::authority = stake_vault
     )]
     pub to_ata: Box<InterfaceAccount<'info, TokenAccount>>,
 
@@ -44,17 +45,21 @@ pub struct DepositStakeRewards<'info> {
     pub system_program: Program<'info, System>,
 }
 
-pub fn deposit_stake_rewards(ctx: Context<DepositStakeRewards>, args: DepositStakeRewardsArgs) -> Result<()> {
+pub fn deposit_stake_rewards(
+    ctx: Context<DepositStakeRewards>,
+    args: DepositStakeRewardsArgs
+) -> Result<()> {
     let stake_vault = &mut ctx.accounts.stake_vault;
 
     let cpi_context = CpiContext::new(
-        ctx.accounts.token_program.to_account_info(), 
+        ctx.accounts.token_program.to_account_info(),
         TransferChecked {
-        from: ctx.accounts.from_ata.to_account_info(),
-        mint: ctx.accounts.mint.to_account_info(),
-        to: ctx.accounts.to_ata.to_account_info(),
-        authority: ctx.accounts.signer.to_account_info(),
-    });
+            from: ctx.accounts.from_ata.to_account_info(),
+            mint: ctx.accounts.mint.to_account_info(),
+            to: ctx.accounts.to_ata.to_account_info(),
+            authority: ctx.accounts.signer.to_account_info(),
+        }
+    );
 
     transfer_checked(cpi_context, args.amount, ctx.accounts.mint.decimals)?;
 
