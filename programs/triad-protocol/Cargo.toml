@@ -2,6 +2,8 @@
 name = "triad-protocol"
 version = "0.1.0"
 edition = "2021"
+description = "Triad protocol, trade solana projects"
+license = "ISC"
 
 [lib]
 crate-type = ["cdylib", "lib"]
