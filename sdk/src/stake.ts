@@ -440,7 +440,8 @@ export default class Stake {
     const method = this.program.methods
       .updateStakeVaultStatus({
         isLocked,
-        initTs: new BN(initTs)
+        initTs: new BN(initTs),
+        slots: new BN(1839)
       })
       .accounts({
         signer: wallet,

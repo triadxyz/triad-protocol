@@ -69,4 +69,4 @@ const createUser = async () => {
   )
 }
 
-getStake()
+getUsers()
