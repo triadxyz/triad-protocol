@@ -69,18 +69,20 @@ pub fn withdraw_stake(ctx: Context<WithdrawStake>) -> Result<()> {
         amount = stake.amount;
     }
 
-    let cpi_context = CpiContext::new_with_signer(
-        ctx.accounts.token_program.to_account_info(),
-        TransferChecked {
-            from: ctx.accounts.from_ata.to_account_info().clone(),
-            mint: ctx.accounts.mint.to_account_info().clone(),
-            to: ctx.accounts.to_ata.to_account_info().clone(),
-            authority: stake_vault.to_account_info(),
-        },
-        signer
-    );
-
-    transfer_checked(cpi_context, amount, ctx.accounts.mint.decimals)?;
+    transfer_checked(
+        CpiContext::new_with_signer(
+            ctx.accounts.token_program.to_account_info(),
+            TransferChecked {
+                from: ctx.accounts.from_ata.to_account_info().clone(),
+                mint: ctx.accounts.mint.to_account_info().clone(),
+                to: ctx.accounts.to_ata.to_account_info().clone(),
+                authority: stake_vault.to_account_info(),
+            },
+            signer
+        ),
+        amount,
+        ctx.accounts.mint.decimals
+    )?;
 
     if is_token_stake {
         stake_vault.token_staked -= stake.amount;

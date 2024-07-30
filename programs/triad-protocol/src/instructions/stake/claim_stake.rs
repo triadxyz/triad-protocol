@@ -54,22 +54,6 @@ pub fn claim_stake(ctx: Context<ClaimStake>) -> Result<()> {
         signer
     );
 
-    // IF TOKEN 10K tokens
-
-    // let mut og_rewards = 0.0;
-
-    // if stake.stake_rewards != Pubkey::default() {
-    //     og_rewards = 3.69;
-    // }
-
-    // let max_rank = 1839;
-    // let rank_weigth = (max_rank - stake.rank + 1) as f64 / max_rank as f64;
-    // let multiplier = stake.collections.len() as f64 * 1.5;
-    // let auw = rank_weigth * multiplier * og_rewards;
-    // let pdru = auw / stake_vault.sum_all_users;
-
-    // let days_staked = stake_vault.init_ts - stake.init_ts;
-
     let rewards = stake.available;
 
     transfer_checked(cpi_context, rewards, ctx.accounts.mint.decimals)?;

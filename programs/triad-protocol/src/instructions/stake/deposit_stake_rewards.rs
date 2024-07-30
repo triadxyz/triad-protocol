@@ -51,17 +51,16 @@ pub fn deposit_stake_rewards(
 ) -> Result<()> {
     let stake_vault = &mut ctx.accounts.stake_vault;
 
-    let cpi_context = CpiContext::new(
-        ctx.accounts.token_program.to_account_info(),
-        TransferChecked {
+    transfer_checked(
+        CpiContext::new(ctx.accounts.token_program.to_account_info(), TransferChecked {
             from: ctx.accounts.from_ata.to_account_info(),
             mint: ctx.accounts.mint.to_account_info(),
             to: ctx.accounts.to_ata.to_account_info(),
             authority: ctx.accounts.signer.to_account_info(),
-        }
-    );
-
-    transfer_checked(cpi_context, args.amount, ctx.accounts.mint.decimals)?;
+        }),
+        args.amount,
+        ctx.accounts.mint.decimals
+    )?;
 
     stake_vault.amount += args.amount;
 

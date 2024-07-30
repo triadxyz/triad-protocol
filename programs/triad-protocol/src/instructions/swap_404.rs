@@ -7,7 +7,7 @@ pub struct Swap404<'info> {
     #[account(mut)]
     pub signer: Signer<'info>,
 
-    #[account(mut)]
+    #[account(mut, seeds = [User::PREFIX_SEED, signer.key().as_ref()], bump)]
     pub user: Account<'info, User>,
 
     pub system_program: Program<'info, System>,

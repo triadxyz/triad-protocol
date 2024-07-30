@@ -38,6 +38,18 @@ pub struct StakeVault {
 }
 
 #[derive(AnchorSerialize, AnchorDeserialize, Clone)]
+pub struct StakeDetails {
+    pub rank: u64,
+    pub collections: u16,
+}
+
+#[account]
+pub struct StakeVaultMetrics {
+    pub authority: Pubkey,
+    pub stakes: [StakeDetails; 1836],
+}
+
+#[derive(AnchorSerialize, AnchorDeserialize, Clone)]
 pub struct StakeNFTArgs {
     pub name: String,
     pub stake_vault: String,
@@ -62,6 +74,7 @@ pub struct InitializeStakeVaultArgs {
 pub struct UpdateStakeVaultStatusArgs {
     pub is_locked: bool,
     pub init_ts: i64,
+    pub slots: u64,
 }
 
 #[derive(AnchorSerialize, AnchorDeserialize, Clone)]
