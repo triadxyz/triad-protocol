@@ -6,8 +6,8 @@ mod constants;
 mod constraints;
 mod errors;
 mod events;
-mod instructions;
-mod state;
+pub mod instructions;
+pub mod state;
 
 declare_id!("TRDwq3BN4mP3m9KsuNUWSN6QDff93VKGSwE95Jbr9Ss");
 
