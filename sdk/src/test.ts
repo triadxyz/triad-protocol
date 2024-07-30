@@ -68,5 +68,3 @@ const createUser = async () => {
     }
   )
 }
-
-getUsers()
