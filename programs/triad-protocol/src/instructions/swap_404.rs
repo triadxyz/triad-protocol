@@ -16,6 +16,10 @@ pub struct Swap404<'info> {
 pub fn swap_404(ctx: Context<Swap404>) -> Result<()> {
     let user: &mut Account<User> = &mut ctx.accounts.user;
 
+    if user.swaps == 0 {
+        return Err(TriadProtocolError::SwapsReachedLimit.into());
+    }
+
     let ts = Clock::get()?.unix_timestamp;
     let is_24h = ts - user.first_swap >= 24 * 60 * 60;
 

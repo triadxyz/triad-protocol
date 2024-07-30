@@ -48,6 +48,14 @@ const getUsers = async () => {
   console.log(response)
 }
 
+const getUser = async () => {
+  const response = await triadProtocol.getUser(
+    new PublicKey('HjJQdfTHgC3EBX3471w4st8BXbBmtbaMyCAXNgcUb7dq')
+  )
+
+  console.log(response)
+}
+
 const getReferral = async () => {
   const response = await triadProtocol.hasUser(
     new PublicKey('6MuTdUhc4LDHDW3fiTemyns4NgR99oAWvHM2SwCSTcau')
