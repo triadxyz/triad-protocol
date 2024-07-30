@@ -19,10 +19,6 @@ pub fn swap_404(ctx: Context<Swap404>) -> Result<()> {
     let ts = Clock::get()?.unix_timestamp;
     let is_24h = ts - user.first_swap < 24 * 60 * 60;
 
-    if user.first_swap == 0 {
-        user.first_swap = ts;
-    }
-
     let reached_limit = user.swaps_made >= user.swaps;
 
     if reached_limit && is_24h {
