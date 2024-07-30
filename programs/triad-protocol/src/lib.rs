@@ -86,8 +86,4 @@ pub mod triad_protocol {
     pub fn swap_404(ctx: Context<Swap404>) -> Result<()> {
         instructions::swap_404(ctx)
     }
-
-    pub fn claim_stake_rewards(ctx: Context<ClaimStakeRewards>) -> Result<()> {
-        instructions::claim_stake_rewards(ctx)
-    }
 }

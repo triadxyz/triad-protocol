@@ -38,18 +38,6 @@ pub struct StakeVault {
 }
 
 #[derive(AnchorSerialize, AnchorDeserialize, Clone)]
-pub struct StakeDetails {
-    pub rank: u64,
-    pub collections: u16,
-}
-
-#[account]
-pub struct StakeVaultMetrics {
-    pub authority: Pubkey,
-    pub stakes: [StakeDetails; 1836],
-}
-
-#[derive(AnchorSerialize, AnchorDeserialize, Clone)]
 pub struct StakeNFTArgs {
     pub name: String,
     pub stake_vault: String,
