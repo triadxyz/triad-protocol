@@ -2,8 +2,9 @@
   "address": "TRDwq3BN4mP3m9KsuNUWSN6QDff93VKGSwE95Jbr9Ss",
   "metadata": {
     "name": "triad_protocol",
-    "version": "0.1.0",
-    "spec": "0.1.0"
+    "version": "0.1.4",
+    "spec": "0.1.0",
+    "description": "Triad protocol, trade solana projects"
   },
   "instructions": [
     {
@@ -509,6 +510,10 @@
           "writable": true
         },
         {
+          "name": "user",
+          "writable": true
+        },
+        {
           "name": "stake",
           "writable": true
         },
@@ -748,6 +753,38 @@
           }
         }
       ]
+    },
+    {
+      "name": "swap_404",
+      "discriminator": [227, 249, 224, 136, 128, 95, 255, 239],
+      "accounts": [
+        {
+          "name": "signer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "user",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [117, 115, 101, 114]
+              },
+              {
+                "kind": "account",
+                "path": "signer"
+              }
+            ]
+          }
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": []
     },
     {
       "name": "update_stake_vault_status",
@@ -1033,6 +1070,11 @@
       "code": 6020,
       "name": "StakeOverflow",
       "msg": "Stake overflow"
+    },
+    {
+      "code": 6021,
+      "name": "SwapsReachedLimit",
+      "msg": "Swaps reached limit"
     }
   ],
   "types": [
@@ -1474,6 +1516,10 @@
           {
             "name": "init_ts",
             "type": "i64"
+          },
+          {
+            "name": "slots",
+            "type": "u64"
           }
         ]
       }
@@ -1532,9 +1578,13 @@
             "type": "u64"
           },
           {
+            "name": "first_swap",
+            "type": "i64"
+          },
+          {
             "name": "padding",
             "type": {
-              "array": ["u8", 40]
+              "array": ["u8", 32]
             }
           }
         ]

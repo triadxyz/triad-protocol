@@ -8,8 +8,9 @@ export type TriadProtocol = {
   address: 'TRDwq3BN4mP3m9KsuNUWSN6QDff93VKGSwE95Jbr9Ss'
   metadata: {
     name: 'triadProtocol'
-    version: '0.1.0'
+    version: '0.1.4'
     spec: '0.1.0'
+    description: 'Triad protocol, trade solana projects'
   }
   instructions: [
     {
@@ -340,92 +341,6 @@ export type TriadProtocol = {
         {
           name: 'toAta'
           writable: true
-          pda: {
-            seeds: [
-              {
-                kind: 'account'
-                path: 'stakeVault'
-              },
-              {
-                kind: 'const'
-                value: [
-                  6,
-                  221,
-                  246,
-                  225,
-                  215,
-                  101,
-                  161,
-                  147,
-                  217,
-                  203,
-                  225,
-                  70,
-                  206,
-                  235,
-                  121,
-                  172,
-                  28,
-                  180,
-                  133,
-                  237,
-                  95,
-                  91,
-                  55,
-                  145,
-                  58,
-                  140,
-                  245,
-                  133,
-                  126,
-                  255,
-                  0,
-                  169
-                ]
-              },
-              {
-                kind: 'account'
-                path: 'mint'
-              }
-            ]
-            program: {
-              kind: 'const'
-              value: [
-                140,
-                151,
-                37,
-                143,
-                78,
-                36,
-                137,
-                241,
-                187,
-                61,
-                16,
-                41,
-                20,
-                142,
-                13,
-                131,
-                11,
-                90,
-                19,
-                153,
-                218,
-                255,
-                16,
-                132,
-                4,
-                142,
-                123,
-                216,
-                219,
-                233,
-                248,
-                89
-              ]
-            }
-          }
         },
         {
           name: 'tokenProgram'
@@ -588,6 +503,10 @@ export type TriadProtocol = {
         },
         {
           name: 'stakeVault'
+          writable: true
+        },
+        {
+          name: 'user'
           writable: true
         },
         {
@@ -774,6 +693,38 @@ export type TriadProtocol = {
           }
         }
       ]
+    },
+    {
+      name: 'swap404'
+      discriminator: [227, 249, 224, 136, 128, 95, 255, 239]
+      accounts: [
+        {
+          name: 'signer'
+          writable: true
+          signer: true
+        },
+        {
+          name: 'user'
+          writable: true
+          pda: {
+            seeds: [
+              {
+                kind: 'const'
+                value: [117, 115, 101, 114]
+              },
+              {
+                kind: 'account'
+                path: 'signer'
+              }
+            ]
+          }
+        },
+        {
+          name: 'systemProgram'
+          address: '11111111111111111111111111111111'
+        }
+      ]
+      args: []
     },
     {
       name: 'updateStakeVaultStatus'
@@ -1031,6 +982,11 @@ export type TriadProtocol = {
       code: 6020
       name: 'stakeOverflow'
       msg: 'Stake overflow'
+    },
+    {
+      code: 6021
+      name: 'swapsReachedLimit'
+      msg: 'Swaps reached limit'
     }
   ]
   types: [
@@ -1472,6 +1428,10 @@ export type TriadProtocol = {
           {
             name: 'initTs'
             type: 'i64'
+          },
+          {
+            name: 'slots'
+            type: 'u64'
           }
         ]
       }
@@ -1530,9 +1490,13 @@ export type TriadProtocol = {
             type: 'u64'
           },
           {
+            name: 'firstSwap'
+            type: 'i64'
+          },
+          {
             name: 'padding'
             type: {
-              array: ['u8', 40]
+              array: ['u8', 32]
             }
           }
         ]
