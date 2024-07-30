@@ -33,23 +33,57 @@ export default class TriadProtocolClient {
   }
 
   /**
-   * Get all Users
+   * Get User by wallet
+   * @param wallet - User wallet
+   */
+  getUser = async (wallet: PublicKey) => {
+    const UserPDA = getUserAddressSync(this.program.programId, wallet)
+    const response = await this.program.account.user.fetch(UserPDA)
+
+    return formatUser(response)
+  }
+
+  /**
+   * Get User by wallet
+   * @param wallet - User wallet
    */
   getUsers = async () => {
     const response = await this.program.account.user.all()
 
-    return response.map((item) => formatUser(item.account))
+    return response
+      .map((item) => formatUser(item.account))
+      .sort((a, b) => b.referred - a.referred)
   }
 
-  hasReferral = async (referral: string) => {
+  /**
+   * Check if user exists
+   * @param username - User name
+   */
+  hasUser = async (wallet: PublicKey) => {
     try {
       await this.program.account.user.fetch(
-        getUserAddressSync(this.program.programId, referral)
+        getUserAddressSync(this.program.programId, wallet)
       )
 
       return true
     } catch {
       return false
+    }
+  }
+
+  /**
+   * Get Refferal
+   * @param name - User name
+   */
+  getRefferal = async (name: string) => {
+    try {
+      const response = await this.program.account.user.all()
+
+      const data = response.find((item) => item.account.name === name)
+
+      return data.publicKey
+    } catch {
+      return ''
     }
   }
 
@@ -97,16 +131,13 @@ export default class TriadProtocolClient {
     { wallet, name, referral }: CreateUserArgs,
     options?: RpcOptions
   ) => {
-    const referralPDA = getUserAddressSync(this.program.programId, referral)
-
     const method = this.program.methods
       .createUser({
-        name,
-        referral: referralPDA
+        name
       })
       .accounts({
         signer: wallet,
-        referral: referralPDA
+        referral
       })
 
     if (options?.microLamports) {

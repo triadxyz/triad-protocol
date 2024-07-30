@@ -8,5 +8,5 @@ export type RpcOptions = {
 export type CreateUserArgs = {
   wallet: PublicKey
   name: string
-  referral?: string
+  referral?: PublicKey
 }

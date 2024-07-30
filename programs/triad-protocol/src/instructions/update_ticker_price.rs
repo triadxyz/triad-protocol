@@ -1,7 +1,7 @@
 use crate::{
     constraints::is_authority_for_ticker,
     events::TickerPriceUpdateRecord,
-    state::{Ticker, UpdateTickerPriceArgs},
+    state::{ Ticker, UpdateTickerPriceArgs },
 };
 
 use anchor_lang::prelude::*;
@@ -20,7 +20,7 @@ pub struct UpdateTickerPrice<'info> {
 
 pub fn update_ticker_price(
     ctx: Context<UpdateTickerPrice>,
-    args: UpdateTickerPriceArgs,
+    args: UpdateTickerPriceArgs
 ) -> Result<()> {
     let ticker = &mut ctx.accounts.ticker;
 

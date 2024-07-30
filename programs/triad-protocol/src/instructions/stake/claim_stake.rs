@@ -1,14 +1,8 @@
 use crate::StakeV2;
-use crate::{
-    constraints::{is_authority_for_stake, is_ttriad_mint},
-    state::StakeVault,
-};
+use crate::{ constraints::{ is_authority_for_stake, is_ttriad_mint }, state::StakeVault };
 use anchor_lang::prelude::*;
-use anchor_spl::token_2022::Token2022;
-use anchor_spl::{
-    associated_token::AssociatedToken,
-    token_interface::{transfer_checked, Mint, TokenAccount, TransferChecked},
-};
+use anchor_spl::token_2022::{ transfer_checked, Token2022, TransferChecked };
+use anchor_spl::{ associated_token::AssociatedToken, token_interface::{ Mint, TokenAccount } };
 
 #[derive(Accounts)]
 pub struct ClaimStake<'info> {
@@ -32,7 +26,7 @@ pub struct ClaimStake<'info> {
         payer = signer,
         constraint = to_ata.owner == *signer.key && to_ata.mint == mint.key(),
         associated_token::mint = mint,
-        associated_token::authority = signer,
+        associated_token::authority = signer
     )]
     pub to_ata: Box<InterfaceAccount<'info, TokenAccount>>,
 
@@ -45,11 +39,9 @@ pub fn claim_stake(ctx: Context<ClaimStake>) -> Result<()> {
     let stake_vault = &mut ctx.accounts.stake_vault;
     let stake = &mut ctx.accounts.stake;
 
-    let signer: &[&[&[u8]]] = &[&[
-        b"stake_vault",
-        stake_vault.name.as_bytes(),
-        &[stake_vault.bump],
-    ]];
+    let signer: &[&[&[u8]]] = &[
+        &[b"stake_vault", stake_vault.name.as_bytes(), &[stake_vault.bump]],
+    ];
 
     let cpi_context = CpiContext::new_with_signer(
         ctx.accounts.token_program.to_account_info(),
@@ -59,24 +51,8 @@ pub fn claim_stake(ctx: Context<ClaimStake>) -> Result<()> {
             to: ctx.accounts.to_ata.to_account_info(),
             authority: stake_vault.to_account_info(),
         },
-        signer,
+        signer
     );
-
-    // IF TOKEN 10K tokens
-
-    // let mut og_rewards = 0.0;
-
-    // if stake.stake_rewards != Pubkey::default() {
-    //     og_rewards = 3.69;
-    // }
-
-    // let max_rank = 1839;
-    // let rank_weigth = (max_rank - stake.rank + 1) as f64 / max_rank as f64;
-    // let multiplier = stake.collections.len() as f64 * 1.5;
-    // let auw = rank_weigth * multiplier * og_rewards;
-    // let pdru = auw / stake_vault.sum_all_users;
-
-    // let days_staked = stake_vault.init_ts - stake.init_ts;
 
     let rewards = stake.available;
 
@@ -84,6 +60,7 @@ pub fn claim_stake(ctx: Context<ClaimStake>) -> Result<()> {
 
     stake_vault.amount -= rewards;
     stake_vault.amount_paid += rewards;
+
     stake.claimed += rewards;
     stake.available = 0;
 

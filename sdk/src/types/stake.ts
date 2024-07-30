@@ -25,7 +25,6 @@ export type StakeTokenArgs = {
   name: string
   wallet: PublicKey
   stakeVault: string
-  mint: PublicKey
   amount: number
 }
 
@@ -60,8 +59,8 @@ export type WithdrawArgs = {
 export type UpdateStakeVaultStatusArgs = {
   wallet: PublicKey
   isLocked: boolean
-  week: number
   stakeVault: string
+  initTs: number
 }
 
 export type ClaimStakeRewardsArgs = {
@@ -135,4 +134,7 @@ export type UserResponse = {
   referral: string
   referred: number
   name: string
+  swapsMade: number
+  swaps: number
+  staked: number
 }

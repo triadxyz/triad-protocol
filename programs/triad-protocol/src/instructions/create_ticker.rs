@@ -1,12 +1,12 @@
 use crate::{
     constants::ADMIN,
     errors::TriadProtocolError,
-    state::{CreateTickerArgs, Ticker},
+    state::{ CreateTickerArgs, Ticker },
     Vault,
 };
 
 use anchor_lang::prelude::*;
-use anchor_spl::token::{Mint, Token, TokenAccount};
+use anchor_spl::token::{ Mint, Token, TokenAccount };
 
 #[derive(Accounts)]
 #[instruction(args: CreateTickerArgs)]
@@ -14,10 +14,22 @@ pub struct CreateTicker<'info> {
     #[account(mut)]
     pub signer: Signer<'info>,
 
-    #[account(init, payer = signer, space = Ticker::SPACE, seeds = [Ticker::PREFIX_SEED, args.name.as_bytes()], bump)]
+    #[account(
+        init,
+        payer = signer,
+        space = Ticker::SPACE,
+        seeds = [Ticker::PREFIX_SEED, args.name.as_bytes()],
+        bump
+    )]
     pub ticker: Box<Account<'info, Ticker>>,
 
-    #[account(init, payer = signer, space = Vault::SPACE, seeds = [Vault::PREFIX_SEED, ticker.to_account_info().key.as_ref()], bump)]
+    #[account(
+        init,
+        payer = signer,
+        space = Vault::SPACE,
+        seeds = [Vault::PREFIX_SEED, ticker.to_account_info().key.as_ref()],
+        bump
+    )]
     pub vault: Box<Account<'info, Vault>>,
 
     pub payer_token_mint: Box<Account<'info, Mint>>,
@@ -28,7 +40,7 @@ pub struct CreateTicker<'info> {
         bump,
         payer = signer,
         token::mint = payer_token_mint,
-        token::authority = vault,
+        token::authority = vault
     )]
     pub token_account: Box<Account<'info, TokenAccount>>,
 

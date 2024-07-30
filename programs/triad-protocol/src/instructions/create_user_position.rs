@@ -1,4 +1,4 @@
-use crate::{state::UserPosition, Position, Ticker};
+use crate::{ state::UserPosition, Position, Ticker };
 
 use anchor_lang::prelude::*;
 
@@ -10,7 +10,13 @@ pub struct CreateUserPosition<'info> {
     #[account(mut)]
     pub ticker: Account<'info, Ticker>,
 
-    #[account(init, payer = signer, space = UserPosition::SPACE, seeds = [UserPosition::PREFIX_SEED, signer.key().as_ref(), ticker.key().as_ref()], bump)]
+    #[account(
+        init,
+        payer = signer,
+        space = UserPosition::SPACE,
+        seeds = [UserPosition::PREFIX_SEED, signer.key().as_ref(), ticker.key().as_ref()],
+        bump
+    )]
     pub user_position: Account<'info, UserPosition>,
 
     pub system_program: Program<'info, System>,

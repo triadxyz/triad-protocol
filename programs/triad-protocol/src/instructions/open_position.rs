@@ -1,12 +1,12 @@
-use crate::constraints::{is_authority_for_user_position, is_token_mint_for_vault};
+use crate::constraints::{ is_authority_for_user_position, is_token_mint_for_vault };
 use crate::errors::TriadProtocolError;
 use crate::events::OpenPositionRecord;
 use crate::state::Vault;
-use crate::{OpenPositionArgs, UserPosition};
-use crate::{Position, Ticker};
+use crate::{ OpenPositionArgs, UserPosition };
+use crate::{ Position, Ticker };
 
 use anchor_lang::prelude::*;
-use anchor_spl::token::{self, Token, TokenAccount, Transfer};
+use anchor_spl::token::{ self, Token, TokenAccount, Transfer };
 
 #[derive(Accounts)]
 #[instruction(args: OpenPositionArgs)]
@@ -48,15 +48,12 @@ pub struct OpenPosition<'info> {
 
 pub fn open_position(ctx: Context<OpenPosition>, args: OpenPositionArgs) -> Result<()> {
     let transfer = token::transfer(
-        CpiContext::new(
-            ctx.accounts.token_program.to_account_info(),
-            Transfer {
-                from: ctx.accounts.user_token_account.to_account_info(),
-                to: ctx.accounts.vault_token_account.to_account_info(),
-                authority: ctx.accounts.signer.to_account_info(),
-            },
-        ),
-        args.amount,
+        CpiContext::new(ctx.accounts.token_program.to_account_info(), Transfer {
+            from: ctx.accounts.user_token_account.to_account_info(),
+            to: ctx.accounts.vault_token_account.to_account_info(),
+            authority: ctx.accounts.signer.to_account_info(),
+        }),
+        args.amount
     );
 
     if transfer.is_err() {

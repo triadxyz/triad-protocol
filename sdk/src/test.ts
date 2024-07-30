@@ -18,8 +18,8 @@ const updateStakeVaultStatus = async () => {
     {
       wallet: wallet.publicKey,
       isLocked: false,
-      week: 4,
-      stakeVault: STAKE_SEASON
+      stakeVault: STAKE_SEASON,
+      initTs: 0
     },
     {
       skipPreflight: true,
@@ -30,17 +30,15 @@ const updateStakeVaultStatus = async () => {
   console.log(response)
 }
 
-updateStakeVaultStatus()
-
 const getStake = async () => {
-  const response = await triadProtocol.stake.getStakeByWallet(
-    new PublicKey('BCTdjdcjMiECGFbF5Ps15yjLRPzy5YZGJNa4VdGRbhjB'),
-    STAKE_SEASON
-  )
+  // const response = await triadProtocol.stake.getStakeByWallet(
+  //   new PublicKey('BCTdjdcjMiECGFbF5Ps15yjLRPzy5YZGJNa4VdGRbhjB'),
+  //   STAKE_SEASON
+  // )
 
   const stakeVaults = await triadProtocol.stake.getStakeVaults()
 
-  console.log(response)
+  // console.log(response)
   console.log(stakeVaults)
 }
 
@@ -50,16 +48,25 @@ const getUsers = async () => {
   console.log(response)
 }
 
-const getStakes = async () => {
-  const response = await triadProtocol.stake.getStakes(STAKE_SEASON)
-
-  console.log(response)
-
-  fs.writeFileSync('stakes.json', JSON.stringify(response))
-}
-
 const getReferral = async () => {
-  const response = await triadProtocol.hasReferral('a')
+  const response = await triadProtocol.hasUser(
+    new PublicKey('6MuTdUhc4LDHDW3fiTemyns4NgR99oAWvHM2SwCSTcau')
+  )
 
   console.log(response)
 }
+
+const createUser = async () => {
+  const response = await triadProtocol.createUser(
+    {
+      wallet: wallet.publicKey,
+      referral: new PublicKey('5vPF9vByRCUB2pr1oGmJsRPm9WDrH9a2v6iF4pbMiobK'),
+      name: 'Builder'
+    },
+    {
+      microLamports: 10000
+    }
+  )
+}
+
+getStake()

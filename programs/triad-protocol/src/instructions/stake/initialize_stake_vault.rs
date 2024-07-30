@@ -1,4 +1,4 @@
-use crate::{constraints::is_admin, state::InitializeStakeVaultArgs, StakeVault};
+use crate::{ constraints::is_admin, state::InitializeStakeVaultArgs, StakeVault };
 use anchor_lang::prelude::*;
 use anchor_spl::token::Token;
 
@@ -24,7 +24,7 @@ pub struct InitializeStakeVault<'info> {
 
 pub fn initialize_stake_vault(
     ctx: Context<InitializeStakeVault>,
-    args: InitializeStakeVaultArgs,
+    args: InitializeStakeVaultArgs
 ) -> Result<()> {
     let stake_vault = &mut ctx.accounts.stake_vault;
 

@@ -8,8 +8,9 @@ export type TriadProtocol = {
   address: 'TRDwq3BN4mP3m9KsuNUWSN6QDff93VKGSwE95Jbr9Ss'
   metadata: {
     name: 'triadProtocol'
-    version: '0.1.0'
+    version: '0.1.4'
     spec: '0.1.0'
+    description: 'Triad protocol, trade solana projects'
   }
   instructions: [
     {
@@ -228,8 +229,8 @@ export type TriadProtocol = {
                 value: [117, 115, 101, 114]
               },
               {
-                kind: 'arg'
-                path: 'args.name'
+                kind: 'account'
+                path: 'signer'
               }
             ]
           }
@@ -411,88 +412,6 @@ export type TriadProtocol = {
       ]
     },
     {
-      name: 'migrateStake'
-      discriminator: [178, 5, 26, 85, 56, 20, 153, 160]
-      accounts: [
-        {
-          name: 'signer'
-          writable: true
-          signer: true
-        },
-        {
-          name: 'stakeVault'
-          writable: true
-          pda: {
-            seeds: [
-              {
-                kind: 'const'
-                value: [115, 116, 97, 107, 101, 95, 118, 97, 117, 108, 116]
-              },
-              {
-                kind: 'arg'
-                path: 'args.stake_vault'
-              }
-            ]
-          }
-        },
-        {
-          name: 'stakeV1'
-          writable: true
-        },
-        {
-          name: 'stakeV2'
-          writable: true
-          pda: {
-            seeds: [
-              {
-                kind: 'const'
-                value: [115, 116, 97, 107, 101]
-              },
-              {
-                kind: 'account'
-                path: 'stake_v1.authority'
-                account: 'stake'
-              },
-              {
-                kind: 'arg'
-                path: 'args.name'
-              }
-            ]
-          }
-        },
-        {
-          name: 'mint'
-          writable: true
-        },
-        {
-          name: 'nftRewards'
-          writable: true
-        },
-        {
-          name: 'tokenProgram'
-          address: 'TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb'
-        },
-        {
-          name: 'associatedTokenProgram'
-          address: 'ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL'
-        },
-        {
-          name: 'systemProgram'
-          address: '11111111111111111111111111111111'
-        }
-      ]
-      args: [
-        {
-          name: 'args'
-          type: {
-            defined: {
-              name: 'migrateStakeArgs'
-            }
-          }
-        }
-      ]
-    },
-    {
       name: 'openPosition'
       discriminator: [135, 128, 47, 77, 15, 152, 240, 49]
       accounts: [
@@ -584,6 +503,10 @@ export type TriadProtocol = {
         },
         {
           name: 'stakeVault'
+          writable: true
+        },
+        {
+          name: 'user'
           writable: true
         },
         {
@@ -712,6 +635,10 @@ export type TriadProtocol = {
           }
         },
         {
+          name: 'user'
+          writable: true
+        },
+        {
           name: 'stake'
           writable: true
           pda: {
@@ -766,6 +693,38 @@ export type TriadProtocol = {
           }
         }
       ]
+    },
+    {
+      name: 'swap404'
+      discriminator: [227, 249, 224, 136, 128, 95, 255, 239]
+      accounts: [
+        {
+          name: 'signer'
+          writable: true
+          signer: true
+        },
+        {
+          name: 'user'
+          writable: true
+          pda: {
+            seeds: [
+              {
+                kind: 'const'
+                value: [117, 115, 101, 114]
+              },
+              {
+                kind: 'account'
+                path: 'signer'
+              }
+            ]
+          }
+        },
+        {
+          name: 'systemProgram'
+          address: '11111111111111111111111111111111'
+        }
+      ]
+      args: []
     },
     {
       name: 'updateStakeVaultStatus'
@@ -839,6 +798,10 @@ export type TriadProtocol = {
           writable: true
         },
         {
+          name: 'user'
+          writable: true
+        },
+        {
           name: 'stake'
           writable: true
         },
@@ -875,14 +838,6 @@ export type TriadProtocol = {
     }
   ]
   accounts: [
-    {
-      name: 'nftRewards'
-      discriminator: [210, 99, 18, 65, 58, 128, 167, 91]
-    },
-    {
-      name: 'stake'
-      discriminator: [150, 197, 176, 29, 55, 132, 112, 149]
-    },
     {
       name: 'stakeV2'
       discriminator: [207, 98, 130, 13, 118, 181, 238, 47]
@@ -1022,6 +977,16 @@ export type TriadProtocol = {
       code: 6019
       name: 'rewardsAlreadyClaimed'
       msg: 'Rewards already claimed'
+    },
+    {
+      code: 6020
+      name: 'stakeOverflow'
+      msg: 'Stake overflow'
+    },
+    {
+      code: 6021
+      name: 'swapsReachedLimit'
+      msg: 'Swaps reached limit'
     }
   ]
   types: [
@@ -1074,26 +1039,6 @@ export type TriadProtocol = {
       }
     },
     {
-      name: 'collection'
-      type: {
-        kind: 'enum'
-        variants: [
-          {
-            name: 'coleta'
-          },
-          {
-            name: 'undead'
-          },
-          {
-            name: 'alligators'
-          },
-          {
-            name: 'pyth'
-          }
-        ]
-      }
-    },
-    {
       name: 'createTickerArgs'
       type: {
         kind: 'struct'
@@ -1117,10 +1062,6 @@ export type TriadProtocol = {
           {
             name: 'name'
             type: 'string'
-          },
-          {
-            name: 'referral'
-            type: 'pubkey'
           }
         ]
       }
@@ -1161,50 +1102,6 @@ export type TriadProtocol = {
           {
             name: 'amount'
             type: 'u64'
-          }
-        ]
-      }
-    },
-    {
-      name: 'migrateStakeArgs'
-      type: {
-        kind: 'struct'
-        fields: [
-          {
-            name: 'name'
-            type: 'string'
-          },
-          {
-            name: 'stakeVault'
-            type: 'string'
-          }
-        ]
-      }
-    },
-    {
-      name: 'nftRewards'
-      type: {
-        kind: 'struct'
-        fields: [
-          {
-            name: 'stake'
-            type: 'pubkey'
-          },
-          {
-            name: 'dailyRewards'
-            type: {
-              array: ['u64', 30]
-            }
-          },
-          {
-            name: 'weeklyRewardsPaid'
-            type: {
-              array: ['bool', 5]
-            }
-          },
-          {
-            name: 'apr'
-            type: 'f32'
           }
         ]
       }
@@ -1285,94 +1182,6 @@ export type TriadProtocol = {
           {
             name: 'pnl'
             type: 'i64'
-          }
-        ]
-      }
-    },
-    {
-      name: 'rarity'
-      type: {
-        kind: 'enum'
-        variants: [
-          {
-            name: 'common'
-          },
-          {
-            name: 'uncommon'
-          },
-          {
-            name: 'rare'
-          },
-          {
-            name: 'epic'
-          },
-          {
-            name: 'legendary'
-          },
-          {
-            name: 'mythic'
-          }
-        ]
-      }
-    },
-    {
-      name: 'stake'
-      type: {
-        kind: 'struct'
-        fields: [
-          {
-            name: 'bump'
-            type: 'u8'
-          },
-          {
-            name: 'authority'
-            type: 'pubkey'
-          },
-          {
-            name: 'initTs'
-            type: 'i64'
-          },
-          {
-            name: 'isLocked'
-            type: 'bool'
-          },
-          {
-            name: 'withdrawTs'
-            type: 'i64'
-          },
-          {
-            name: 'name'
-            type: 'string'
-          },
-          {
-            name: 'collections'
-            type: {
-              vec: {
-                defined: {
-                  name: 'collection'
-                }
-              }
-            }
-          },
-          {
-            name: 'rarity'
-            type: {
-              defined: {
-                name: 'rarity'
-              }
-            }
-          },
-          {
-            name: 'mint'
-            type: 'pubkey'
-          },
-          {
-            name: 'stakeVault'
-            type: 'pubkey'
-          },
-          {
-            name: 'stakeRewards'
-            type: 'pubkey'
           }
         ]
       }
@@ -1617,8 +1426,12 @@ export type TriadProtocol = {
             type: 'bool'
           },
           {
-            name: 'week'
-            type: 'u8'
+            name: 'initTs'
+            type: 'i64'
+          },
+          {
+            name: 'slots'
+            type: 'u64'
           }
         ]
       }
@@ -1663,6 +1476,28 @@ export type TriadProtocol = {
           {
             name: 'name'
             type: 'string'
+          },
+          {
+            name: 'swaps'
+            type: 'i16'
+          },
+          {
+            name: 'swapsMade'
+            type: 'i16'
+          },
+          {
+            name: 'staked'
+            type: 'u64'
+          },
+          {
+            name: 'firstSwap'
+            type: 'i64'
+          },
+          {
+            name: 'padding'
+            type: {
+              array: ['u8', 32]
+            }
           }
         ]
       }
