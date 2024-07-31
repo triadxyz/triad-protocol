@@ -67,4 +67,7 @@ pub enum TriadProtocolError {
 
     #[msg("Swaps reached limit")]
     SwapsReachedLimit,
+
+    #[msg("Insufficient funds")]
+    InsufficientFunds,
 }

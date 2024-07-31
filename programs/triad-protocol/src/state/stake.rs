@@ -37,6 +37,19 @@ pub struct StakeVault {
     pub padding: [u8; 32],
 }
 
+#[account]
+pub struct StakeMetrics {
+    pub rank: u32,
+    pub collections: u16,
+}
+
+#[account]
+pub struct StakeVaultMetadata {
+    pub markle_root: [u8; 32],
+    pub stake_vault: Pubkey,
+    pub data: Vec<u8>,
+}
+
 #[derive(AnchorSerialize, AnchorDeserialize, Clone)]
 pub struct StakeNFTArgs {
     pub name: String,

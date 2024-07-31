@@ -14,8 +14,8 @@ export type TriadProtocol = {
   }
   instructions: [
     {
-      name: 'claimStake'
-      discriminator: [62, 145, 133, 242, 244, 59, 53, 139]
+      name: 'claimStakeRewards'
+      discriminator: [107, 91, 233, 196, 211, 47, 218, 21]
       accounts: [
         {
           name: 'signer'
@@ -56,6 +56,7 @@ export type TriadProtocol = {
         }
       ]
       args: []
+      returns: 'u64'
     },
     {
       name: 'closePosition'
@@ -987,6 +988,11 @@ export type TriadProtocol = {
       code: 6021
       name: 'swapsReachedLimit'
       msg: 'Swaps reached limit'
+    },
+    {
+      code: 6022
+      name: 'insufficientFunds'
+      msg: 'Insufficient funds'
     }
   ]
   types: [

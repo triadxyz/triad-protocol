@@ -75,8 +75,8 @@ pub mod triad_protocol {
         instructions::update_stake_vault_status(ctx, args)
     }
 
-    pub fn claim_stake(ctx: Context<ClaimStake>) -> Result<()> {
-        instructions::claim_stake(ctx)
+    pub fn claim_stake_rewards(ctx: Context<ClaimStakeRewards>) -> Result<u64> {
+        instructions::claim_stake_rewards(ctx)
     }
 
     pub fn create_user(ctx: Context<CreateUser>, args: CreateUserArgs) -> Result<()> {
