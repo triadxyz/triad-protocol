@@ -20,17 +20,7 @@ pub fn swap_404(ctx: Context<Swap404>) -> Result<()> {
         return Err(TriadProtocolError::SwapsReachedLimit.into());
     }
 
-    let ts = Clock::get()?.unix_timestamp;
-    let is_24h = ts - user.first_swap >= 24 * 60 * 60;
-
-    let mut reached_limit = user.swaps_made >= user.swaps;
-
-    if reached_limit && is_24h {
-        user.swaps_made = 0;
-        user.first_swap = ts;
-
-        reached_limit = false;
-    }
+    let reached_limit = user.swaps_made >= user.swaps;
 
     if reached_limit {
         return Err(TriadProtocolError::SwapsReachedLimit.into());

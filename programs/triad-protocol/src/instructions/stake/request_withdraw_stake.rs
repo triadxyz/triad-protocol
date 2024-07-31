@@ -41,6 +41,8 @@ pub fn request_withdraw_stake(ctx: Context<RequestWithdrawStake>) -> Result<()> 
     if stake.mint.to_string() == TTRIAD_MINT {
         days = 7;
 
+        user.staked -= stake.amount;
+
         let result = user.staked / (10u64).pow(stake_vault.token_decimals as u32) / 10000;
 
         if result > (i16::MAX as u64) {

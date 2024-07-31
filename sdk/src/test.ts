@@ -50,7 +50,7 @@ const getUsers = async () => {
 
 const getUser = async () => {
   const response = await triadProtocol.getUser(
-    new PublicKey('HjJQdfTHgC3EBX3471w4st8BXbBmtbaMyCAXNgcUb7dq')
+    new PublicKey('FrE4R7QSAZSBg6ZHE25hfoCYRj8rqh8BovcHQ2pDscMQ')
   )
 
   console.log(response)
@@ -76,3 +76,6 @@ const createUser = async () => {
     }
   )
 }
+
+
+getUser()

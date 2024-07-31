@@ -51,7 +51,6 @@ pub struct WithdrawStake<'info> {
 pub fn withdraw_stake(ctx: Context<WithdrawStake>) -> Result<()> {
     let stake = &mut ctx.accounts.stake;
     let stake_vault = &mut ctx.accounts.stake_vault;
-    let user = &mut ctx.accounts.user;
 
     if stake.withdraw_ts > Clock::get()?.unix_timestamp {
         return Err(TriadProtocolError::StakeLocked.into());
@@ -86,7 +85,6 @@ pub fn withdraw_stake(ctx: Context<WithdrawStake>) -> Result<()> {
 
     if is_token_stake {
         stake_vault.token_staked -= stake.amount;
-        user.staked -= stake.amount;
     } else {
         close_account(
             CpiContext::new_with_signer(

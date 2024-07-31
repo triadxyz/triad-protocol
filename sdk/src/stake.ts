@@ -356,10 +356,12 @@ export default class Stake {
       stakeVault
     )
     const stakePDA = getStakeAddressSync(this.program.programId, wallet, name)
+    const userPAD = getUserAddressSync(this.program.programId, wallet)
 
     const method = this.program.methods.requestWithdrawStake().accounts({
       signer: wallet,
       mint: mint,
+      user: userPAD,
       stake: stakePDA,
       stakeVault: stakeVaultPDA
     })
