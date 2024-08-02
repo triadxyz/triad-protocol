@@ -31,14 +31,14 @@ const updateStakeVaultStatus = async () => {
 }
 
 const getStake = async () => {
-  // const response = await triadProtocol.stake.getStakeByWallet(
-  //   new PublicKey('BCTdjdcjMiECGFbF5Ps15yjLRPzy5YZGJNa4VdGRbhjB'),
-  //   STAKE_SEASON
-  // )
+  const response = await triadProtocol.stake.getStakeByWallet(
+    new PublicKey('Dv7QnfzEAfNC9F4QkB5DiKbTVATnQVLfsf7nNfvvx9hy'),
+    STAKE_SEASON
+  )
 
   const stakeVaults = await triadProtocol.stake.getStakeVaults()
 
-  // console.log(response)
+  console.log(response)
   console.log(stakeVaults)
 }
 
@@ -78,4 +78,4 @@ const createUser = async () => {
 }
 
 
-getUser()
+getStake()
