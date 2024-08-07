@@ -1,11 +1,21 @@
 use std::str::FromStr;
 
-use crate::{ constants::{ ADMIN, TTRIAD_MINT }, StakeV2, StakeVault, Ticker, UserPosition };
+use crate::{
+    constants::{ ADMIN, TTRIAD_MINT, VERIFIER },
+    StakeV2,
+    StakeVault,
+    Ticker,
+    UserPosition,
+};
 
 use anchor_lang::prelude::*;
 
 pub fn is_admin(signer: &Signer) -> anchor_lang::Result<bool> {
     Ok(Pubkey::from_str(ADMIN).unwrap().eq(signer.key))
+}
+
+pub fn is_verifier(signer: &Signer) -> anchor_lang::Result<bool> {
+    Ok(Pubkey::from_str(VERIFIER).unwrap().eq(signer.key))
 }
 
 pub fn is_ttriad_mint(mint: &Pubkey) -> anchor_lang::Result<bool> {
