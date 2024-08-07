@@ -32,7 +32,7 @@ const updateStakeVaultStatus = async () => {
 
 const getStake = async () => {
   const response = await triadProtocol.stake.getStakeByWallet(
-    new PublicKey('Dv7QnfzEAfNC9F4QkB5DiKbTVATnQVLfsf7nNfvvx9hy'),
+    new PublicKey('BCTdjdcjMiECGFbF5Ps15yjLRPzy5YZGJNa4VdGRbhjB'),
     STAKE_SEASON
   )
 
@@ -49,9 +49,7 @@ const getUsers = async () => {
 }
 
 const getUser = async () => {
-  const response = await triadProtocol.getUser(
-    new PublicKey('FrE4R7QSAZSBg6ZHE25hfoCYRj8rqh8BovcHQ2pDscMQ')
-  )
+  const response = await triadProtocol.getUser(wallet.publicKey)
 
   console.log(response)
 }
@@ -77,5 +75,17 @@ const createUser = async () => {
   )
 }
 
+const getRewards = async () => {
+  const response = await triadProtocol.stake.getStakeRewards({
+    wallet: new PublicKey('BCTdjdcjMiECGFbF5Ps15yjLRPzy5YZGJNa4VdGRbhjB'),
+    mint: new PublicKey('t3DohmswhKk94PPbPYwA6ZKACyY3y5kbcqeQerAJjmV'),
+    nftName: 'Triad 2996',
+    stakeVault: STAKE_SEASON,
+    collections: 3,
+    rank: 40
+  })
 
-getStake()
+  console.log(response)
+}
+
+getRewards()

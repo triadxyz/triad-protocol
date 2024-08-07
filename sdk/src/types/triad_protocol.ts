@@ -23,6 +23,11 @@ export type TriadProtocol = {
           signer: true
         },
         {
+          name: 'verifier'
+          writable: true
+          signer: true
+        },
+        {
           name: 'stakeVault'
           writable: true
         },
@@ -55,7 +60,16 @@ export type TriadProtocol = {
           address: '11111111111111111111111111111111'
         }
       ]
-      args: []
+      args: [
+        {
+          name: 'args'
+          type: {
+            defined: {
+              name: 'claimStakeRewardsArgs'
+            }
+          }
+        }
+      ]
       returns: 'u64'
     },
     {
@@ -996,6 +1010,22 @@ export type TriadProtocol = {
     }
   ]
   types: [
+    {
+      name: 'claimStakeRewardsArgs'
+      type: {
+        kind: 'struct'
+        fields: [
+          {
+            name: 'rank'
+            type: 'u16'
+          },
+          {
+            name: 'collections'
+            type: 'u8'
+          }
+        ]
+      }
+    },
     {
       name: 'closePositionArgs'
       type: {

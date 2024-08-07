@@ -27,7 +27,8 @@ import {
   ClaimStakeRewardsArgs,
   StakeTokenArgs
 } from './types/stake'
-import { TTRIAD_MINT } from './utils/constants'
+import { TTRIAD_DECIMALS, TTRIAD_MINT, VERIFIER } from './utils/constants'
+import { toByteArray } from 'base64-js'
 
 export default class Stake {
   program: Program<TriadProtocol>
@@ -54,7 +55,9 @@ export default class Stake {
     wallet,
     mint,
     stakeVault,
-    nftName
+    nftName,
+    collections,
+    rank
   }: ClaimStakeRewardsArgs) {
     const StakeVault = getStakeVaultAddressSync(
       this.program.programId,
@@ -64,19 +67,25 @@ export default class Stake {
     const FromAta = getATASync(StakeVault, mint)
     const ToAta = getATASync(wallet, mint)
 
-    const method = this.program.methods
-      .claimStakeRewards()
+    const method = await this.program.methods
+      .claimStakeRewards({
+        collections,
+        rank
+      })
       .accounts({
         signer: wallet,
         fromAta: FromAta,
         mint: mint,
         toAta: ToAta,
         stake: Stake,
-        stakeVault: StakeVault
+        stakeVault: StakeVault,
+        verifier: new PublicKey(VERIFIER)
       })
-      .view()
+      .simulate()
 
-    console.log(method)
+    let value = method.raw[method.raw.length - 2].split(' ')[3]
+
+    return new BN(toByteArray(value), 'le').toNumber() / 10 ** TTRIAD_DECIMALS
   }
 
   /**
@@ -459,7 +468,14 @@ export default class Stake {
    *
    */
   public async claimStakeRewards(
-    { wallet, mint, stakeVault, nftName }: ClaimStakeRewardsArgs,
+    {
+      wallet,
+      mint,
+      stakeVault,
+      nftName,
+      collections,
+      rank
+    }: ClaimStakeRewardsArgs,
     options?: RpcOptions
   ) {
     const StakeVault = getStakeVaultAddressSync(
@@ -470,14 +486,20 @@ export default class Stake {
     const FromAta = getATASync(StakeVault, mint)
     const ToAta = getATASync(wallet, mint)
 
-    const method = this.program.methods.claimStakeRewards().accounts({
-      signer: wallet,
-      fromAta: FromAta,
-      mint: mint,
-      toAta: ToAta,
-      stake: Stake,
-      stakeVault: StakeVault
-    })
+    const method = this.program.methods
+      .claimStakeRewards({
+        collections,
+        rank
+      })
+      .accounts({
+        signer: wallet,
+        fromAta: FromAta,
+        mint: mint,
+        toAta: ToAta,
+        stake: Stake,
+        stakeVault: StakeVault,
+        verifier: new PublicKey(VERIFIER)
+      })
 
     if (options?.microLamports) {
       method.postInstructions([
