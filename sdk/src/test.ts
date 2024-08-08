@@ -32,7 +32,7 @@ const updateStakeVaultStatus = async () => {
 
 const getStake = async () => {
   const response = await triadProtocol.stake.getStakeByWallet(
-    new PublicKey('BCTdjdcjMiECGFbF5Ps15yjLRPzy5YZGJNa4VdGRbhjB'),
+    new PublicKey('HjJQdfTHgC3EBX3471w4st8BXbBmtbaMyCAXNgcUb7dq'),
     STAKE_SEASON
   )
 
@@ -42,50 +42,30 @@ const getStake = async () => {
   console.log(stakeVaults)
 }
 
-const getUsers = async () => {
-  const response = await triadProtocol.getUsers()
-
-  console.log(response)
-}
-
-const getUser = async () => {
-  const response = await triadProtocol.getUser(wallet.publicKey)
-
-  console.log(response)
-}
-
-const getReferral = async () => {
-  const response = await triadProtocol.hasUser(
-    new PublicKey('6MuTdUhc4LDHDW3fiTemyns4NgR99oAWvHM2SwCSTcau')
-  )
-
-  console.log(response)
-}
-
-const createUser = async () => {
-  const response = await triadProtocol.createUser(
-    {
-      wallet: wallet.publicKey,
-      referral: new PublicKey('5vPF9vByRCUB2pr1oGmJsRPm9WDrH9a2v6iF4pbMiobK'),
-      name: 'Builder'
-    },
-    {
-      microLamports: 10000
-    }
-  )
-}
-
 const getRewards = async () => {
-  const response = await triadProtocol.stake.getStakeRewards({
-    wallet: new PublicKey('BCTdjdcjMiECGFbF5Ps15yjLRPzy5YZGJNa4VdGRbhjB'),
-    mint: new PublicKey('t3DohmswhKk94PPbPYwA6ZKACyY3y5kbcqeQerAJjmV'),
-    nftName: 'Triad 2996',
-    stakeVault: STAKE_SEASON,
-    collections: 3,
-    rank: 40
-  })
+  let sum = 0
 
-  console.log(response)
+  const a = await triadProtocol.stake.getStakeByWallet(
+    new PublicKey('HjJQdfTHgC3EBX3471w4st8BXbBmtbaMyCAXNgcUb7dq'),
+    STAKE_SEASON
+  )
+
+  for (let i = 0; i < a.length; i++) {
+    const stake = a[i]
+
+    const response = await triadProtocol.stake.getStakeRewards({
+      wallet: new PublicKey('HjJQdfTHgC3EBX3471w4st8BXbBmtbaMyCAXNgcUb7dq'),
+      mint: new PublicKey('t3DohmswhKk94PPbPYwA6ZKACyY3y5kbcqeQerAJjmV'),
+      nftName: stake.name,
+      stakeVault: STAKE_SEASON,
+      collections: 5,
+      rank: i
+    })
+
+    sum += response
+  }
+
+  console.log(sum)
 }
 
 getRewards()
