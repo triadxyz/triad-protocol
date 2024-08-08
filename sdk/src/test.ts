@@ -32,14 +32,11 @@ const updateStakeVaultStatus = async () => {
 
 const getStake = async () => {
   const response = await triadProtocol.stake.getStakeByWallet(
-    new PublicKey('HjJQdfTHgC3EBX3471w4st8BXbBmtbaMyCAXNgcUb7dq'),
+    new PublicKey('BCTdjdcjMiECGFbF5Ps15yjLRPzy5YZGJNa4VdGRbhjB'),
     STAKE_SEASON
   )
 
-  const stakeVaults = await triadProtocol.stake.getStakeVaults()
-
   console.log(response)
-  console.log(stakeVaults)
 }
 
 const getRewards = async () => {
@@ -67,5 +64,3 @@ const getRewards = async () => {
 
   console.log(sum)
 }
-
-getRewards()

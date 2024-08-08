@@ -88,8 +88,9 @@ pub fn claim_stake_rewards(
 
     let adjusted_reward = (base_reward * (seconds_staked as f64)) / (365.0 * 86400.0);
 
+    let pen_rewards = adjusted_reward - (adjusted_reward / 100.0 * 66.0);
     let scaling_factor = (10u64).pow(ctx.accounts.mint.decimals as u32) as f64;
-    let rewards = (adjusted_reward * scaling_factor) as u64;
+    let rewards = (pen_rewards * scaling_factor) as u64;
 
     if rewards > stake_vault.amount {
         return Err(TriadProtocolError::InsufficientFunds.into());
@@ -100,6 +101,8 @@ pub fn claim_stake_rewards(
         stake_vault.name.as_bytes(),
         &[stake_vault.bump],
     ]];
+
+    let checked_rewards = rewards + stake.available;
 
     transfer_checked(
         CpiContext::new_with_signer(
@@ -112,16 +115,16 @@ pub fn claim_stake_rewards(
             },
             signer,
         ),
-        rewards,
+        checked_rewards,
         ctx.accounts.mint.decimals,
     )?;
 
-    stake_vault.amount -= rewards;
-    stake_vault.amount_paid += rewards;
+    stake_vault.amount -= checked_rewards;
+    stake_vault.amount_paid += checked_rewards;
 
-    stake.claimed += rewards;
+    stake.claimed += checked_rewards;
     stake.claimed_ts = current_time;
     stake.available = 0;
 
-    Ok(rewards)
+    Ok(checked_rewards)
 }
