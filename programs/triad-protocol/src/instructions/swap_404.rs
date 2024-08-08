@@ -20,12 +20,6 @@ pub fn swap_404(ctx: Context<Swap404>) -> Result<()> {
         return Err(TriadProtocolError::SwapsReachedLimit.into());
     }
 
-    let reached_limit = user.swaps_made >= user.swaps;
-
-    if reached_limit {
-        return Err(TriadProtocolError::SwapsReachedLimit.into());
-    }
-
     user.swaps_made += 1;
 
     Ok(())

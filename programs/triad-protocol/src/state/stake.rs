@@ -38,6 +38,12 @@ pub struct StakeVault {
 }
 
 #[derive(AnchorSerialize, AnchorDeserialize, Clone)]
+pub struct ClaimStakeRewardsArgs {
+    pub rank: u16,
+    pub collections: u8,
+}
+
+#[derive(AnchorSerialize, AnchorDeserialize, Clone)]
 pub struct StakeNFTArgs {
     pub name: String,
     pub stake_vault: String,

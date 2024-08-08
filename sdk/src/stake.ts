@@ -27,7 +27,8 @@ import {
   ClaimStakeRewardsArgs,
   StakeTokenArgs
 } from './types/stake'
-import { TTRIAD_DECIMALS, TTRIAD_FEE, TTRIAD_MINT } from './utils/constants'
+import { TTRIAD_DECIMALS, TTRIAD_MINT, VERIFIER } from './utils/constants'
+import { toByteArray } from 'base64-js'
 
 export default class Stake {
   program: Program<TriadProtocol>
@@ -45,6 +46,46 @@ export default class Stake {
     const response = await this.program.account.stakeVault.all()
 
     return response.map((stakeVault) => formatStakeVault(stakeVault.account))
+  }
+
+  /**
+   * Get Stake Rewards
+   */
+  async getStakeRewards({
+    wallet,
+    mint,
+    stakeVault,
+    nftName,
+    collections,
+    rank
+  }: ClaimStakeRewardsArgs) {
+    const StakeVault = getStakeVaultAddressSync(
+      this.program.programId,
+      stakeVault
+    )
+    const Stake = getStakeAddressSync(this.program.programId, wallet, nftName)
+    const FromAta = getATASync(StakeVault, mint)
+    const ToAta = getATASync(wallet, mint)
+
+    const method = await this.program.methods
+      .claimStakeRewards({
+        collections,
+        rank
+      })
+      .accounts({
+        signer: wallet,
+        fromAta: FromAta,
+        mint: mint,
+        toAta: ToAta,
+        stake: Stake,
+        stakeVault: StakeVault,
+        verifier: new PublicKey(VERIFIER)
+      })
+      .simulate()
+
+    let value = method.raw[method.raw.length - 2].split(' ')[3]
+
+    return new BN(toByteArray(value), 'le').toNumber() / 10 ** TTRIAD_DECIMALS
   }
 
   /**
@@ -95,49 +136,6 @@ export default class Stake {
     )
 
     return myStakes
-  }
-
-  /**
-   * Get Stake Vault Rewards details
-   * @param stakeVault - Stake Vault name
-   */
-  async getStakeVaultRewards(stakeVault: string) {
-    const StakeVault = getStakeVaultAddressSync(
-      this.program.programId,
-      stakeVault
-    )
-    const response = await this.program.account.stakeVault.fetch(StakeVault)
-
-    const amount = response.amount.toNumber() / 10 ** TTRIAD_DECIMALS
-    const period =
-      (response.endTs.toNumber() - response.initTs.toNumber()) / (60 * 60 * 24)
-    const netAmount = amount - (amount * TTRIAD_FEE) / 100
-
-    const data: {
-      amount: number
-      perDay: number
-      perWeek: number
-      perMonth: number
-      period: number
-      days: number[]
-    } = {
-      amount: netAmount,
-      perDay: netAmount / period,
-      perWeek: (netAmount / period) * 7,
-      perMonth: (netAmount / period) * 30,
-      period,
-      days: []
-    }
-
-    for (
-      let ts = response.initTs.toNumber();
-      ts <= response.endTs.toNumber();
-      ts += 60 * 60 * 24
-    ) {
-      data.days.push(ts)
-    }
-
-    return data
   }
 
   /**
@@ -470,7 +468,14 @@ export default class Stake {
    *
    */
   public async claimStakeRewards(
-    { wallet, mint, stakeVault, nftName }: ClaimStakeRewardsArgs,
+    {
+      wallet,
+      mint,
+      stakeVault,
+      nftName,
+      collections,
+      rank
+    }: ClaimStakeRewardsArgs,
     options?: RpcOptions
   ) {
     const StakeVault = getStakeVaultAddressSync(
@@ -481,14 +486,20 @@ export default class Stake {
     const FromAta = getATASync(StakeVault, mint)
     const ToAta = getATASync(wallet, mint)
 
-    const method = this.program.methods.claimStake().accounts({
-      signer: wallet,
-      fromAta: FromAta,
-      mint: mint,
-      toAta: ToAta,
-      stake: Stake,
-      stakeVault: StakeVault
-    })
+    const method = this.program.methods
+      .claimStakeRewards({
+        collections,
+        rank
+      })
+      .accounts({
+        signer: wallet,
+        fromAta: FromAta,
+        mint: mint,
+        toAta: ToAta,
+        stake: Stake,
+        stakeVault: StakeVault,
+        verifier: new PublicKey(VERIFIER)
+      })
 
     if (options?.microLamports) {
       method.postInstructions([

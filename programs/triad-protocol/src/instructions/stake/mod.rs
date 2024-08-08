@@ -6,8 +6,10 @@ mod stake_nft;
 mod stake_token;
 mod update_stake_vault_status;
 mod withdraw_stake;
+mod claim_stake_rewards;
 
 pub use claim_stake::*;
+pub use claim_stake_rewards::*;
 pub use deposit_stake_rewards::*;
 pub use initialize_stake_vault::*;
 pub use request_withdraw_stake::*;

@@ -68,6 +68,8 @@ export type ClaimStakeRewardsArgs = {
   mint: PublicKey
   stakeVault: string
   nftName: string
+  collections: number
+  rank: number
 }
 
 export type UpdateStakeRewardsArgs = {
