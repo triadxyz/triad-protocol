@@ -1,8 +1,14 @@
-import RARITY_LIST from './rarity.json';
-
-export const getRarityRank = (onchainId: string, name: string) => {
-  const item = RARITY_LIST.find(
-    (entry) => entry.mint.onchainId === onchainId || entry.mint.name === name
+export const getRarityRank = (
+  ranks: {
+    onchainId: string
+    name: string
+    rarityRankHrtt: number
+  }[],
+  onchainId: string,
+  name: string
+) => {
+  const item = ranks.find(
+    (entry) => entry.onchainId === onchainId || entry.name === name
   )
-  return item ? item.mint.rarityRankHrtt : 0
+  return item ? item.rarityRankHrtt : 0
 }

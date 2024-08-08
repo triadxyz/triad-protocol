@@ -88,7 +88,7 @@ pub fn claim_stake_rewards(
 
     let adjusted_reward = (base_reward * (seconds_staked as f64)) / (365.0 * 86400.0);
 
-    let pen_rewards = adjusted_reward - (adjusted_reward / 100.0 * 66.0);
+    let pen_rewards = adjusted_reward - (adjusted_reward / 100.0 * 20.0);
     let scaling_factor = (10u64).pow(ctx.accounts.mint.decimals as u32) as f64;
     let rewards = (pen_rewards * scaling_factor) as u64;
 

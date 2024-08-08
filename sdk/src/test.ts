@@ -32,34 +32,14 @@ const updateStakeVaultStatus = async () => {
 
 const getStake = async () => {
   const response = await triadProtocol.stake.getStakeByWallet(
-    new PublicKey('BCTdjdcjMiECGFbF5Ps15yjLRPzy5YZGJNa4VdGRbhjB'),
-    STAKE_SEASON
+    new PublicKey('HjJQdfTHgC3EBX3471w4st8BXbBmtbaMyCAXNgcUb7dq'),
+    STAKE_SEASON,
+    5,
+    []
   )
 
   console.log(response)
 }
 
-const getRewards = async () => {
-  let sum = 0
 
-  const a = await triadProtocol.stake.getStakeByWallet(
-    new PublicKey('HjJQdfTHgC3EBX3471w4st8BXbBmtbaMyCAXNgcUb7dq'),
-    STAKE_SEASON
-  )
-
-  for (let i = 0; i < a.length; i++) {
-    const stake = a[i]
-
-    const response = await triadProtocol.stake.getStakeRewards({
-      wallet: new PublicKey('HjJQdfTHgC3EBX3471w4st8BXbBmtbaMyCAXNgcUb7dq'),
-      nftName: stake.name,
-      stakeVault: STAKE_SEASON,
-      collections: 5,
-      rank: i
-    })
-
-    sum += response
-  }
-
-  console.log(sum)
-}
+getStake()
