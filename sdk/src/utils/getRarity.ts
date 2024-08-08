@@ -10,5 +10,6 @@ export const getRarityRank = (
   const item = ranks.find(
     (entry) => entry.onchainId === onchainId || entry.name === name
   )
+
   return item ? item.rarityRankHrtt : 0
 }

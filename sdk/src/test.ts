@@ -3,6 +3,7 @@ import { Connection, Keypair, PublicKey } from '@solana/web3.js'
 import TriadProtocol from './index'
 import { Wallet } from '@coral-xyz/anchor'
 import { STAKE_SEASON } from './utils/constants'
+import RARITY_JSON from './utils/stake-season-1/rarity.json'
 
 const file = fs.readFileSync('/Users/dannpl/.config/solana/id.json')
 const rpc_file = fs.readFileSync('/Users/dannpl/.config/solana/rpc.txt')
@@ -40,6 +41,5 @@ const getStake = async () => {
 
   console.log(response)
 }
-
 
 getStake()
