@@ -29,6 +29,7 @@ import {
 } from './types/stake'
 import { TTRIAD_DECIMALS, TTRIAD_MINT, VERIFIER } from './utils/constants'
 import { toByteArray } from 'base64-js'
+import { getRarityRank } from './utils/getRarity'
 
 export default class Stake {
   program: Program<TriadProtocol>
@@ -126,16 +127,35 @@ export default class Stake {
    * Get Stake by wallet
    * @param wallet - User wallet
    * @param stakeVault - Stake Vault name
+   * @param collections - NFT collections
    *
    */
-  async getStakeByWallet(wallet: PublicKey, stakeVault: string) {
+  async getStakeByWallet(
+    wallet: PublicKey,
+    stakeVault: string,
+    collections: number
+  ) {
     const response = await this.getStakes(stakeVault)
 
     const myStakes = response.filter(
       (item) => item.authority === wallet.toBase58()
     )
 
-    return myStakes
+    const stakePromises = myStakes.map(async (nft) => {
+      const getRank = getRarityRank(nft.mint, nft.name)
+
+      return await this.getStakeRewards({
+        wallet,
+        nftName: nft.name,
+        stakeVault,
+        rank: getRank,
+        collections
+      })
+    })
+
+    const rewards = await Promise.all(stakePromises)
+
+    return rewards
   }
 
   /**
