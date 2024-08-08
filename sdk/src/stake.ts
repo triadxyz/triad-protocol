@@ -53,7 +53,6 @@ export default class Stake {
    */
   async getStakeRewards({
     wallet,
-    mint,
     stakeVault,
     nftName,
     collections,
@@ -63,6 +62,7 @@ export default class Stake {
       this.program.programId,
       stakeVault
     )
+    const mint = new PublicKey(TTRIAD_MINT)
     const Stake = getStakeAddressSync(this.program.programId, wallet, nftName)
     const FromAta = getATASync(StakeVault, mint)
     const ToAta = getATASync(wallet, mint)
@@ -468,20 +468,14 @@ export default class Stake {
    *
    */
   public async claimStakeRewards(
-    {
-      wallet,
-      mint,
-      stakeVault,
-      nftName,
-      collections,
-      rank
-    }: ClaimStakeRewardsArgs,
+    { wallet, stakeVault, nftName, collections, rank }: ClaimStakeRewardsArgs,
     options?: RpcOptions
   ) {
     const StakeVault = getStakeVaultAddressSync(
       this.program.programId,
       stakeVault
     )
+    const mint = new PublicKey(TTRIAD_MINT)
     const Stake = getStakeAddressSync(this.program.programId, wallet, nftName)
     const FromAta = getATASync(StakeVault, mint)
     const ToAta = getATASync(wallet, mint)

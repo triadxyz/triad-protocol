@@ -52,7 +52,6 @@ const getRewards = async () => {
 
     const response = await triadProtocol.stake.getStakeRewards({
       wallet: new PublicKey('HjJQdfTHgC3EBX3471w4st8BXbBmtbaMyCAXNgcUb7dq'),
-      mint: new PublicKey('t3DohmswhKk94PPbPYwA6ZKACyY3y5kbcqeQerAJjmV'),
       nftName: stake.name,
       stakeVault: STAKE_SEASON,
       collections: 5,
