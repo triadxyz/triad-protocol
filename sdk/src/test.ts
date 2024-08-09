@@ -35,8 +35,8 @@ const getStake = async () => {
   const response = await triadProtocol.stake.getStakeByWallet(
     new PublicKey('HjJQdfTHgC3EBX3471w4st8BXbBmtbaMyCAXNgcUb7dq'),
     STAKE_SEASON,
-    5,
-    []
+    1,
+    RARITY_JSON
   )
 
   console.log(response)

@@ -88,9 +88,8 @@ pub fn claim_stake_rewards(
 
     let adjusted_reward = (base_reward * (seconds_staked as f64)) / (365.0 * 86400.0);
 
-    let pen_rewards = adjusted_reward - (adjusted_reward / 100.0 * 10.0);
     let scaling_factor = (10u64).pow(ctx.accounts.mint.decimals as u32) as f64;
-    let rewards = (pen_rewards * scaling_factor) as u64;
+    let rewards = (adjusted_reward * scaling_factor) as u64;
 
     if rewards > stake_vault.amount {
         return Err(TriadProtocolError::InsufficientFunds.into());
