@@ -52,14 +52,14 @@ pub fn claim_stake_rewards(
     let stake_vault: &mut Box<Account<StakeVault>> = &mut ctx.accounts.stake_vault;
     let stake: &mut Box<Account<StakeV2>> = &mut ctx.accounts.stake;
 
-    if args.rank > 1766 || args.collections > 5 {
+    if args.collections > 5 {
         return Err(TriadProtocolError::Unauthorized.into());
     }
 
     let rank = args.rank;
     let collections = args.collections;
 
-    let boost_rewards = if stake.boost { 3.69 * 1000.0 } else { 1.0 };
+    let boost_rewards = if stake.boost { 3.69 * 1000.0 } else { 10.0 };
     let collections_multiplier = (collections as f64) * 150.0;
 
     let user_staked_amount = if stake.mint.to_string() == TTRIAD_MINT {
@@ -88,7 +88,7 @@ pub fn claim_stake_rewards(
 
     let adjusted_reward = (base_reward * (seconds_staked as f64)) / (365.0 * 86400.0);
 
-    let pen_rewards = adjusted_reward - (adjusted_reward / 100.0 * 20.0);
+    let pen_rewards = adjusted_reward - (adjusted_reward / 100.0 * 10.0);
     let scaling_factor = (10u64).pow(ctx.accounts.mint.decimals as u32) as f64;
     let rewards = (pen_rewards * scaling_factor) as u64;
 
