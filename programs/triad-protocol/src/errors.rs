@@ -70,4 +70,7 @@ pub enum TriadProtocolError {
 
     #[msg("Insufficient funds")]
     InsufficientFunds,
+
+    #[msg("No rewards available")]
+    NoRewardsAvailable,
 }

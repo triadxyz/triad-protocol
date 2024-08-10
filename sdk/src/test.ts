@@ -14,28 +14,11 @@ const connection = new Connection(rpc_file.toString(), 'confirmed')
 const wallet = new Wallet(keypair)
 const triadProtocol = new TriadProtocol(connection, wallet)
 
-const updateStakeVaultStatus = async () => {
-  const response = await triadProtocol.stake.updateStakeVaultStatus(
-    {
-      wallet: wallet.publicKey,
-      isLocked: false,
-      stakeVault: STAKE_SEASON,
-      initTs: 0
-    },
-    {
-      skipPreflight: true,
-      microLamports: 10000
-    }
-  )
-
-  console.log(response)
-}
-
 const getStake = async () => {
   const response = await triadProtocol.stake.getStakeByWallet(
     new PublicKey('HjJQdfTHgC3EBX3471w4st8BXbBmtbaMyCAXNgcUb7dq'),
     STAKE_SEASON,
-    1,
+    0,
     RARITY_JSON
   )
 

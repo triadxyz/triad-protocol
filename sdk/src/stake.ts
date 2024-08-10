@@ -147,13 +147,17 @@ export default class Stake {
       .map(async (nft) => {
         const getRank = getRarityRank(ranks, nft.mint, nft.name)
 
-        const available = await this.getStakeRewards({
-          wallet,
-          nftName: nft.name,
-          stakeVault,
-          rank: getRank,
-          collections
-        })
+        let available = 0
+
+        try {
+          available = await this.getStakeRewards({
+            wallet,
+            nftName: nft.name,
+            stakeVault,
+            rank: getRank,
+            collections
+          })
+        } catch (error) {}
 
         return {
           ...nft,
