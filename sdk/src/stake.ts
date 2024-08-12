@@ -533,6 +533,6 @@ export default class Stake {
       ])
     }
 
-    return method.rpc({ skipPreflight: options?.skipPreflight })
+    return method.transaction()
   }
 }
