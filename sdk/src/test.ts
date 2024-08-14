@@ -1,8 +1,8 @@
 import fs from 'fs'
 import { Connection, Keypair, PublicKey } from '@solana/web3.js'
 import TriadProtocol from './index'
-import { Wallet } from '@coral-xyz/anchor'
-import { STAKE_SEASON } from './utils/constants'
+import { BN, Wallet } from '@coral-xyz/anchor'
+import { STAKE_SEASON, TTRIAD_MINT } from './utils/constants'
 import RARITY_JSON from './utils/stake-season-1/rarity.json'
 import { getRarityRank } from './utils/getRarity'
 
@@ -43,4 +43,15 @@ const getStake = async () => {
   console.log(response.length)
 }
 
-getStake()
+const deposit = async () => {
+  const response = await triadProtocol.stake.depositStakeRewards({
+    wallet: wallet.publicKey,
+    stakeVault: STAKE_SEASON,
+    mint: new PublicKey(TTRIAD_MINT),
+    amount: new BN(192388 * 10 ** 6)
+  })
+
+  console.log(response)
+}
+
+deposit()

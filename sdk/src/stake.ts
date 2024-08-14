@@ -344,7 +344,12 @@ export default class Stake {
     { wallet, mint, amount, stakeVault }: DepositStakeRewardsArgs,
     options?: RpcOptions
   ) {
+    const StakeVaultPDA = getStakeVaultAddressSync(
+      this.program.programId,
+      stakeVault
+    )
     const FromAta = getATASync(wallet, mint)
+    const ToAta = getATASync(StakeVaultPDA, mint)
 
     const method = this.program.methods
       .depositStakeRewards({
@@ -354,7 +359,8 @@ export default class Stake {
       .accounts({
         signer: wallet,
         fromAta: FromAta,
-        mint: mint
+        mint: mint,
+        toAta: ToAta
       })
 
     if (options?.microLamports) {
