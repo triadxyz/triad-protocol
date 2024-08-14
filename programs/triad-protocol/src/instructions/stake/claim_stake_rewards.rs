@@ -60,7 +60,7 @@ pub fn claim_stake_rewards(
     let rank = args.rank;
     let collections = args.collections;
 
-    let boost_rewards = if stake.boost { 3.69 * 1000.0 } else { 0.0 };
+    let boost_rewards = if stake.boost { 3.69 * 369.0 } else { 0.0 };
     let collections_multiplier = (collections as f64) * 150.0;
 
     let user_staked_amount = if stake.mint.to_string() == TTRIAD_MINT {
@@ -84,8 +84,7 @@ pub fn claim_stake_rewards(
     let current_time = Clock::get()?.unix_timestamp;
     let seconds_staked = current_time - last_claim;
 
-    let user_base_rewards =
-        ((adjusted_amount / 10000.0) * 2.369 * (seconds_staked as f64)) / 86400.0;
+    let user_base_rewards = ((adjusted_amount / 10000.0) * 6.0 * (seconds_staked as f64)) / 86400.0;
 
     let rewards = user_base_rewards * ((10u64).pow(ctx.accounts.mint.decimals as u32) as f64);
 

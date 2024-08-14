@@ -4,6 +4,7 @@ import TriadProtocol from './index'
 import { Wallet } from '@coral-xyz/anchor'
 import { STAKE_SEASON } from './utils/constants'
 import RARITY_JSON from './utils/stake-season-1/rarity.json'
+import { getRarityRank } from './utils/getRarity'
 
 const file = fs.readFileSync('/Users/dannpl/.config/solana/id.json')
 const rpc_file = fs.readFileSync('/Users/dannpl/.config/solana/rpc.txt')
@@ -15,14 +16,31 @@ const wallet = new Wallet(keypair)
 const triadProtocol = new TriadProtocol(connection, wallet)
 
 const getStake = async () => {
-  const response = await triadProtocol.stake.getStakeByWallet(
-    new PublicKey('BCTdjdcjMiECGFbF5Ps15yjLRPzy5YZGJNa4VdGRbhjB'),
-    STAKE_SEASON,
-    0,
-    RARITY_JSON
-  )
+  const response = await triadProtocol.stake.getStakes(STAKE_SEASON)
 
-  console.log(response)
+  let available = 0
+  let items = 0
+  for (const stake of response) {
+    const getRank = getRarityRank(RARITY_JSON, stake.mint, stake.name)
+
+    try {
+      available += await triadProtocol.stake.getStakeRewards({
+        wallet: new PublicKey(stake.authority),
+        nftName: stake.name,
+        stakeVault: STAKE_SEASON,
+        rank: getRank,
+        collections: 1
+      })
+
+      items += 1
+      console.log(items)
+      console.log(available)
+    } catch (e) {}
+  }
+
+  console.log(available)
+  console.log(items)
+  console.log(response.length)
 }
 
 getStake()
