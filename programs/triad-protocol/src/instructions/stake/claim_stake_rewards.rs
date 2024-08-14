@@ -85,7 +85,7 @@ pub fn claim_stake_rewards(
     let seconds_staked = current_time - last_claim;
 
     let user_base_rewards =
-        ((adjusted_amount / 10000.0) * 10.693 * (seconds_staked as f64)) / 86400.0;
+        ((adjusted_amount / 10000.0) * 2.369 * (seconds_staked as f64)) / 86400.0;
 
     let rewards = user_base_rewards * ((10u64).pow(ctx.accounts.mint.decimals as u32) as f64);
 
