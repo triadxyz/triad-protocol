@@ -61,7 +61,7 @@ const getStakeVault = async () => {
   console.log(response)
 }
 
-const getStakeaa = async () => {
+const getStakeByWallet = async () => {
   const response = await triadProtocol.stake.getStakeByWallet(
     new PublicKey('HjJQdfTHgC3EBX3471w4st8BXbBmtbaMyCAXNgcUb7dq'),
     STAKE_SEASON,
@@ -71,6 +71,8 @@ const getStakeaa = async () => {
 
   console.log(response)
 }
+
+getStakeByWallet()
 
 const updateBoost = async () => {
   const response: string[] = (await axios.get('https://api.triadfi.co/boost'))

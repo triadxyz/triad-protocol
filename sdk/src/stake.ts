@@ -141,34 +141,35 @@ export default class Stake {
       rarityRankHrtt: number
     }[]
   ) {
-    const response = await this.getStakes(stakeVault)
+    const response = (await this.getStakes(stakeVault)).filter(
+      (item) => item.authority === wallet.toBase58()
+    )
+    const data: StakeResponse[] = []
 
-    const stakePromises = response
-      .filter((item) => item.authority === wallet.toBase58())
-      .map(async (nft) => {
-        const getRank = getRarityRank(ranks, nft.mint, nft.name)
+    for (const stake of response) {
+      const getRank = getRarityRank(ranks, stake.mint, stake.name)
 
-        let available = 0
+      let available = 0
 
-        try {
-          available = await this.getStakeRewards({
-            wallet,
-            nftName: nft.name,
-            stakeVault,
-            rank: getRank,
-            collections
-          })
-        } catch (error) {
-          console.log(error)
-        }
+      try {
+        available = await this.getStakeRewards({
+          wallet,
+          nftName: stake.name,
+          stakeVault,
+          rank: getRank,
+          collections
+        })
+      } catch (error) {
+        console.log(error)
+      }
 
-        return {
-          ...nft,
-          available
-        }
+      data.push({
+        ...stake,
+        available
       })
+    }
 
-    return Promise.all(stakePromises)
+    return data
   }
 
   /**
