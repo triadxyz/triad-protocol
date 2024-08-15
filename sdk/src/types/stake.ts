@@ -60,7 +60,6 @@ export type UpdateStakeVaultStatusArgs = {
   wallet: PublicKey
   isLocked: boolean
   stakeVault: string
-  initTs: number
 }
 
 export type ClaimStakeRewardsArgs = {
@@ -69,6 +68,13 @@ export type ClaimStakeRewardsArgs = {
   nftName: string
   collections: number
   rank: number
+}
+
+export type UpdateBoostArgs = {
+  wallet: PublicKey
+  stakeVault: string
+  nfts: { name: string; wallet: string }[]
+  boost: boolean
 }
 
 export type UpdateStakeRewardsArgs = {

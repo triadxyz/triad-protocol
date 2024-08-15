@@ -79,17 +79,17 @@ pub fn stake_token(ctx: Context<StakeToken>, args: StakeTokenArgs) -> Result<()>
     stake.available = 0;
     stake.amount = args.amount;
 
-    stake_vault.token_staked += args.amount;
+    stake_vault.token_staked = stake_vault.token_staked.checked_add(args.amount).unwrap();
 
-    user.staked += args.amount;
+    user.staked = user.staked.checked_add(args.amount).unwrap();
 
-    let result = user.staked / (10u64).pow(stake_vault.token_decimals as u32) / 10000;
+    let result = user.staked
+        .checked_div((10u64).pow(stake_vault.token_decimals as u32))
+        .unwrap()
+        .checked_div(10000)
+        .unwrap();
 
-    if result > (i16::MAX as u64) {
-        return Err(TriadProtocolError::StakeOverflow.into());
-    } else {
-        user.swaps = result as i16;
-    }
+    user.swaps = result as i16;
 
     transfer_checked(
         CpiContext::new(ctx.accounts.token_program.to_account_info(), TransferChecked {

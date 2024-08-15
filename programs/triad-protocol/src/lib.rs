@@ -70,9 +70,9 @@ pub mod triad_protocol {
 
     pub fn update_stake_vault_status(
         ctx: Context<UpdateStakeVaultStatus>,
-        args: UpdateStakeVaultStatusArgs
+        is_locked: bool
     ) -> Result<()> {
-        instructions::update_stake_vault_status(ctx, args)
+        instructions::update_stake_vault_status(ctx, is_locked)
     }
 
     pub fn claim_stake_rewards(
@@ -88,5 +88,9 @@ pub mod triad_protocol {
 
     pub fn swap_404(ctx: Context<Swap404>) -> Result<()> {
         instructions::swap_404(ctx)
+    }
+
+    pub fn update_stake_boost(ctx: Context<UpdateStakeBoost>, boost: bool) -> Result<()> {
+        instructions::update_stake_boost(ctx, boost)
     }
 }

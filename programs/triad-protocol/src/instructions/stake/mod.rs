@@ -1,4 +1,4 @@
-mod claim_stake;
+mod update_stake_boost;
 mod deposit_stake_rewards;
 mod initialize_stake_vault;
 mod request_withdraw_stake;
@@ -8,7 +8,7 @@ mod update_stake_vault_status;
 mod withdraw_stake;
 mod claim_stake_rewards;
 
-pub use claim_stake::*;
+pub use update_stake_boost::*;
 pub use claim_stake_rewards::*;
 pub use deposit_stake_rewards::*;
 pub use initialize_stake_vault::*;

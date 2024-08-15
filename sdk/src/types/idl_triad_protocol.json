@@ -802,6 +802,31 @@
       "args": []
     },
     {
+      "name": "update_stake_boost",
+      "discriminator": [239, 85, 19, 140, 235, 236, 88, 70],
+      "accounts": [
+        {
+          "name": "signer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "stake",
+          "writable": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "boost",
+          "type": "bool"
+        }
+      ]
+    },
+    {
       "name": "update_stake_vault_status",
       "discriminator": [71, 64, 188, 150, 86, 254, 221, 65],
       "accounts": [
@@ -821,12 +846,8 @@
       ],
       "args": [
         {
-          "name": "args",
-          "type": {
-            "defined": {
-              "name": "UpdateStakeVaultStatusArgs"
-            }
-          }
+          "name": "is_locked",
+          "type": "bool"
         }
       ]
     },
@@ -1095,6 +1116,11 @@
       "code": 6022,
       "name": "InsufficientFunds",
       "msg": "Insufficient funds"
+    },
+    {
+      "code": 6023,
+      "name": "NoRewardsAvailable",
+      "msg": "No rewards available"
     }
   ],
   "types": [
@@ -1536,26 +1562,6 @@
           {
             "name": "ticker",
             "type": "pubkey"
-          }
-        ]
-      }
-    },
-    {
-      "name": "UpdateStakeVaultStatusArgs",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "is_locked",
-            "type": "bool"
-          },
-          {
-            "name": "init_ts",
-            "type": "i64"
-          },
-          {
-            "name": "slots",
-            "type": "u64"
           }
         ]
       }

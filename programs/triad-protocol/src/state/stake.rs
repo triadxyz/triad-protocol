@@ -65,13 +65,6 @@ pub struct InitializeStakeVaultArgs {
 }
 
 #[derive(AnchorSerialize, AnchorDeserialize, Clone)]
-pub struct UpdateStakeVaultStatusArgs {
-    pub is_locked: bool,
-    pub init_ts: i64,
-    pub slots: u64,
-}
-
-#[derive(AnchorSerialize, AnchorDeserialize, Clone)]
 pub struct DepositStakeRewardsArgs {
     pub amount: u64,
     pub stake_vault: String,

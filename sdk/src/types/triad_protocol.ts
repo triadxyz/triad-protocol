@@ -742,6 +742,31 @@ export type TriadProtocol = {
       args: []
     },
     {
+      name: 'updateStakeBoost'
+      discriminator: [239, 85, 19, 140, 235, 236, 88, 70]
+      accounts: [
+        {
+          name: 'signer'
+          writable: true
+          signer: true
+        },
+        {
+          name: 'stake'
+          writable: true
+        },
+        {
+          name: 'systemProgram'
+          address: '11111111111111111111111111111111'
+        }
+      ]
+      args: [
+        {
+          name: 'boost'
+          type: 'bool'
+        }
+      ]
+    },
+    {
       name: 'updateStakeVaultStatus'
       discriminator: [71, 64, 188, 150, 86, 254, 221, 65]
       accounts: [
@@ -761,12 +786,8 @@ export type TriadProtocol = {
       ]
       args: [
         {
-          name: 'args'
-          type: {
-            defined: {
-              name: 'updateStakeVaultStatusArgs'
-            }
-          }
+          name: 'isLocked'
+          type: 'bool'
         }
       ]
     },
@@ -1007,6 +1028,11 @@ export type TriadProtocol = {
       code: 6022
       name: 'insufficientFunds'
       msg: 'Insufficient funds'
+    },
+    {
+      code: 6023
+      name: 'noRewardsAvailable'
+      msg: 'No rewards available'
     }
   ]
   types: [
@@ -1448,26 +1474,6 @@ export type TriadProtocol = {
           {
             name: 'ticker'
             type: 'pubkey'
-          }
-        ]
-      }
-    },
-    {
-      name: 'updateStakeVaultStatusArgs'
-      type: {
-        kind: 'struct'
-        fields: [
-          {
-            name: 'isLocked'
-            type: 'bool'
-          },
-          {
-            name: 'initTs'
-            type: 'i64'
-          },
-          {
-            name: 'slots'
-            type: 'u64'
           }
         ]
       }

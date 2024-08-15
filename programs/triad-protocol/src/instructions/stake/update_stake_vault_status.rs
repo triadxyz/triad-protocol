@@ -1,8 +1,8 @@
-use crate::{ constraints::is_admin, state::UpdateStakeVaultStatusArgs, StakeVault };
+use crate::{ constraints::is_admin, StakeVault };
 use anchor_lang::prelude::*;
 
 #[derive(Accounts)]
-#[instruction(args: UpdateStakeVaultStatusArgs)]
+#[instruction(is_locked: bool)]
 pub struct UpdateStakeVaultStatus<'info> {
     #[account(mut, constraint = is_admin(&signer)?)]
     pub signer: Signer<'info>,
@@ -15,13 +15,11 @@ pub struct UpdateStakeVaultStatus<'info> {
 
 pub fn update_stake_vault_status(
     ctx: Context<UpdateStakeVaultStatus>,
-    args: UpdateStakeVaultStatusArgs
+    is_locked: bool
 ) -> Result<()> {
     let stake_vault = &mut ctx.accounts.stake_vault;
 
-    stake_vault.is_locked = args.is_locked;
-    stake_vault.init_ts = args.init_ts;
-    stake_vault.slots = args.slots;
+    stake_vault.is_locked = is_locked;
 
     Ok(())
 }

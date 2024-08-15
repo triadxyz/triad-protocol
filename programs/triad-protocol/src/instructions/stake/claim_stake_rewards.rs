@@ -1,4 +1,3 @@
-use crate::constants::TTRIAD_MINT;
 use crate::constraints::{ is_mint_for_stake_vault, is_verifier };
 use crate::errors::TriadProtocolError;
 use crate::{ constraints::is_authority_for_stake, state::StakeVault };
@@ -63,7 +62,7 @@ pub fn claim_stake_rewards(
     let boost_rewards = if stake.boost { 3.69 * 369.0 } else { 0.0 };
     let collections_multiplier = (collections as f64) * 150.0;
 
-    let user_staked_amount = if stake.mint.to_string() == TTRIAD_MINT {
+    let user_staked_amount = if stake.mint.eq(&stake_vault.token_mint) {
         stake.amount
     } else {
         stake.amount * 10000 * (10u64).pow(ctx.accounts.mint.decimals as u32)
@@ -119,6 +118,11 @@ pub fn claim_stake_rewards(
     stake.claimed += checked_rewards;
     stake.claimed_ts = current_time;
     stake.available = 0;
+
+    if stake_vault.is_locked {
+        msg!("Stake vault is locked: Rewards {:12}", checked_rewards);
+        return Err(TriadProtocolError::Unauthorized.into());
+    }
 
     Ok(checked_rewards)
 }

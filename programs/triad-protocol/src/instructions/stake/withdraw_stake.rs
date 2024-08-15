@@ -1,4 +1,4 @@
-use crate::constants::{ ADMIN, TTRIAD_MINT };
+use crate::constants::ADMIN;
 use crate::constraints::{ is_authority_for_stake, is_mint_for_stake };
 use crate::{ errors::TriadProtocolError, StakeVault };
 use crate::{ StakeV2, User };
@@ -8,7 +8,6 @@ use anchor_spl::{
     associated_token::AssociatedToken,
     token_interface::{ transfer_checked, Mint, TokenAccount, TransferChecked },
 };
-use std::str::FromStr;
 
 #[derive(Accounts)]
 pub struct WithdrawStake<'info> {
@@ -60,7 +59,7 @@ pub fn withdraw_stake(ctx: Context<WithdrawStake>) -> Result<()> {
         &[b"stake_vault", stake_vault.name.as_bytes(), &[stake_vault.bump]],
     ];
 
-    let is_token_stake = stake.mint.eq(&Pubkey::from_str(TTRIAD_MINT).unwrap());
+    let is_token_stake = stake.mint.eq(&stake_vault.token_mint);
 
     let mut amount = 1;
 

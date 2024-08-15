@@ -1,4 +1,3 @@
-use crate::constants::TTRIAD_MINT;
 use crate::constraints::{ is_authority_for_stake, is_mint_for_stake };
 use crate::{ StakeV2, User };
 use crate::{ errors::TriadProtocolError, StakeVault };
@@ -38,18 +37,18 @@ pub fn request_withdraw_stake(ctx: Context<RequestWithdrawStake>) -> Result<()> 
 
     let mut days = 3;
 
-    if stake.mint.to_string() == TTRIAD_MINT {
+    if stake.mint.eq(&stake_vault.token_mint) {
         days = 7;
 
         user.staked -= stake.amount;
 
-        let result = user.staked / (10u64).pow(stake_vault.token_decimals as u32) / 10000;
+        let result = user.staked
+            .checked_div((10u64).pow(stake_vault.token_decimals as u32))
+            .unwrap()
+            .checked_div(10000)
+            .unwrap();
 
-        if result > (i16::MAX as u64) {
-            return Err(TriadProtocolError::StakeOverflow.into());
-        } else {
-            user.swaps = result as i16;
-        }
+        user.swaps = result as i16;
     }
 
     stake.withdraw_ts = Clock::get()?.unix_timestamp + days * 24 * 60 * 60;

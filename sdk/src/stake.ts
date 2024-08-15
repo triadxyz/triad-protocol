@@ -25,7 +25,8 @@ import {
   StakeResponse,
   UpdateStakeVaultStatusArgs,
   ClaimStakeRewardsArgs,
-  StakeTokenArgs
+  StakeTokenArgs,
+  UpdateBoostArgs
 } from './types/stake'
 import { TTRIAD_DECIMALS, TTRIAD_MINT, VERIFIER } from './utils/constants'
 import { toByteArray } from 'base64-js'
@@ -157,7 +158,9 @@ export default class Stake {
             rank: getRank,
             collections
           })
-        } catch (error) {}
+        } catch (error) {
+          console.log(error)
+        }
 
         return {
           ...nft,
@@ -465,7 +468,7 @@ export default class Stake {
    *
    */
   public async updateStakeVaultStatus(
-    { wallet, isLocked, stakeVault, initTs }: UpdateStakeVaultStatusArgs,
+    { wallet, isLocked, stakeVault }: UpdateStakeVaultStatusArgs,
     options?: RpcOptions
   ) {
     const StakeVault = getStakeVaultAddressSync(
@@ -474,11 +477,7 @@ export default class Stake {
     )
 
     const method = this.program.methods
-      .updateStakeVaultStatus({
-        isLocked,
-        initTs: new BN(initTs),
-        slots: new BN(1839)
-      })
+      .updateStakeVaultStatus(isLocked)
       .accounts({
         signer: wallet,
         stakeVault: StakeVault
@@ -540,5 +539,60 @@ export default class Stake {
     }
 
     return method.transaction()
+  }
+
+  /**
+   *  Update Stake Boost
+   *  @param wallet - User wallet
+   *  @param nftName - Name of the nft
+   *  @param boost - Boost value
+   *
+   */
+  public async updateBoost(
+    { wallet, nfts, boost }: UpdateBoostArgs,
+    options?: RpcOptions
+  ) {
+    const ixs = []
+
+    for (const nft of nfts) {
+      const Stake = getStakeAddressSync(
+        this.program.programId,
+        new PublicKey(nft.wallet),
+        nft.name
+      )
+
+      ixs.push(
+        await this.program.methods
+          .updateStakeBoost(boost)
+          .accounts({
+            signer: wallet,
+            stake: Stake
+          })
+          .instruction()
+      )
+    }
+
+    if (options?.microLamports) {
+      ixs.push(
+        ComputeBudgetProgram.setComputeUnitPrice({
+          microLamports: options.microLamports
+        })
+      )
+    }
+
+    const { blockhash } = await this.provider.connection.getLatestBlockhash()
+
+    const messageV0 = new TransactionMessage({
+      instructions: ixs,
+      recentBlockhash: blockhash,
+      payerKey: wallet
+    }).compileToV0Message()
+
+    const tx = new VersionedTransaction(messageV0)
+
+    return this.provider.sendAndConfirm(tx, [], {
+      skipPreflight: options?.skipPreflight,
+      commitment: 'confirmed'
+    })
   }
 }
