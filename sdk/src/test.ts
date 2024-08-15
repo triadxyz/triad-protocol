@@ -85,8 +85,6 @@ const updateBoost = async () => {
     }
   }
 
-  console.log(update.length)
-
   const updateBoost = await triadProtocol.stake.updateBoost({
     wallet: wallet.publicKey,
     stakeVault: STAKE_SEASON,
