@@ -219,10 +219,10 @@ export default class TriadProtocolClient {
         new TransactionMessage({
           instructions: ixs,
           recentBlockhash: blockhash,
-          payerKey: payer
+          payerKey: payer.publicKey
         }).compileToV0Message()
       ),
-      [],
+      [payer],
       {
         skipPreflight: options?.skipPreflight,
         commitment: 'confirmed'
