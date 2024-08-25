@@ -8,11 +8,14 @@ pub struct CreateUser<'info> {
     pub signer: Signer<'info>,
 
     #[account(mut)]
+    pub payer: Signer<'info>,
+
+    #[account(mut)]
     pub referral: Account<'info, User>,
 
     #[account(
         init,
-        payer = signer,
+        payer = payer,
         space = User::SPACE,
         seeds = [User::PREFIX_SEED, signer.key().as_ref()],
         bump

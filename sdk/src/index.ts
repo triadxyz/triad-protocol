@@ -147,6 +147,7 @@ export default class TriadProtocolClient {
       })
       .accounts({
         signer: wallet,
+        payer: wallet,
         referral
       })
 
@@ -181,6 +182,7 @@ export default class TriadProtocolClient {
           })
           .accounts({
             signer: user,
+            payer: payer.publicKey,
             referral
           })
           .instruction()
