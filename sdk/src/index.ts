@@ -194,6 +194,7 @@ export default class TriadProtocolClient {
         .openOre()
         .accounts({
           signer: user,
+          payer: payer.publicKey,
           minerInfo: userPDA,
           proofInfo: proofInfoPDA,
           sysvarHashesInfo: new PublicKey(

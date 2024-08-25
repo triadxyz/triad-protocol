@@ -9,6 +9,9 @@ pub struct OpenOre<'info> {
     #[account(mut)]
     pub signer: Signer<'info>,
 
+    #[account(mut)]
+    pub payer: Signer<'info>,
+
     #[account(
         mut,
         seeds = [User::PREFIX_SEED, signer.key().as_ref()],
@@ -51,7 +54,7 @@ pub fn open_ore(ctx: Context<OpenOre>) -> Result<()> {
             accounts: vec![
                 AccountMeta::new(user.key(), true),
                 AccountMeta::new_readonly(ctx.accounts.miner_info.key(), false),
-                AccountMeta::new(signer.key(), true),
+                AccountMeta::new(ctx.accounts.payer.key(), true),
                 AccountMeta::new(proof_pda.0, false),
                 AccountMeta::new_readonly(ctx.accounts.system_program.key(), false),
                 AccountMeta::new_readonly(ctx.accounts.sysvar_hashes_info.key(), false)
@@ -63,7 +66,7 @@ pub fn open_ore(ctx: Context<OpenOre>) -> Result<()> {
         }),
         &[
             ctx.accounts.user.to_account_info().clone(),
-            ctx.accounts.signer.to_account_info().clone(),
+            ctx.accounts.payer.to_account_info().clone(),
             ctx.accounts.proof_info.to_account_info().clone(),
             ctx.accounts.miner_info.to_account_info().clone(),
             ctx.accounts.ore_program.clone(),
