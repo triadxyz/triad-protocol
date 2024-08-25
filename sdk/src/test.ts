@@ -72,8 +72,6 @@ const getStakeByWallet = async () => {
   console.log(response)
 }
 
-getStakeByWallet()
-
 const updateBoost = async () => {
   const response: string[] = (await axios.get('https://api.triadfi.co/boost'))
     .data
@@ -87,12 +85,34 @@ const updateBoost = async () => {
     }
   }
 
-  const updateBoost = await triadProtocol.stake.updateBoost({
+  console.log(update)
+
+  const updateBoostResponse = await triadProtocol.stake.updateBoost({
     wallet: wallet.publicKey,
     stakeVault: STAKE_SEASON,
     nfts: update,
     boost: true
   })
 
-  console.log(updateBoost)
+  console.log(updateBoostResponse)
+}
+
+const mineOre = async () => {
+  const response = await triadProtocol.mineOre(
+    {
+      user: wallet.publicKey,
+      payer: wallet.publicKey,
+      bus: new PublicKey('BZJ2xppmny6ME3NkAgu2SMZB2mwS5xboX9n6VsSyGYFJ'),
+      digest: [
+        149, 32, 37, 176, 97, 139, 13, 182, 108, 28, 66, 160, 137, 156, 204, 249
+      ],
+      nonce: [217, 46, 186, 232, 162, 139, 46, 186]
+    },
+    {
+      skipPreflight: true,
+      microLamports: 10000
+    }
+  )
+
+  console.log(response)
 }

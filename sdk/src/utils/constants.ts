@@ -7,11 +7,6 @@ export const STAKE_SEASON = 'Triad Share 1'
 export const TTRIAD_DECIMALS = 6
 export const TTRIAD_MINT = 't3DohmswhKk94PPbPYwA6ZKACyY3y5kbcqeQerAJjmV'
 export const TTRIAD_FEE = 2
-export const RARITY_RANK_SEASON_1 = {
-  mythic: { min: 1, max: 18 },
-  legendary: { min: 19, max: 91 },
-  epic: { min: 92, max: 275 },
-  rare: { min: 276, max: 643 },
-  uncommon: { min: 644, max: 1103 },
-  common: { min: 1104, max: 1839 }
-}
+
+export const ORE_PROGRAM_ID = 'oreV2ZymfyeXgNgBdqMkumTqqAprVqgBWQfoYkrtKWQ'
+export const NOOP_PROGRAM_ID = 'noop8ytexvkpCuqbf6FB89BSuNemHtPRqaNC31GWivW'

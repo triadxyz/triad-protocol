@@ -225,15 +225,7 @@
     "@solana/codecs-core" "2.0.0-preview.2"
     "@solana/codecs-numbers" "2.0.0-preview.2"
 
-"@solana/spl-token-group@^0.0.4":
-  version "0.0.4"
-  resolved "https://registry.yarnpkg.com/@solana/spl-token-group/-/spl-token-group-0.0.4.tgz#4f45d9526c96a33b9a1929a264d0aa21c7e38a2d"
-  integrity sha512-7+80nrEMdUKlK37V6kOe024+T7J4nNss0F8LQ9OOPYdWCCfJmsGUzVx2W3oeizZR4IHM6N4yC9v1Xqwc3BTPWw==
-  dependencies:
-    "@solana/codecs" "2.0.0-preview.2"
-    "@solana/spl-type-length-value" "0.1.0"
-
-"@solana/spl-token-metadata@^0.1.4":
+"@solana/spl-token-metadata@^0.1.2":
   version "0.1.4"
   resolved "https://registry.yarnpkg.com/@solana/spl-token-metadata/-/spl-token-metadata-0.1.4.tgz#5cdc3b857a8c4a6877df24e24a8648c4132d22ba"
   integrity sha512-N3gZ8DlW6NWDV28+vCCDJoTqaCZiF/jDUnk3o8GRkAFzHObiR60Bs1gXHBa8zCPdvOwiG6Z3dg5pg7+RW6XNsQ==
@@ -241,15 +233,14 @@
     "@solana/codecs" "2.0.0-preview.2"
     "@solana/spl-type-length-value" "0.1.0"
 
-"@solana/spl-token@0.4.6":
-  version "0.4.6"
-  resolved "https://registry.yarnpkg.com/@solana/spl-token/-/spl-token-0.4.6.tgz#eb44e5080ea7b6fc976abcb39457223211bd9076"
-  integrity sha512-1nCnUqfHVtdguFciVWaY/RKcQz1IF4b31jnKgAmjU9QVN1q7dRUkTEWJZgTYIEtsULjVnC9jRqlhgGN39WbKKA==
+"@solana/spl-token@0.4.1":
+  version "0.4.1"
+  resolved "https://registry.yarnpkg.com/@solana/spl-token/-/spl-token-0.4.1.tgz#7302c8052803f63012bd8189d42ca7d74d7917a5"
+  integrity sha512-DEe15GI0l+XLHwtau/3GUwGQJ9YY/VWNE0k/QuXaaGKo4adMZLEAIQUktRc/S2sRqPjvUdR5anZGxQ9p5khWZw==
   dependencies:
     "@solana/buffer-layout" "^4.0.0"
     "@solana/buffer-layout-utils" "^0.2.0"
-    "@solana/spl-token-group" "^0.0.4"
-    "@solana/spl-token-metadata" "^0.1.4"
+    "@solana/spl-token-metadata" "^0.1.2"
     buffer "^6.0.3"
 
 "@solana/spl-type-length-value@0.1.0":

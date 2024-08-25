@@ -8,7 +8,7 @@ import { PublicKey } from '@solana/web3.js'
 import * as anchor from '@coral-xyz/anchor'
 import BN from 'bn.js'
 import { TOKEN_2022_PROGRAM_ID } from '@solana/spl-token'
-import { ATA_PROGRAM_ID } from './constants'
+import { ATA_PROGRAM_ID, ORE_PROGRAM_ID } from './constants'
 
 export const getTickerAddressSync = (
   programId: PublicKey,
@@ -135,6 +135,24 @@ export const getUserAddressSync = (programId: PublicKey, wallet: PublicKey) => {
   )
 
   return StakePDA
+}
+
+export const getProofOreAddressSync = (wallet: PublicKey) => {
+  const [ProofPDA] = PublicKey.findProgramAddressSync(
+    [Buffer.from('proof'), wallet.toBuffer()],
+    new PublicKey(ORE_PROGRAM_ID)
+  )
+
+  return ProofPDA
+}
+
+export const configOreProgramAddressSync = () => {
+  const [ProofPDA] = PublicKey.findProgramAddressSync(
+    [Buffer.from('config')],
+    new PublicKey(ORE_PROGRAM_ID)
+  )
+
+  return ProofPDA
 }
 
 export const formatNumber = (number: bigint | BN, decimals = 6) => {

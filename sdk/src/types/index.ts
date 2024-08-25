@@ -10,3 +10,18 @@ export type CreateUserArgs = {
   name: string
   referral?: PublicKey
 }
+
+export type OpenOreArgs = {
+  user: PublicKey
+  payer: PublicKey
+  name: string
+  referralName: string
+}
+
+export type MineOreArgs = {
+  user: PublicKey
+  payer: PublicKey
+  bus: PublicKey
+  digest: number[]
+  nonce: number[]
+}

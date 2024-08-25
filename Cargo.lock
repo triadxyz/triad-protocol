@@ -2417,6 +2417,8 @@ dependencies = [
  "anchor-lang",
  "anchor-spl",
  "bytemuck",
+ "num_enum",
+ "serde",
  "spl-token-metadata-interface",
  "spl-type-length-value",
 ]

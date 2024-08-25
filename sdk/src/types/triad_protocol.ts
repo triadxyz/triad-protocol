@@ -427,6 +427,113 @@ export type TriadProtocol = {
       ]
     },
     {
+      name: 'mineOre'
+      discriminator: [170, 66, 140, 123, 15, 20, 224, 194]
+      accounts: [
+        {
+          name: 'signer'
+          writable: true
+          signer: true
+        },
+        {
+          name: 'user'
+          writable: true
+          pda: {
+            seeds: [
+              {
+                kind: 'const'
+                value: [117, 115, 101, 114]
+              },
+              {
+                kind: 'account'
+                path: 'signer'
+              }
+            ]
+          }
+        },
+        {
+          name: 'proofInfo'
+          writable: true
+        },
+        {
+          name: 'bus'
+          writable: true
+        },
+        {
+          name: 'oreProgram'
+        },
+        {
+          name: 'configProgram'
+        },
+        {
+          name: 'sysvarHashesInfo'
+        },
+        {
+          name: 'sysvarInstructionsInfo'
+        },
+        {
+          name: 'systemProgram'
+          address: '11111111111111111111111111111111'
+        }
+      ]
+      args: [
+        {
+          name: 'args'
+          type: {
+            defined: {
+              name: 'mineArgs'
+            }
+          }
+        }
+      ]
+    },
+    {
+      name: 'openOre'
+      discriminator: [120, 233, 125, 197, 12, 153, 25, 229]
+      accounts: [
+        {
+          name: 'signer'
+          writable: true
+          signer: true
+        },
+        {
+          name: 'user'
+          writable: true
+          pda: {
+            seeds: [
+              {
+                kind: 'const'
+                value: [117, 115, 101, 114]
+              },
+              {
+                kind: 'account'
+                path: 'signer'
+              }
+            ]
+          }
+        },
+        {
+          name: 'minerInfo'
+          writable: true
+        },
+        {
+          name: 'proofInfo'
+          writable: true
+        },
+        {
+          name: 'oreProgram'
+        },
+        {
+          name: 'sysvarHashesInfo'
+        },
+        {
+          name: 'systemProgram'
+          address: '11111111111111111111111111111111'
+        }
+      ]
+      args: []
+    },
+    {
       name: 'openPosition'
       discriminator: [135, 128, 47, 77, 15, 152, 240, 49]
       accounts: [
@@ -1164,6 +1271,26 @@ export type TriadProtocol = {
           {
             name: 'amount'
             type: 'u64'
+          }
+        ]
+      }
+    },
+    {
+      name: 'mineArgs'
+      type: {
+        kind: 'struct'
+        fields: [
+          {
+            name: 'digest'
+            type: {
+              array: ['u8', 16]
+            }
+          },
+          {
+            name: 'nonce'
+            type: {
+              array: ['u8', 8]
+            }
           }
         ]
       }

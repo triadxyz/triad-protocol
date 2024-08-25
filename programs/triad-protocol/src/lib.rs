@@ -93,4 +93,12 @@ pub mod triad_protocol {
     pub fn update_stake_boost(ctx: Context<UpdateStakeBoost>, boost: bool) -> Result<()> {
         instructions::update_stake_boost(ctx, boost)
     }
+
+    pub fn open_ore(ctx: Context<OpenOre>) -> Result<()> {
+        instructions::open_ore(ctx)
+    }
+
+    pub fn mine_ore(ctx: Context<MineOre>, args: MineArgs) -> Result<()> {
+        instructions::mine_ore(ctx, args)
+    }
 }
