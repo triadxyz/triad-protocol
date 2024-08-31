@@ -57,14 +57,6 @@ pub struct StakeTokenArgs {
 }
 
 #[derive(AnchorSerialize, AnchorDeserialize, Clone)]
-pub struct InitializeStakeVaultArgs {
-    pub name: String,
-    pub slots: u64,
-    pub collection: String,
-    pub amount: u64,
-}
-
-#[derive(AnchorSerialize, AnchorDeserialize, Clone)]
 pub struct DepositStakeRewardsArgs {
     pub amount: u64,
     pub stake_vault: String,

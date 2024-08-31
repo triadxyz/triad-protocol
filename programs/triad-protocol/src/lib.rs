@@ -39,13 +39,6 @@ pub mod triad_protocol {
         instructions::stake_token(ctx, args)
     }
 
-    pub fn initialize_stake_vault(
-        ctx: Context<InitializeStakeVault>,
-        args: InitializeStakeVaultArgs
-    ) -> Result<()> {
-        instructions::initialize_stake_vault(ctx, args)
-    }
-
     pub fn request_withdraw_stake(ctx: Context<RequestWithdrawStake>) -> Result<()> {
         instructions::request_withdraw_stake(ctx)
     }
