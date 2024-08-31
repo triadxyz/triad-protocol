@@ -7,7 +7,7 @@ import RARITY_JSON from './utils/stake-season-1/rarity.json'
 import { getRarityRank } from './utils/getRarity'
 import axios from 'axios'
 
-const file = fs.readFileSync('/Users/dannpl/.config/solana/id.json')
+const file = fs.readFileSync('/Users/dannpl/.config/solana/triad-builder.json')
 const rpc_file = fs.readFileSync('/Users/dannpl/.config/solana/rpc.txt')
 const keypair = Keypair.fromSecretKey(
   new Uint8Array(JSON.parse(file.toString()))

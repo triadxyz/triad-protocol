@@ -23,13 +23,6 @@ pub mod triad_protocol {
         instructions::create_ticker(ctx, args)
     }
 
-    pub fn update_ticker_price(
-        ctx: Context<UpdateTickerPrice>,
-        args: UpdateTickerPriceArgs
-    ) -> Result<()> {
-        instructions::update_ticker_price(ctx, args)
-    }
-
     pub fn open_position(ctx: Context<OpenPosition>, args: OpenPositionArgs) -> Result<()> {
         instructions::open_position(ctx, args)
     }
@@ -86,19 +79,7 @@ pub mod triad_protocol {
         instructions::create_user(ctx, args)
     }
 
-    pub fn swap_404(ctx: Context<Swap404>) -> Result<()> {
-        instructions::swap_404(ctx)
-    }
-
     pub fn update_stake_boost(ctx: Context<UpdateStakeBoost>, boost: bool) -> Result<()> {
         instructions::update_stake_boost(ctx, boost)
-    }
-
-    pub fn open_ore(ctx: Context<OpenOre>) -> Result<()> {
-        instructions::open_ore(ctx)
-    }
-
-    pub fn mine_ore(ctx: Context<MineOre>, args: MineArgs) -> Result<()> {
-        instructions::mine_ore(ctx, args)
     }
 }
