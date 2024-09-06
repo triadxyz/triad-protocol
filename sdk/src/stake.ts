@@ -31,6 +31,7 @@ import {
 import { TTRIAD_DECIMALS, TTRIAD_MINT, VERIFIER } from './utils/constants'
 import { toByteArray } from 'base64-js'
 import { getRarityRank } from './utils/getRarity'
+import { set } from '@coral-xyz/anchor/dist/cjs/utils/features'
 
 export default class Stake {
   program: Program<TriadProtocol>
@@ -159,9 +160,9 @@ export default class Stake {
           rank: getRank,
           collections
         })
-      } catch (error) {
-        console.log(error)
-      }
+      } catch {}
+
+      await new Promise((resolve) => setTimeout(resolve, 500))
 
       data.push({
         ...stake,
