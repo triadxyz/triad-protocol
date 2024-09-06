@@ -10,7 +10,7 @@ impl OreInstruction {
     }
 }
 
-impl OpenArgs {
+impl Open {
     pub fn to_bytes(&self) -> Vec<u8> {
         bytemuck::bytes_of(self).to_vec()
     }
@@ -33,7 +33,7 @@ pub enum OreInstruction {
 
 #[repr(C)]
 #[derive(Clone, Copy, Debug, Pod, Zeroable)]
-pub struct OpenArgs {
+pub struct Open {
     pub bump: u8,
 }
 

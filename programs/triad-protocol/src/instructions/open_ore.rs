@@ -1,4 +1,4 @@
-use crate::{ state::User, OpenArgs, OreInstruction, PROOF };
+use crate::{ state::User, Open, PROOF };
 use anchor_lang::{
     prelude::*,
     solana_program::{ instruction::Instruction, program::invoke_signed },
@@ -59,10 +59,7 @@ pub fn open_ore(ctx: Context<OpenOre>) -> Result<()> {
                 AccountMeta::new_readonly(ctx.accounts.system_program.key(), false),
                 AccountMeta::new_readonly(ctx.accounts.sysvar_hashes_info.key(), false)
             ],
-            data: [
-                OreInstruction::Open.to_vec(),
-                (OpenArgs { bump: proof_pda.1 }).to_bytes().to_vec(),
-            ].concat(),
+            data: (Open { bump: proof_pda.1 }).to_bytes(),
         }),
         &[
             ctx.accounts.user.to_account_info().clone(),
