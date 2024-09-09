@@ -4,7 +4,6 @@ use crate::{
     state::{ CreateTickerArgs, Ticker },
     Vault,
 };
-
 use anchor_lang::prelude::*;
 use anchor_spl::token::{ Mint, Token, TokenAccount };
 
@@ -76,7 +75,6 @@ pub fn create_ticker(ctx: Context<CreateTicker>, args: CreateTickerArgs) -> Resu
     ticker.name = args.name;
     ticker.vault = *ctx.accounts.vault.to_account_info().key;
     ticker.price = 0;
-    ticker.protocol_program_id = args.protocol_program_id;
     ticker.init_ts = current_timestamp;
     ticker.updated_ts = current_timestamp;
 

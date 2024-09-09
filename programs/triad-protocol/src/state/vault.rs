@@ -18,17 +18,6 @@ pub struct Vault {
     pub short_positions_opened: u64,
 }
 
-#[derive(AnchorSerialize, AnchorDeserialize, Clone)]
-pub struct OpenPositionArgs {
-    pub amount: u64,
-    pub is_long: bool,
-}
-
-#[derive(AnchorSerialize, AnchorDeserialize)]
-pub struct ClosePositionArgs {
-    pub position_index: u8,
-}
-
 impl Vault {
     pub const PREFIX_SEED: &'static [u8] = b"vault";
 
