@@ -86,10 +86,6 @@ pub mod triad_protocol {
         instructions::create_user(ctx, args)
     }
 
-    pub fn swap_404(ctx: Context<Swap404>) -> Result<()> {
-        instructions::swap_404(ctx)
-    }
-
     pub fn update_stake_boost(ctx: Context<UpdateStakeBoost>, boost: bool) -> Result<()> {
         instructions::update_stake_boost(ctx, boost)
     }

@@ -83,7 +83,16 @@ pub fn claim_stake_rewards(
     let current_time = Clock::get()?.unix_timestamp;
     let seconds_staked = current_time - last_claim;
 
-    let user_base_rewards = ((adjusted_amount / 10000.0) * 6.0 * (seconds_staked as f64)) / 86400.0;
+    let mut amount_base = 6.0;
+
+    // Wed Sep 18 2024
+    // Mon Sep 16 2024
+    if stake.claimed_ts < 1726680267 || stake.init_ts > 1726518236 {
+        amount_base = 3.0;
+    }
+
+    let user_base_rewards =
+        ((adjusted_amount / 10000.0) * amount_base * (seconds_staked as f64)) / 86400.0;
 
     let rewards = user_base_rewards * ((10u64).pow(ctx.accounts.mint.decimals as u32) as f64);
 
