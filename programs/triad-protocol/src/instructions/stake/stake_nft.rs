@@ -30,11 +30,7 @@ pub struct StakeNFT<'info> {
         init_if_needed,
         payer = signer,
         space = StakeV2::SPACE,
-        seeds = [
-            StakeV2::PREFIX_SEED,
-            signer.to_account_info().key().as_ref(),
-            args.name.as_bytes(),
-        ],
+        seeds = [StakeV2::PREFIX_SEED, signer.key().as_ref(), args.name.as_bytes()],
         bump
     )]
     pub stake: Box<Account<'info, StakeV2>>,

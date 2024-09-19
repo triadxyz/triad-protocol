@@ -43,7 +43,7 @@ pub fn request_withdraw_stake(ctx: Context<RequestWithdrawStake>) -> Result<()> 
     if stake.mint.eq(&stake_vault.token_mint) {
         days = 7;
 
-        user.staked -= stake.amount;
+        user.staked = user.staked.checked_sub(stake.amount).unwrap();
     }
 
     stake.withdraw_ts = Clock::get()?.unix_timestamp + days * 24 * 60 * 60;

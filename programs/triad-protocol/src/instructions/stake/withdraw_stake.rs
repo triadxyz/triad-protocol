@@ -40,7 +40,6 @@ pub struct WithdrawStake<'info> {
     #[account(
         init_if_needed,
         payer = signer,
-        constraint = to_ata.owner == *signer.key && to_ata.mint == mint.key(),
         associated_token::mint = mint,
         associated_token::authority = signer
     )]
