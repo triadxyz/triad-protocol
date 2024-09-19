@@ -22,7 +22,7 @@ pub struct StakeToken<'info> {
     pub user: Box<Account<'info, User>>,
 
     #[account(
-        init_if_needed,
+        init,
         payer = signer,
         space = StakeV2::SPACE,
         seeds = [
