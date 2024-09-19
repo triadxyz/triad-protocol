@@ -85,10 +85,9 @@ pub fn claim_stake_rewards(
 
     let mut amount_base = 6.0;
 
-    // Wed Sep 18 2024
-    // Mon Sep 16 2024
-    if stake.claimed_ts < 1726680267 || stake.init_ts > 1726518236 {
-        amount_base = 3.69;
+    // Thu Sep 19 2024 14:32:02
+    if stake.claimed_ts > 1726756310 || stake.init_ts > 1726756310 {
+        amount_base = 3.0;
     }
 
     let user_base_rewards =
@@ -121,10 +120,10 @@ pub fn claim_stake_rewards(
         ctx.accounts.mint.decimals
     )?;
 
-    stake_vault.amount -= checked_rewards;
-    stake_vault.amount_paid += checked_rewards;
+    stake_vault.amount = stake_vault.amount.checked_sub(checked_rewards).unwrap();
+    stake_vault.amount_paid = stake_vault.amount_paid.checked_add(checked_rewards).unwrap();
 
-    stake.claimed += checked_rewards;
+    stake.claimed = stake.claimed.checked_add(checked_rewards).unwrap();
     stake.claimed_ts = current_time;
     stake.available = 0;
 

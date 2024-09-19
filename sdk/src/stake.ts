@@ -306,39 +306,6 @@ export default class Stake {
   }
 
   /**
-   *  Initialize Stake Vault
-   *  @param name - The ticker's name
-   *  @param slots - Amount available to users joining the vault
-   *  @param collection - The Collection name
-   *
-   */
-  public async initializeStakeVault(
-    { name, slots, collection, amount }: InitializeStakeArgs,
-    options?: RpcOptions
-  ) {
-    const method = this.program.methods
-      .initializeStakeVault({
-        name,
-        slots,
-        collection,
-        amount
-      })
-      .accounts({
-        signer: this.provider.wallet.publicKey
-      })
-
-    if (options?.microLamports) {
-      method.postInstructions([
-        ComputeBudgetProgram.setComputeUnitPrice({
-          microLamports: options.microLamports
-        })
-      ])
-    }
-
-    return method.rpc({ skipPreflight: options?.skipPreflight })
-  }
-
-  /**
    *  Deposit Stake Rewards
    *  @param wallet - User wallet
    *  @param mint - NFT mint
