@@ -12,7 +12,7 @@ pub struct User {
     pub swaps_made: i16,
     pub staked: u64,
     pub first_swap: i64,
-    pub padding: [u8; 32],
+    pub user_trade: Pubkey,
 }
 
 #[derive(AnchorSerialize, AnchorDeserialize)]

@@ -58,7 +58,7 @@ pub fn claim_stake_rewards(
         return Err(TriadProtocolError::Unauthorized.into());
     }
 
-    let rank = args.rank;
+    let mut rank = args.rank;
     let collections = args.collections;
 
     let boost_rewards = if stake.boost { 3.69 * 369.0 } else { 0.0 };
@@ -69,6 +69,10 @@ pub fn claim_stake_rewards(
     } else {
         stake.amount * 10000 * (10u64).pow(ctx.accounts.mint.decimals as u32)
     };
+
+    if stake.mint.eq(&stake_vault.token_mint) {
+        rank = 963;
+    }
 
     let max_rank = 1823 as f64;
     let rank = rank as f64;
@@ -87,8 +91,8 @@ pub fn claim_stake_rewards(
 
     let mut amount_base = 6.0;
 
-    if stake.claimed_ts > 1726756310 || stake.init_ts > 1726756310 {
-        amount_base = 3.0;
+    if stake.claimed_ts > 1726876394 || stake.init_ts > 1726876394 {
+        amount_base = 3.69;
     }
 
     let user_base_rewards =
