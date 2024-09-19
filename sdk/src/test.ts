@@ -2,7 +2,7 @@ import fs from 'fs'
 import { Connection, Keypair, PublicKey } from '@solana/web3.js'
 import TriadProtocol from './index'
 import { BN, Wallet } from '@coral-xyz/anchor'
-import { STAKE_SEASON, TTRIAD_MINT } from './utils/constants'
+import { TTRIAD_MINT } from './utils/constants'
 import RARITY_JSON from './utils/stake-season-1/rarity.json'
 import { getRarityRank } from './utils/getRarity'
 import axios from 'axios'
@@ -17,7 +17,7 @@ const wallet = new Wallet(keypair)
 const triadProtocol = new TriadProtocol(connection, wallet)
 
 const getStake = async () => {
-  const response = await triadProtocol.stake.getStakes(STAKE_SEASON)
+  const response = await triadProtocol.stake.getStakes()
 
   let available = 0
   let items = 0
@@ -28,7 +28,6 @@ const getStake = async () => {
       available += await triadProtocol.stake.getStakeRewards({
         wallet: new PublicKey(stake.authority),
         nftName: stake.name,
-        stakeVault: STAKE_SEASON,
         rank: getRank,
         collections: 1
       })
@@ -44,30 +43,22 @@ const getStake = async () => {
   console.log(response.length)
 }
 
-const deposit = async () => {
-  const response = await triadProtocol.stake.depositStakeRewards({
-    wallet: wallet.publicKey,
-    stakeVault: STAKE_SEASON,
-    mint: new PublicKey(TTRIAD_MINT),
-    amount: new BN(192388 * 10 ** 6)
-  })
-
-  console.log(response)
-}
-
-const getStakeVault = async () => {
-  const response = await triadProtocol.stake.getStakeVaultByName(STAKE_SEASON)
-
-  console.log(response)
-}
-
 const getStakeByWallet = async () => {
   const response = await triadProtocol.stake.getStakeByWallet(
     new PublicKey('HjJQdfTHgC3EBX3471w4st8BXbBmtbaMyCAXNgcUb7dq'),
-    STAKE_SEASON,
     1,
     RARITY_JSON
   )
+
+  console.log(response)
+}
+
+const depositStakeRewards = async () => {
+  const response = await triadProtocol.stake.depositStakeRewards({
+    wallet: wallet.publicKey,
+    mint: new PublicKey(TTRIAD_MINT),
+    amount: new BN(192388 * 10 ** 6)
+  })
 
   console.log(response)
 }
@@ -76,7 +67,7 @@ const updateBoost = async () => {
   const response: string[] = (await axios.get('https://api.triadfi.co/boost'))
     .data
 
-  const stakes = await triadProtocol.stake.getStakes(STAKE_SEASON)
+  const stakes = await triadProtocol.stake.getStakes()
   const update: { name: string; wallet: string }[] = []
 
   for (const stake of stakes) {
@@ -91,30 +82,9 @@ const updateBoost = async () => {
 
   const updateBoostResponse = await triadProtocol.stake.updateBoost({
     wallet: wallet.publicKey,
-    stakeVault: STAKE_SEASON,
     nfts: update,
     boost: true
   })
 
   console.log(updateBoostResponse)
-}
-
-const mineOre = async () => {
-  const response = await triadProtocol.mineOre(
-    {
-      user: wallet.publicKey,
-      payer: wallet.publicKey,
-      bus: new PublicKey('BZJ2xppmny6ME3NkAgu2SMZB2mwS5xboX9n6VsSyGYFJ'),
-      digest: [
-        149, 32, 37, 176, 97, 139, 13, 182, 108, 28, 66, 160, 137, 156, 204, 249
-      ],
-      nonce: [217, 46, 186, 232, 162, 139, 46, 186]
-    },
-    {
-      skipPreflight: true,
-      microLamports: 10000
-    }
-  )
-
-  console.log(response)
 }

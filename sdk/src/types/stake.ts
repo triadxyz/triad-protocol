@@ -5,16 +5,6 @@ export type Collection = 'alligators' | 'coleta' | 'undead' | 'pyth'
 
 export type StakeNftArgs = {
   wallet: PublicKey
-  stakeVault: string
-  items: {
-    mint: PublicKey
-    name: string
-  }[]
-}
-
-export type MigrateStakeArgs = {
-  wallet: PublicKey
-  stakeVault: string
   items: {
     mint: PublicKey
     name: string
@@ -24,7 +14,6 @@ export type MigrateStakeArgs = {
 export type StakeTokenArgs = {
   name: string
   wallet: PublicKey
-  stakeVault: string
   amount: number
 }
 
@@ -39,32 +28,27 @@ export type DepositStakeRewardsArgs = {
   wallet: PublicKey
   amount: BN
   mint: PublicKey
-  stakeVault: string
 }
 
 export type RequestWithdrawArgs = {
   wallet: PublicKey
   name: string
   mint: PublicKey
-  stakeVault: string
 }
 
 export type WithdrawArgs = {
   wallet: PublicKey
   name: string
   mint: PublicKey
-  stakeVault: string
 }
 
 export type UpdateStakeVaultStatusArgs = {
   wallet: PublicKey
   isLocked: boolean
-  stakeVault: string
 }
 
 export type ClaimStakeRewardsArgs = {
   wallet: PublicKey
-  stakeVault: string
   nftName: string
   collections: number
   rank: number
@@ -72,7 +56,6 @@ export type ClaimStakeRewardsArgs = {
 
 export type UpdateBoostArgs = {
   wallet: PublicKey
-  stakeVault: string
   nfts: { name: string; wallet: string }[]
   boost: boolean
 }

@@ -18,7 +18,6 @@ import {
 import { RpcOptions } from './types'
 import {
   DepositStakeRewardsArgs,
-  InitializeStakeArgs,
   StakeNftArgs,
   RequestWithdrawArgs,
   WithdrawArgs,
@@ -28,14 +27,19 @@ import {
   StakeTokenArgs,
   UpdateBoostArgs
 } from './types/stake'
-import { TTRIAD_DECIMALS, TTRIAD_MINT, VERIFIER } from './utils/constants'
+import {
+  STAKE_VAULT_NAME,
+  TTRIAD_DECIMALS,
+  TTRIAD_MINT,
+  VERIFIER
+} from './utils/constants'
 import { toByteArray } from 'base64-js'
 import { getRarityRank } from './utils/getRarity'
-import { set } from '@coral-xyz/anchor/dist/cjs/utils/features'
 
 export default class Stake {
   program: Program<TriadProtocol>
   provider: AnchorProvider
+  stakeVaultName: string = STAKE_VAULT_NAME
 
   constructor(program: Program<TriadProtocol>, provider: AnchorProvider) {
     this.provider = provider
@@ -56,14 +60,13 @@ export default class Stake {
    */
   async getStakeRewards({
     wallet,
-    stakeVault,
     nftName,
     collections,
     rank
   }: ClaimStakeRewardsArgs) {
     const StakeVault = getStakeVaultAddressSync(
       this.program.programId,
-      stakeVault
+      this.stakeVaultName
     )
     const mint = new PublicKey(TTRIAD_MINT)
     const Stake = getStakeAddressSync(this.program.programId, wallet, nftName)
@@ -91,31 +94,11 @@ export default class Stake {
     return new BN(toByteArray(value), 'le').toNumber() / 10 ** TTRIAD_DECIMALS
   }
 
-  /**
-   * Get Stake Vault by name
-   * @param stakeVault - Stake Vault name
-   */
-  async getStakeVaultByName(stakeVault: string) {
-    const StakeVault = getStakeVaultAddressSync(
-      this.program.programId,
-      stakeVault
-    )
-
-    return formatStakeVault(
-      await this.program.account.stakeVault.fetch(StakeVault)
-    )
-  }
-
-  /**
-   * Get all stakes by vault
-   * @param stakeVault - Stake Vault name
-   *
-   */
-  async getStakes(stakeVault: string) {
+  async getStakes() {
     const response = await this.program.account.stakeV2.all()
     const StakeVault = getStakeVaultAddressSync(
       this.program.programId,
-      stakeVault
+      this.stakeVaultName
     )
 
     return response
@@ -128,13 +111,11 @@ export default class Stake {
   /**
    * Get Stake by wallet
    * @param wallet - User wallet
-   * @param stakeVault - Stake Vault name
    * @param collections - NFT collections
    *
    */
   async getStakeByWallet(
     wallet: PublicKey,
-    stakeVault: string,
     collections: number,
     ranks: {
       onchainId: string
@@ -142,7 +123,7 @@ export default class Stake {
       rarityRankHrtt: number
     }[]
   ) {
-    const response = (await this.getStakes(stakeVault)).filter(
+    const response = (await this.getStakes()).filter(
       (item) => item.authority === wallet.toBase58()
     )
     const data: StakeResponse[] = []
@@ -156,7 +137,6 @@ export default class Stake {
         available = await this.getStakeRewards({
           wallet,
           nftName: stake.name,
-          stakeVault,
           rank: getRank,
           collections
         })
@@ -175,11 +155,10 @@ export default class Stake {
 
   /**
    * Get Stakes by day
-   * @param stakeVault - Stake Vault name
    * @param day - Day timestamp
    */
-  async getStakesByDay(stakeVault: string, day: number) {
-    const stakes = await this.getStakes(stakeVault)
+  async getStakesByDay(day: number) {
+    const stakes = await this.getStakes()
 
     const rewards: StakeResponse[] = []
 
@@ -199,18 +178,14 @@ export default class Stake {
   /**
    *  Stake NFT
    *  @param mint - NFT mint
-   *  @param stakeVault - Name of the stake vault
    *  @param items - NFT items
    *
    */
-  public async stakeNft(
-    { wallet, stakeVault, items }: StakeNftArgs,
-    options?: RpcOptions
-  ) {
+  public async stakeNft({ wallet, items }: StakeNftArgs, options?: RpcOptions) {
     let ixs: TransactionInstruction[] = []
     const stakeVaultPDA = getStakeVaultAddressSync(
       this.program.programId,
-      stakeVault
+      this.stakeVaultName
     )
 
     for (let i = 0; i < items.length; i++) {
@@ -223,7 +198,7 @@ export default class Stake {
         await this.program.methods
           .stakeNft({
             name: item.name,
-            stakeVault
+            stakeVault: this.stakeVaultName
           })
           .accounts({
             signer: wallet,
@@ -268,12 +243,12 @@ export default class Stake {
    *
    */
   public async stakeToken(
-    { name, wallet, stakeVault, amount }: StakeTokenArgs,
+    { name, wallet, amount }: StakeTokenArgs,
     options?: RpcOptions
   ) {
     const stakeVaultPDA = getStakeVaultAddressSync(
       this.program.programId,
-      stakeVault
+      this.stakeVaultName
     )
     const ttriad = new PublicKey(TTRIAD_MINT)
     const FromAta = getATASync(wallet, ttriad)
@@ -284,7 +259,7 @@ export default class Stake {
       .stakeToken({
         name,
         amount: new BN(amount * 10 ** 6),
-        stakeVault
+        stakeVault: this.stakeVaultName
       })
       .accounts({
         signer: wallet,
@@ -313,12 +288,12 @@ export default class Stake {
    *
    */
   public async depositStakeRewards(
-    { wallet, mint, amount, stakeVault }: DepositStakeRewardsArgs,
+    { wallet, mint, amount }: DepositStakeRewardsArgs,
     options?: RpcOptions
   ) {
     const StakeVaultPDA = getStakeVaultAddressSync(
       this.program.programId,
-      stakeVault
+      this.stakeVaultName
     )
     const FromAta = getATASync(wallet, mint)
     const ToAta = getATASync(StakeVaultPDA, mint)
@@ -326,7 +301,7 @@ export default class Stake {
     const method = this.program.methods
       .depositStakeRewards({
         amount,
-        stakeVault
+        stakeVault: this.stakeVaultName
       })
       .accounts({
         signer: wallet,
@@ -350,16 +325,15 @@ export default class Stake {
    *  Request Withdraw
    *  @param wallet - User wallet
    *  @param name - Stake name
-   *  @param stakeVault - Name of the stake vault
    *
    */
   public async requestWithdraw(
-    { wallet, name, mint, stakeVault }: RequestWithdrawArgs,
+    { wallet, name, mint }: RequestWithdrawArgs,
     options?: RpcOptions
   ) {
     const stakeVaultPDA = getStakeVaultAddressSync(
       this.program.programId,
-      stakeVault
+      this.stakeVaultName
     )
     const stakePDA = getStakeAddressSync(this.program.programId, wallet, name)
     const userPAD = getUserAddressSync(this.program.programId, wallet)
@@ -388,16 +362,15 @@ export default class Stake {
    *  @param wallet - User wallet
    *  @param name - Stake name
    *  @param mint - NFT mint
-   *  @param stakeVault - Name of the stake vault
    *
    */
   public async withdrawStake(
-    { wallet, name, mint, stakeVault }: WithdrawArgs,
+    { wallet, name, mint }: WithdrawArgs,
     options?: RpcOptions
   ) {
     const stakeVaultPDA = getStakeVaultAddressSync(
       this.program.programId,
-      stakeVault
+      this.stakeVaultName
     )
 
     const userPDA = getUserAddressSync(this.program.programId, wallet)
@@ -431,18 +404,17 @@ export default class Stake {
   /**
    *  Update Stake Vault Status
    *  @param wallet - User wallet
-   *  @param stakeVault - Name of the stake vault
    *  @param isLocked - Status of the stake vault
    *  @param week - Current week rewards (Starts from 0)
    *
    */
   public async updateStakeVaultStatus(
-    { wallet, isLocked, stakeVault }: UpdateStakeVaultStatusArgs,
+    { wallet, isLocked }: UpdateStakeVaultStatusArgs,
     options?: RpcOptions
   ) {
     const StakeVault = getStakeVaultAddressSync(
       this.program.programId,
-      stakeVault
+      this.stakeVaultName
     )
 
     const method = this.program.methods
@@ -467,17 +439,16 @@ export default class Stake {
    *  Claim Stake Rewards
    *  @param wallet - User wallet
    *  @param mint - NFT mint
-   *  @param stakeVault - Name of the stake vault
    *  @param nftName - Name of the nft
    *
    */
   public async claimStakeRewards(
-    { wallet, stakeVault, nftName, collections, rank }: ClaimStakeRewardsArgs,
+    { wallet, nftName, collections, rank }: ClaimStakeRewardsArgs,
     options?: RpcOptions
   ) {
     const StakeVault = getStakeVaultAddressSync(
       this.program.programId,
-      stakeVault
+      this.stakeVaultName
     )
     const mint = new PublicKey(TTRIAD_MINT)
     const Stake = getStakeAddressSync(this.program.programId, wallet, nftName)
