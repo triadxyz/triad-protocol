@@ -62,7 +62,7 @@ pub fn deposit_stake_rewards(
         ctx.accounts.mint.decimals
     )?;
 
-    stake_vault.amount += args.amount;
+    stake_vault.amount = stake_vault.amount.checked_add(args.amount).unwrap();
 
     Ok(())
 }
