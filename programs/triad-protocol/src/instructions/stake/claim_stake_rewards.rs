@@ -88,7 +88,7 @@ pub fn claim_stake_rewards(
     // Wed Sep 18 2024
     // Mon Sep 16 2024
     if stake.claimed_ts < 1726680267 || stake.init_ts > 1726518236 {
-        amount_base = 3.0;
+        amount_base = 3.69;
     }
 
     let user_base_rewards =
