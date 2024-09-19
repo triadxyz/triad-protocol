@@ -80,12 +80,14 @@ const updateBoost = async () => {
   const update: { name: string; wallet: string }[] = []
 
   for (const stake of stakes) {
+    if (update.length >= 10) {
+      break
+    }
+
     if (response.includes(stake.mint) && !stake.boost) {
       update.push({ name: stake.name, wallet: stake.authority })
     }
   }
-
-  console.log(update)
 
   const updateBoostResponse = await triadProtocol.stake.updateBoost({
     wallet: wallet.publicKey,

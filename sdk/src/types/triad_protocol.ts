@@ -827,38 +827,6 @@ export type TriadProtocol = {
       ]
     },
     {
-      name: 'swap404'
-      discriminator: [227, 249, 224, 136, 128, 95, 255, 239]
-      accounts: [
-        {
-          name: 'signer'
-          writable: true
-          signer: true
-        },
-        {
-          name: 'user'
-          writable: true
-          pda: {
-            seeds: [
-              {
-                kind: 'const'
-                value: [117, 115, 101, 114]
-              },
-              {
-                kind: 'account'
-                path: 'signer'
-              }
-            ]
-          }
-        },
-        {
-          name: 'systemProgram'
-          address: '11111111111111111111111111111111'
-        }
-      ]
-      args: []
-    },
-    {
       name: 'updateStakeBoost'
       discriminator: [239, 85, 19, 140, 235, 236, 88, 70]
       accounts: [
