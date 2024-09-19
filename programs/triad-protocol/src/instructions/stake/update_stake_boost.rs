@@ -1,6 +1,6 @@
-use crate::constraints::is_admin;
-use crate::StakeV2;
 use anchor_lang::prelude::*;
+
+use crate::{ constraints::is_admin, state::StakeV2 };
 
 #[derive(Accounts)]
 pub struct UpdateStakeBoost<'info> {
@@ -13,10 +13,10 @@ pub struct UpdateStakeBoost<'info> {
     pub system_program: Program<'info, System>,
 }
 
-pub fn update_stake_boost(ctx: Context<UpdateStakeBoost>, boost: bool) -> Result<()> {
+pub fn update_stake_boost(ctx: Context<UpdateStakeBoost>) -> Result<()> {
     let stake = &mut ctx.accounts.stake;
 
-    stake.boost = boost;
+    stake.boost = true;
 
     Ok(())
 }

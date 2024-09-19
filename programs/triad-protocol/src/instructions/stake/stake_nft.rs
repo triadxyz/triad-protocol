@@ -1,10 +1,3 @@
-use std::str::FromStr;
-use crate::{
-    constants::{ MYSTERY_BOX_PROGRAM, TRIAD_MYSTERY_BOX },
-    errors::TriadProtocolError,
-    state::{ StakeNFTArgs, StakeVault },
-    StakeV2,
-};
 use anchor_lang::prelude::*;
 use anchor_spl::token_2022::spl_token_2022::extension::BaseStateWithExtensions;
 use anchor_spl::token_2022::{
@@ -16,6 +9,13 @@ use anchor_spl::{
     token_interface::{ transfer_checked, Mint, TokenAccount, TransferChecked },
 };
 use spl_token_metadata_interface::state::TokenMetadata;
+use std::str::FromStr;
+
+use crate::{
+    constants::{ MYSTERY_BOX_PROGRAM, TRIAD_MYSTERY_BOX },
+    errors::TriadProtocolError,
+    state::{ StakeNFTArgs, StakeVault, StakeV2 },
+};
 
 #[derive(Accounts)]
 #[instruction(args: StakeNFTArgs)]

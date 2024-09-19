@@ -15,6 +15,10 @@ declare_id!("TRDwq3BN4mP3m9KsuNUWSN6QDff93VKGSwE95Jbr9Ss");
 pub mod triad_protocol {
     use super::*;
 
+    pub fn create_user(ctx: Context<CreateUser>, args: CreateUserArgs) -> Result<()> {
+        instructions::create_user(ctx, args)
+    }
+
     pub fn create_user_position(ctx: Context<CreateUserPosition>) -> Result<()> {
         instructions::create_user_position(ctx)
     }
@@ -31,6 +35,7 @@ pub mod triad_protocol {
         instructions::close_position(ctx, args)
     }
 
+    // Stake instructions
     pub fn stake_nft(ctx: Context<StakeNFT>, args: StakeNFTArgs) -> Result<()> {
         instructions::stake_nft(ctx, args)
     }
@@ -54,13 +59,6 @@ pub mod triad_protocol {
         instructions::deposit_stake_rewards(ctx, args)
     }
 
-    pub fn update_stake_vault_status(
-        ctx: Context<UpdateStakeVaultStatus>,
-        is_locked: bool
-    ) -> Result<()> {
-        instructions::update_stake_vault_status(ctx, is_locked)
-    }
-
     pub fn claim_stake_rewards(
         ctx: Context<ClaimStakeRewards>,
         args: ClaimStakeRewardsArgs
@@ -68,11 +66,7 @@ pub mod triad_protocol {
         instructions::claim_stake_rewards(ctx, args)
     }
 
-    pub fn create_user(ctx: Context<CreateUser>, args: CreateUserArgs) -> Result<()> {
-        instructions::create_user(ctx, args)
-    }
-
-    pub fn update_stake_boost(ctx: Context<UpdateStakeBoost>, boost: bool) -> Result<()> {
-        instructions::update_stake_boost(ctx, boost)
+    pub fn update_stake_boost(ctx: Context<UpdateStakeBoost>) -> Result<()> {
+        instructions::update_stake_boost(ctx)
     }
 }

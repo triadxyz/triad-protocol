@@ -1,12 +1,13 @@
-use crate::{
-    constraints::is_authority_for_stake_vault,
-    state::{ DepositStakeRewardsArgs, StakeVault },
-};
 use anchor_lang::prelude::*;
 use anchor_spl::token_2022::Token2022;
 use anchor_spl::{
     associated_token::AssociatedToken,
     token_interface::{ transfer_checked, Mint, TokenAccount, TransferChecked },
+};
+
+use crate::{
+    constraints::is_authority_for_stake_vault,
+    state::{ DepositStakeRewardsArgs, StakeVault },
 };
 
 #[derive(Accounts)]

@@ -1,13 +1,12 @@
-use crate::{
-    constraints::is_mint_for_stake_vault,
-    errors::TriadProtocolError,
-    state::{ StakeTokenArgs, StakeVault },
-    StakeV2,
-    User,
-};
 use anchor_lang::prelude::*;
 use anchor_spl::token_2022::{ Token2022, transfer_checked, TransferChecked };
 use anchor_spl::{ associated_token::AssociatedToken, token_interface::{ Mint, TokenAccount } };
+
+use crate::{
+    constraints::is_mint_for_stake_vault,
+    errors::TriadProtocolError,
+    state::{ StakeTokenArgs, StakeVault, StakeV2, User },
+};
 
 #[derive(Accounts)]
 #[instruction(args: StakeTokenArgs)]
@@ -82,14 +81,6 @@ pub fn stake_token(ctx: Context<StakeToken>, args: StakeTokenArgs) -> Result<()>
     stake_vault.token_staked = stake_vault.token_staked.checked_add(args.amount).unwrap();
 
     user.staked = user.staked.checked_add(args.amount).unwrap();
-
-    let result = user.staked
-        .checked_div((10u64).pow(stake_vault.token_decimals as u32))
-        .unwrap()
-        .checked_div(10000)
-        .unwrap();
-
-    user.swaps = result as i16;
 
     transfer_checked(
         CpiContext::new(ctx.accounts.token_program.to_account_info(), TransferChecked {

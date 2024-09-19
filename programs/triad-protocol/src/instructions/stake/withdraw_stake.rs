@@ -1,12 +1,16 @@
-use crate::constants::ADMIN;
-use crate::constraints::{ is_authority_for_stake, is_mint_for_stake };
-use crate::{ errors::TriadProtocolError, StakeVault };
-use crate::{ StakeV2, User };
 use anchor_lang::prelude::*;
 use anchor_spl::token_2022::{ close_account, CloseAccount, Token2022 };
 use anchor_spl::{
     associated_token::AssociatedToken,
     token_interface::{ transfer_checked, Mint, TokenAccount, TransferChecked },
+};
+
+use crate::{
+    state::{ StakeV2, User },
+    constants::ADMIN,
+    constraints::{ is_authority_for_stake, is_mint_for_stake },
+    errors::TriadProtocolError,
+    StakeVault,
 };
 
 #[derive(Accounts)]
@@ -17,13 +21,13 @@ pub struct WithdrawStake<'info> {
     #[account(mut)]
     pub stake_vault: Box<Account<'info, StakeVault>>,
 
-    #[account(mut, constraint = user.authority == *signer.key)]
+    #[account(mut, constraint = user.authority == stake.authority)]
     pub user: Box<Account<'info, User>>,
 
-    #[account(mut, close = signer, constraint = is_authority_for_stake(&stake, &signer)?)]
+    #[account(mut, close = admin, constraint = is_authority_for_stake(&stake, &signer)?)]
     pub stake: Box<Account<'info, StakeV2>>,
 
-    /// CHECK: Just Admin account the recovery the rent
+    /// CHECK: Admin Account
     #[account(mut, constraint = admin.key.to_string() == ADMIN)]
     pub admin: AccountInfo<'info>,
 

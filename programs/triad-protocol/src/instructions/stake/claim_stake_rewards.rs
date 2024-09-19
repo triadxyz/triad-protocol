@@ -1,10 +1,12 @@
-use crate::constraints::{ is_mint_for_stake_vault, is_verifier };
-use crate::errors::TriadProtocolError;
-use crate::{ constraints::is_authority_for_stake, state::StakeVault };
-use crate::{ ClaimStakeRewardsArgs, StakeV2 };
 use anchor_lang::prelude::*;
 use anchor_spl::token_2022::{ transfer_checked, Token2022, TransferChecked };
 use anchor_spl::{ associated_token::AssociatedToken, token_interface::{ Mint, TokenAccount } };
+
+use crate::{
+    state::{ ClaimStakeRewardsArgs, StakeV2, StakeVault },
+    constraints::{ is_authority_for_stake, is_mint_for_stake_vault, is_verifier },
+    errors::TriadProtocolError,
+};
 
 #[derive(Accounts)]
 #[instruction(args: ClaimStakeRewardsArgs)]
@@ -81,11 +83,10 @@ pub fn claim_stake_rewards(
 
     let last_claim = if stake.claimed_ts == 0 { stake.init_ts } else { stake.claimed_ts };
     let current_time = Clock::get()?.unix_timestamp;
-    let seconds_staked = current_time - last_claim;
+    let seconds_staked = current_time.checked_sub(last_claim).unwrap();
 
     let mut amount_base = 6.0;
 
-    // Thu Sep 19 2024 14:32:02
     if stake.claimed_ts > 1726756310 || stake.init_ts > 1726756310 {
         amount_base = 3.0;
     }
