@@ -408,51 +408,6 @@
       ]
     },
     {
-      "name": "initialize_stake_vault",
-      "discriminator": [125, 55, 104, 34, 35, 179, 67, 3],
-      "accounts": [
-        {
-          "name": "signer",
-          "writable": true,
-          "signer": true
-        },
-        {
-          "name": "stake_vault",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [115, 116, 97, 107, 101, 95, 118, 97, 117, 108, 116]
-              },
-              {
-                "kind": "arg",
-                "path": "args.name"
-              }
-            ]
-          }
-        },
-        {
-          "name": "system_program",
-          "address": "11111111111111111111111111111111"
-        },
-        {
-          "name": "token_program",
-          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
-        }
-      ],
-      "args": [
-        {
-          "name": "args",
-          "type": {
-            "defined": {
-              "name": "InitializeStakeVaultArgs"
-            }
-          }
-        }
-      ]
-    },
-    {
       "name": "mine_ore",
       "discriminator": [170, 66, 140, 123, 15, 20, 224, 194],
       "accounts": [
@@ -1313,30 +1268,6 @@
           {
             "name": "stake_vault",
             "type": "string"
-          }
-        ]
-      }
-    },
-    {
-      "name": "InitializeStakeVaultArgs",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "name",
-            "type": "string"
-          },
-          {
-            "name": "slots",
-            "type": "u64"
-          },
-          {
-            "name": "collection",
-            "type": "string"
-          },
-          {
-            "name": "amount",
-            "type": "u64"
           }
         ]
       }

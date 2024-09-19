@@ -387,51 +387,6 @@ export type TriadProtocol = {
       ]
     },
     {
-      name: 'initializeStakeVault'
-      discriminator: [125, 55, 104, 34, 35, 179, 67, 3]
-      accounts: [
-        {
-          name: 'signer'
-          writable: true
-          signer: true
-        },
-        {
-          name: 'stakeVault'
-          writable: true
-          pda: {
-            seeds: [
-              {
-                kind: 'const'
-                value: [115, 116, 97, 107, 101, 95, 118, 97, 117, 108, 116]
-              },
-              {
-                kind: 'arg'
-                path: 'args.name'
-              }
-            ]
-          }
-        },
-        {
-          name: 'systemProgram'
-          address: '11111111111111111111111111111111'
-        },
-        {
-          name: 'tokenProgram'
-          address: 'TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA'
-        }
-      ]
-      args: [
-        {
-          name: 'args'
-          type: {
-            defined: {
-              name: 'initializeStakeVaultArgs'
-            }
-          }
-        }
-      ]
-    },
-    {
       name: 'mineOre'
       discriminator: [170, 66, 140, 123, 15, 20, 224, 194]
       accounts: [
@@ -1225,30 +1180,6 @@ export type TriadProtocol = {
           {
             name: 'stakeVault'
             type: 'string'
-          }
-        ]
-      }
-    },
-    {
-      name: 'initializeStakeVaultArgs'
-      type: {
-        kind: 'struct'
-        fields: [
-          {
-            name: 'name'
-            type: 'string'
-          },
-          {
-            name: 'slots'
-            type: 'u64'
-          },
-          {
-            name: 'collection'
-            type: 'string'
-          },
-          {
-            name: 'amount'
-            type: 'u64'
           }
         ]
       }
