@@ -5,7 +5,7 @@
  * IDL can be found at `target/idl/triad_protocol.json`.
  */
 export type TriadProtocol = {
-  address: 'TRDwq3BN4mP3m9KsuNUWSN6QDff93VKGSwE95Jbr9Ss'
+  address: '3ZmkveqMGGwf4coSRmJuYHCxaQjX1YXjbvM87v71J2P9'
   metadata: {
     name: 'triadProtocol'
     version: '0.1.4'
@@ -71,55 +71,6 @@ export type TriadProtocol = {
         }
       ]
       returns: 'u64'
-    },
-    {
-      name: 'closePosition'
-      discriminator: [123, 134, 81, 0, 49, 68, 98, 98]
-      accounts: [
-        {
-          name: 'signer'
-          writable: true
-          signer: true
-        },
-        {
-          name: 'ticker'
-          writable: true
-        },
-        {
-          name: 'vault'
-          writable: true
-        },
-        {
-          name: 'userPosition'
-          writable: true
-        },
-        {
-          name: 'vaultTokenAccount'
-          writable: true
-        },
-        {
-          name: 'userTokenAccount'
-          writable: true
-        },
-        {
-          name: 'systemProgram'
-          address: '11111111111111111111111111111111'
-        },
-        {
-          name: 'tokenProgram'
-          address: 'TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA'
-        }
-      ]
-      args: [
-        {
-          name: 'args'
-          type: {
-            defined: {
-              name: 'closePositionArgs'
-            }
-          }
-        }
-      ]
     },
     {
       name: 'createTicker'
@@ -272,60 +223,6 @@ export type TriadProtocol = {
       ]
     },
     {
-      name: 'createUserPosition'
-      discriminator: [6, 137, 127, 227, 135, 241, 14, 109]
-      accounts: [
-        {
-          name: 'signer'
-          writable: true
-          signer: true
-        },
-        {
-          name: 'ticker'
-          writable: true
-        },
-        {
-          name: 'userPosition'
-          writable: true
-          pda: {
-            seeds: [
-              {
-                kind: 'const'
-                value: [
-                  117,
-                  115,
-                  101,
-                  114,
-                  95,
-                  112,
-                  111,
-                  115,
-                  105,
-                  116,
-                  105,
-                  111,
-                  110
-                ]
-              },
-              {
-                kind: 'account'
-                path: 'signer'
-              },
-              {
-                kind: 'account'
-                path: 'ticker'
-              }
-            ]
-          }
-        },
-        {
-          name: 'systemProgram'
-          address: '11111111111111111111111111111111'
-        }
-      ]
-      args: []
-    },
-    {
       name: 'depositStakeRewards'
       discriminator: [59, 201, 204, 3, 44, 75, 231, 129]
       accounts: [
@@ -387,8 +284,8 @@ export type TriadProtocol = {
       ]
     },
     {
-      name: 'mineOre'
-      discriminator: [170, 66, 140, 123, 15, 20, 224, 194]
+      name: 'openOrder'
+      discriminator: [206, 88, 88, 143, 38, 136, 50, 224]
       accounts: [
         {
           name: 'signer'
@@ -396,13 +293,13 @@ export type TriadProtocol = {
           signer: true
         },
         {
-          name: 'user'
+          name: 'userTrade'
           writable: true
           pda: {
             seeds: [
               {
                 kind: 'const'
-                value: [117, 115, 101, 114]
+                value: [117, 115, 101, 114, 95, 116, 114, 97, 100, 101]
               },
               {
                 kind: 'account'
@@ -412,160 +309,209 @@ export type TriadProtocol = {
           }
         },
         {
-          name: 'proofInfo'
+          name: 'market'
           writable: true
         },
         {
-          name: 'bus'
+          name: 'mint'
           writable: true
         },
         {
-          name: 'oreProgram'
-        },
-        {
-          name: 'configProgram'
-        },
-        {
-          name: 'sysvarHashesInfo'
-        },
-        {
-          name: 'sysvarInstructionsInfo'
-        },
-        {
-          name: 'systemProgram'
-          address: '11111111111111111111111111111111'
-        }
-      ]
-      args: [
-        {
-          name: 'args'
-          type: {
-            defined: {
-              name: 'mineArgs'
-            }
-          }
-        }
-      ]
-    },
-    {
-      name: 'openOre'
-      discriminator: [120, 233, 125, 197, 12, 153, 25, 229]
-      accounts: [
-        {
-          name: 'signer'
-          writable: true
-          signer: true
-        },
-        {
-          name: 'payer'
-          writable: true
-          signer: true
-        },
-        {
-          name: 'user'
+          name: 'fromAta'
           writable: true
           pda: {
             seeds: [
-              {
-                kind: 'const'
-                value: [117, 115, 101, 114]
-              },
               {
                 kind: 'account'
                 path: 'signer'
-              }
-            ]
-          }
-        },
-        {
-          name: 'minerInfo'
-          writable: true
-        },
-        {
-          name: 'proofInfo'
-          writable: true
-        },
-        {
-          name: 'oreProgram'
-        },
-        {
-          name: 'sysvarHashesInfo'
-        },
-        {
-          name: 'systemProgram'
-          address: '11111111111111111111111111111111'
-        }
-      ]
-      args: []
-    },
-    {
-      name: 'openPosition'
-      discriminator: [135, 128, 47, 77, 15, 152, 240, 49]
-      accounts: [
-        {
-          name: 'signer'
-          writable: true
-          signer: true
-        },
-        {
-          name: 'ticker'
-          writable: true
-        },
-        {
-          name: 'vault'
-          writable: true
-        },
-        {
-          name: 'userPosition'
-          writable: true
-        },
-        {
-          name: 'vaultTokenAccount'
-          writable: true
-          pda: {
-            seeds: [
+              },
               {
                 kind: 'const'
                 value: [
-                  118,
-                  97,
-                  117,
-                  108,
-                  116,
-                  95,
-                  116,
-                  111,
-                  107,
+                  6,
+                  221,
+                  246,
+                  225,
+                  215,
                   101,
-                  110,
+                  161,
+                  147,
+                  217,
+                  203,
+                  225,
+                  70,
+                  206,
+                  235,
+                  121,
+                  172,
+                  28,
+                  180,
+                  133,
+                  237,
                   95,
-                  97,
-                  99,
-                  99,
-                  111,
-                  117,
-                  110,
-                  116
+                  91,
+                  55,
+                  145,
+                  58,
+                  140,
+                  245,
+                  133,
+                  126,
+                  255,
+                  0,
+                  169
                 ]
               },
               {
                 kind: 'account'
-                path: 'vault'
+                path: 'mint'
               }
             ]
+            program: {
+              kind: 'const'
+              value: [
+                140,
+                151,
+                37,
+                143,
+                78,
+                36,
+                137,
+                241,
+                187,
+                61,
+                16,
+                41,
+                20,
+                142,
+                13,
+                131,
+                11,
+                90,
+                19,
+                153,
+                218,
+                255,
+                16,
+                132,
+                4,
+                142,
+                123,
+                216,
+                219,
+                233,
+                248,
+                89
+              ]
+            }
           }
         },
         {
-          name: 'userTokenAccount'
+          name: 'toAta'
           writable: true
+        },
+        {
+          name: 'feeAta'
+          writable: true
+          pda: {
+            seeds: [
+              {
+                kind: 'account'
+                path: 'market.fee_authority'
+                account: 'market'
+              },
+              {
+                kind: 'const'
+                value: [
+                  6,
+                  221,
+                  246,
+                  225,
+                  215,
+                  101,
+                  161,
+                  147,
+                  217,
+                  203,
+                  225,
+                  70,
+                  206,
+                  235,
+                  121,
+                  172,
+                  28,
+                  180,
+                  133,
+                  237,
+                  95,
+                  91,
+                  55,
+                  145,
+                  58,
+                  140,
+                  245,
+                  133,
+                  126,
+                  255,
+                  0,
+                  169
+                ]
+              },
+              {
+                kind: 'account'
+                path: 'mint'
+              }
+            ]
+            program: {
+              kind: 'const'
+              value: [
+                140,
+                151,
+                37,
+                143,
+                78,
+                36,
+                137,
+                241,
+                187,
+                61,
+                16,
+                41,
+                20,
+                142,
+                13,
+                131,
+                11,
+                90,
+                19,
+                153,
+                218,
+                255,
+                16,
+                132,
+                4,
+                142,
+                123,
+                216,
+                219,
+                233,
+                248,
+                89
+              ]
+            }
+          }
+        },
+        {
+          name: 'tokenProgram'
+          address: 'TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb'
+        },
+        {
+          name: 'associatedTokenProgram'
+          address: 'ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL'
         },
         {
           name: 'systemProgram'
           address: '11111111111111111111111111111111'
-        },
-        {
-          name: 'tokenProgram'
-          address: 'TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA'
         }
       ]
       args: [
@@ -573,7 +519,7 @@ export type TriadProtocol = {
           name: 'args'
           type: {
             defined: {
-              name: 'openPositionArgs'
+              name: 'openOrderArgs'
             }
           }
         }
@@ -799,66 +745,7 @@ export type TriadProtocol = {
           address: '11111111111111111111111111111111'
         }
       ]
-      args: [
-        {
-          name: 'boost'
-          type: 'bool'
-        }
-      ]
-    },
-    {
-      name: 'updateStakeVaultStatus'
-      discriminator: [71, 64, 188, 150, 86, 254, 221, 65]
-      accounts: [
-        {
-          name: 'signer'
-          writable: true
-          signer: true
-        },
-        {
-          name: 'stakeVault'
-          writable: true
-        },
-        {
-          name: 'systemProgram'
-          address: '11111111111111111111111111111111'
-        }
-      ]
-      args: [
-        {
-          name: 'isLocked'
-          type: 'bool'
-        }
-      ]
-    },
-    {
-      name: 'updateTickerPrice'
-      discriminator: [203, 166, 139, 83, 76, 144, 250, 29]
-      accounts: [
-        {
-          name: 'signer'
-          writable: true
-          signer: true
-        },
-        {
-          name: 'ticker'
-          writable: true
-        },
-        {
-          name: 'systemProgram'
-          address: '11111111111111111111111111111111'
-        }
-      ]
-      args: [
-        {
-          name: 'args'
-          type: {
-            defined: {
-              name: 'updateTickerPriceArgs'
-            }
-          }
-        }
-      ]
+      args: []
     },
     {
       name: 'withdrawStake'
@@ -915,6 +802,10 @@ export type TriadProtocol = {
   ]
   accounts: [
     {
+      name: 'market'
+      discriminator: [219, 190, 213, 55, 0, 227, 198, 154]
+    },
+    {
       name: 'stakeV2'
       discriminator: [207, 98, 130, 13, 118, 181, 238, 47]
     },
@@ -931,8 +822,8 @@ export type TriadProtocol = {
       discriminator: [159, 117, 95, 227, 239, 151, 58, 236]
     },
     {
-      name: 'userPosition'
-      discriminator: [251, 248, 209, 245, 83, 234, 17, 27]
+      name: 'userTrade'
+      discriminator: [149, 190, 47, 218, 136, 9, 222, 222]
     },
     {
       name: 'vault'
@@ -941,16 +832,12 @@ export type TriadProtocol = {
   ]
   events: [
     {
-      name: 'closePositionRecord'
-      discriminator: [202, 208, 157, 166, 193, 229, 76, 5]
+      name: 'orderUpdate'
+      discriminator: [97, 239, 148, 96, 83, 234, 245, 14]
     },
     {
-      name: 'openPositionRecord'
-      discriminator: [118, 71, 105, 89, 222, 111, 56, 63]
-    },
-    {
-      name: 'tickerPriceUpdateRecord'
-      discriminator: [11, 38, 250, 234, 149, 218, 144, 15]
+      name: 'priceUpdate'
+      discriminator: [222, 51, 180, 226, 165, 188, 203, 54]
     }
   ]
   errors: [
@@ -1073,6 +960,56 @@ export type TriadProtocol = {
       code: 6023
       name: 'noRewardsAvailable'
       msg: 'No rewards available'
+    },
+    {
+      code: 6024
+      name: 'invalidPrice'
+      msg: 'Invalid price'
+    },
+    {
+      code: 6025
+      name: 'invalidOrderSize'
+      msg: 'Invalid order size'
+    },
+    {
+      code: 6026
+      name: 'maxOpenOrdersReached'
+      msg: 'Maximum number of open orders reached'
+    },
+    {
+      code: 6027
+      name: 'noAvailableOrderSlot'
+      msg: 'No available order slot'
+    },
+    {
+      code: 6028
+      name: 'marketInactive'
+      msg: 'Market is inactive'
+    },
+    {
+      code: 6029
+      name: 'invalidOrderType'
+      msg: 'Invalid order type'
+    },
+    {
+      code: 6030
+      name: 'invalidOrderDirection'
+      msg: 'Invalid order direction'
+    },
+    {
+      code: 6031
+      name: 'orderNotFound'
+      msg: 'Order not found'
+    },
+    {
+      code: 6032
+      name: 'invalidOrderStatus'
+      msg: 'Invalid order status'
+    },
+    {
+      code: 6033
+      name: 'arithmeticOverflow'
+      msg: 'Arithmetic overflow'
     }
   ]
   types: [
@@ -1093,54 +1030,6 @@ export type TriadProtocol = {
       }
     },
     {
-      name: 'closePositionArgs'
-      type: {
-        kind: 'struct'
-        fields: [
-          {
-            name: 'positionIndex'
-            type: 'u8'
-          }
-        ]
-      }
-    },
-    {
-      name: 'closePositionRecord'
-      type: {
-        kind: 'struct'
-        fields: [
-          {
-            name: 'amount'
-            type: 'u64'
-          },
-          {
-            name: 'ticker'
-            type: 'pubkey'
-          },
-          {
-            name: 'closePrice'
-            type: 'u64'
-          },
-          {
-            name: 'ts'
-            type: 'i64'
-          },
-          {
-            name: 'isLong'
-            type: 'bool'
-          },
-          {
-            name: 'pnl'
-            type: 'i64'
-          },
-          {
-            name: 'user'
-            type: 'pubkey'
-          }
-        ]
-      }
-    },
-    {
       name: 'createTickerArgs'
       type: {
         kind: 'struct'
@@ -1148,10 +1037,6 @@ export type TriadProtocol = {
           {
             name: 'name'
             type: 'string'
-          },
-          {
-            name: 'protocolProgramId'
-            type: 'pubkey'
           }
         ]
       }
@@ -1185,101 +1070,430 @@ export type TriadProtocol = {
       }
     },
     {
-      name: 'mineArgs'
+      name: 'market'
       type: {
         kind: 'struct'
         fields: [
           {
-            name: 'digest'
+            name: 'bump'
+            type: 'u8'
+          },
+          {
+            name: 'authority'
+            type: 'pubkey'
+          },
+          {
+            name: 'marketId'
+            docs: ['Unique identifier for the market']
+            type: 'u64'
+          },
+          {
+            name: 'tickerName'
+            docs: ['The event being predicted (e.g., "tJUP/TRD")']
+            type: 'string'
+          },
+          {
+            name: 'hypePrice'
+            docs: [
+              'Current price for Hype outcome (0-1000000, representing 0 to 1 TRD)',
+              '1000000 = 1 TRD, 500000 = 0.5 TRD, etc.'
+            ]
+            type: 'u64'
+          },
+          {
+            name: 'flopPrice'
+            docs: [
+              'Current price for Flop outcome (0-1000000, representing 0 to 1 TRD)'
+            ]
+            type: 'u64'
+          },
+          {
+            name: 'hypeLiquidity'
+            docs: ['Total liquidity for Hype (in TRD)']
+            type: 'u64'
+          },
+          {
+            name: 'flopLiquidity'
+            docs: ['Total liquidity for Flop (in TRD)']
+            type: 'u64'
+          },
+          {
+            name: 'totalHypeShares'
+            docs: ['Total number of Hype shares issued']
+            type: 'u64'
+          },
+          {
+            name: 'totalFlopShares'
+            docs: ['Total number of Flop shares issued']
+            type: 'u64'
+          },
+          {
+            name: 'totalVolume'
+            docs: ['Total trading volume (in TRD)']
+            type: 'u64'
+          },
+          {
+            name: 'vaultTokenAccount'
+            docs: ['Vault token account of $TRD']
+            type: 'pubkey'
+          },
+          {
+            name: 'mint'
+            docs: ['Mint $TRD token']
+            type: 'pubkey'
+          },
+          {
+            name: 'lastUpdateTs'
+            docs: ['Timestamp of the last update']
+            type: 'i64'
+          },
+          {
+            name: 'openOrdersCount'
+            docs: ['Total number of open orders in this market']
+            type: 'u64'
+          },
+          {
+            name: 'nextOrderId'
+            docs: ['Next available order ID']
+            type: 'u64'
+          },
+          {
+            name: 'feeBps'
+            docs: ['Fees applied to trades (in basis points, e.g., 300 = 3%)']
+            type: 'u16'
+          },
+          {
+            name: 'feeAuthority'
+            docs: ['Authority to receive fees']
+            type: 'pubkey'
+          },
+          {
+            name: 'feeAta'
+            docs: ['Token account of the fee token']
+            type: 'pubkey'
+          },
+          {
+            name: 'isActive'
+            docs: ['Whether the market is currently active for trading']
+            type: 'bool'
+          },
+          {
+            name: 'vault'
+            type: 'pubkey'
+          },
+          {
+            name: 'isOfficial'
+            type: 'bool'
+          },
+          {
+            name: 'padding'
+            type: {
+              array: ['u8', 240]
+            }
+          }
+        ]
+      }
+    },
+    {
+      name: 'openOrderArgs'
+      type: {
+        kind: 'struct'
+        fields: [
+          {
+            name: 'amount'
+            docs: ['The amount of TRD to commit to this order']
+            type: 'u64'
+          },
+          {
+            name: 'direction'
+            type: {
+              defined: {
+                name: 'orderDirection'
+              }
+            }
+          },
+          {
+            name: 'orderType'
+            type: {
+              defined: {
+                name: 'orderType'
+              }
+            }
+          },
+          {
+            name: 'price'
+            type: {
+              option: 'u64'
+            }
+          },
+          {
+            name: 'comment'
+            type: {
+              option: {
+                array: ['u8', 64]
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      name: 'order'
+      type: {
+        kind: 'struct'
+        fields: [
+          {
+            name: 'ts'
+            type: 'i64'
+          },
+          {
+            name: 'orderId'
+            type: 'u64'
+          },
+          {
+            name: 'marketId'
+            type: 'u64'
+          },
+          {
+            name: 'status'
+            type: {
+              defined: {
+                name: 'orderStatus'
+              }
+            }
+          },
+          {
+            name: 'price'
+            docs: [
+              'The price of the order (in TRD)',
+              'precision: PRICE_PRECISION (e.g., 1_000_000 = 1 TRD)'
+            ]
+            type: 'u64'
+          },
+          {
+            name: 'totalAmount'
+            docs: [
+              'The total amount of TRD committed to this order',
+              'precision: QUOTE_PRECISION'
+            ]
+            type: 'u64'
+          },
+          {
+            name: 'filledAmount'
+            docs: [
+              'The amount of TRD that has been filled',
+              'precision: QUOTE_PRECISION'
+            ]
+            type: 'u64'
+          },
+          {
+            name: 'totalShares'
+            docs: ['The total number of shares to be purchased']
+            type: 'u64'
+          },
+          {
+            name: 'filledShares'
+            docs: ['The number of shares that have been filled']
+            type: 'u64'
+          },
+          {
+            name: 'orderType'
+            type: {
+              defined: {
+                name: 'orderType'
+              }
+            }
+          },
+          {
+            name: 'direction'
+            type: {
+              defined: {
+                name: 'orderDirection'
+              }
+            }
+          },
+          {
+            name: 'settledPnl'
+            docs: [
+              'The amount of pnl settled in this market since opening the position (in TRD)',
+              'precision: QUOTE_PRECISION'
+            ]
+            type: 'i64'
+          },
+          {
+            name: 'padding'
             type: {
               array: ['u8', 16]
             }
-          },
-          {
-            name: 'nonce'
-            type: {
-              array: ['u8', 8]
-            }
           }
         ]
       }
     },
     {
-      name: 'openPositionArgs'
+      name: 'orderDirection'
       type: {
-        kind: 'struct'
-        fields: [
+        kind: 'enum'
+        variants: [
           {
-            name: 'amount'
-            type: 'u64'
+            name: 'hype'
           },
           {
-            name: 'isLong'
-            type: 'bool'
+            name: 'flop'
           }
         ]
       }
     },
     {
-      name: 'openPositionRecord'
+      name: 'orderStatus'
+      type: {
+        kind: 'enum'
+        variants: [
+          {
+            name: 'init'
+          },
+          {
+            name: 'open'
+          },
+          {
+            name: 'filled'
+          },
+          {
+            name: 'canceled'
+          },
+          {
+            name: 'closed'
+          }
+        ]
+      }
+    },
+    {
+      name: 'orderType'
+      type: {
+        kind: 'enum'
+        variants: [
+          {
+            name: 'limit'
+          },
+          {
+            name: 'market'
+          }
+        ]
+      }
+    },
+    {
+      name: 'orderUpdate'
       type: {
         kind: 'struct'
         fields: [
-          {
-            name: 'amount'
-            type: 'u64'
-          },
-          {
-            name: 'ticker'
-            type: 'pubkey'
-          },
-          {
-            name: 'entryPrice'
-            type: 'u64'
-          },
-          {
-            name: 'ts'
-            type: 'i64'
-          },
-          {
-            name: 'isLong'
-            type: 'bool'
-          },
           {
             name: 'user'
             type: 'pubkey'
+          },
+          {
+            name: 'marketId'
+            type: 'u64'
+          },
+          {
+            name: 'orderId'
+            type: 'u64'
+          },
+          {
+            name: 'direction'
+            type: {
+              defined: {
+                name: 'orderDirection'
+              }
+            }
+          },
+          {
+            name: 'orderType'
+            type: {
+              defined: {
+                name: 'orderType'
+              }
+            }
+          },
+          {
+            name: 'orderStatus'
+            type: {
+              defined: {
+                name: 'orderStatus'
+              }
+            }
+          },
+          {
+            name: 'price'
+            type: 'u64'
+          },
+          {
+            name: 'totalShares'
+            type: 'u64'
+          },
+          {
+            name: 'filledShares'
+            type: 'u64'
+          },
+          {
+            name: 'totalAmount'
+            type: 'u64'
+          },
+          {
+            name: 'filledAmount'
+            type: 'u64'
+          },
+          {
+            name: 'comment'
+            type: {
+              option: {
+                array: ['u8', 64]
+              }
+            }
+          },
+          {
+            name: 'refundAmount'
+            type: {
+              option: 'u64'
+            }
+          },
+          {
+            name: 'timestamp'
+            type: 'i64'
           }
         ]
       }
     },
     {
-      name: 'position'
+      name: 'priceUpdate'
       type: {
         kind: 'struct'
         fields: [
           {
-            name: 'amount'
+            name: 'marketId'
             type: 'u64'
           },
           {
-            name: 'entryPrice'
+            name: 'hypePrice'
             type: 'u64'
           },
           {
-            name: 'ts'
+            name: 'flopPrice'
+            type: 'u64'
+          },
+          {
+            name: 'marketPrice'
+            type: 'u64'
+          },
+          {
+            name: 'timestamp'
             type: 'i64'
           },
           {
-            name: 'isLong'
-            type: 'bool'
-          },
-          {
-            name: 'isOpen'
-            type: 'bool'
-          },
-          {
-            name: 'pnl'
-            type: 'i64'
+            name: 'comment'
+            type: {
+              option: {
+                array: ['u8', 64]
+              }
+            }
           }
         ]
       }
@@ -1495,38 +1709,6 @@ export type TriadProtocol = {
       }
     },
     {
-      name: 'tickerPriceUpdateRecord'
-      type: {
-        kind: 'struct'
-        fields: [
-          {
-            name: 'price'
-            type: 'u64'
-          },
-          {
-            name: 'ts'
-            type: 'i64'
-          },
-          {
-            name: 'ticker'
-            type: 'pubkey'
-          }
-        ]
-      }
-    },
-    {
-      name: 'updateTickerPriceArgs'
-      type: {
-        kind: 'struct'
-        fields: [
-          {
-            name: 'price'
-            type: 'u64'
-          }
-        ]
-      }
-    },
-    {
       name: 'user'
       type: {
         kind: 'struct'
@@ -1572,62 +1754,68 @@ export type TriadProtocol = {
             type: 'i64'
           },
           {
-            name: 'padding'
-            type: {
-              array: ['u8', 32]
-            }
+            name: 'userTrade'
+            type: 'pubkey'
           }
         ]
       }
     },
     {
-      name: 'userPosition'
+      name: 'userTrade'
       type: {
         kind: 'struct'
         fields: [
           {
-            name: 'ts'
-            type: 'i64'
-          },
-          {
             name: 'bump'
             type: 'u8'
-          },
-          {
-            name: 'totalDeposited'
-            type: 'u64'
-          },
-          {
-            name: 'totalWithdrawn'
-            type: 'u64'
-          },
-          {
-            name: 'lpShare'
-            type: 'u64'
-          },
-          {
-            name: 'totalPositions'
-            type: 'u16'
-          },
-          {
-            name: 'ticker'
-            type: 'pubkey'
           },
           {
             name: 'authority'
             type: 'pubkey'
           },
           {
-            name: 'positions'
+            name: 'totalDeposits'
+            docs: [
+              'The total value of deposits the user has made (in TRD)',
+              'precision: QUOTE_PRECISION'
+            ]
+            type: 'u64'
+          },
+          {
+            name: 'totalWithdraws'
+            docs: [
+              'The total value of withdrawals the user has made (in TRD)',
+              'precision: QUOTE_PRECISION'
+            ]
+            type: 'u64'
+          },
+          {
+            name: 'openOrders'
+            docs: ['Number of open orders']
+            type: 'u8'
+          },
+          {
+            name: 'hasOpenOrder'
+            docs: ['Whether or not user has open order']
+            type: 'bool'
+          },
+          {
+            name: 'orders'
             type: {
               array: [
                 {
                   defined: {
-                    name: 'position'
+                    name: 'order'
                   }
                 },
-                3
+                13
               ]
+            }
+          },
+          {
+            name: 'padding'
+            type: {
+              array: ['u8', 64]
             }
           }
         ]

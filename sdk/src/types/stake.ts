@@ -57,7 +57,6 @@ export type ClaimStakeRewardsArgs = {
 export type UpdateBoostArgs = {
   wallet: PublicKey
   nfts: { name: string; wallet: string }[]
-  boost: boolean
 }
 
 export type UpdateStakeRewardsArgs = {

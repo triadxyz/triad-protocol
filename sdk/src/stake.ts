@@ -402,40 +402,6 @@ export default class Stake {
   }
 
   /**
-   *  Update Stake Vault Status
-   *  @param wallet - User wallet
-   *  @param isLocked - Status of the stake vault
-   *  @param week - Current week rewards (Starts from 0)
-   *
-   */
-  public async updateStakeVaultStatus(
-    { wallet, isLocked }: UpdateStakeVaultStatusArgs,
-    options?: RpcOptions
-  ) {
-    const StakeVault = getStakeVaultAddressSync(
-      this.program.programId,
-      this.stakeVaultName
-    )
-
-    const method = this.program.methods
-      .updateStakeVaultStatus(isLocked)
-      .accounts({
-        signer: wallet,
-        stakeVault: StakeVault
-      })
-
-    if (options?.microLamports) {
-      method.postInstructions([
-        ComputeBudgetProgram.setComputeUnitPrice({
-          microLamports: options.microLamports
-        })
-      ])
-    }
-
-    return method.rpc({ skipPreflight: options?.skipPreflight })
-  }
-
-  /**
    *  Claim Stake Rewards
    *  @param wallet - User wallet
    *  @param mint - NFT mint
@@ -485,11 +451,10 @@ export default class Stake {
    *  Update Stake Boost
    *  @param wallet - User wallet
    *  @param nftName - Name of the nft
-   *  @param boost - Boost value
    *
    */
   public async updateBoost(
-    { wallet, nfts, boost }: UpdateBoostArgs,
+    { wallet, nfts }: UpdateBoostArgs,
     options?: RpcOptions
   ) {
     const ixs = []
@@ -503,7 +468,7 @@ export default class Stake {
 
       ixs.push(
         await this.program.methods
-          .updateStakeBoost(boost)
+          .updateStakeBoost()
           .accounts({
             signer: wallet,
             stake: Stake

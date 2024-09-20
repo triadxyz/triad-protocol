@@ -29,13 +29,11 @@ export default class Ticker {
   /**
    * Create a new ticker
    *  @param name - The ticker's name
-   *  @param protocolProgramId - The program ID of the protocol
    *  @param token mint - Token mint for the ticker (e.g. USDC)
    *
    */
   public async createTicker({
     name,
-    protocolProgramId,
     tokenMint
   }: {
     name: string
@@ -43,53 +41,11 @@ export default class Ticker {
     tokenMint: PublicKey
   }) {
     return this.program.methods
-      .createTicker({ name, protocolProgramId })
+      .createTicker({ name })
       .accounts({
         signer: this.provider.wallet.publicKey,
         payerTokenMint: tokenMint
       })
       .rpc()
-  }
-
-  /**
-   * Update a ticker's price
-   *  @param name - The ticker's name
-   *  @param price - The ticker's price
-   *
-   */
-  public async updateTickerPrice({
-    name,
-    price
-  }: {
-    name: string
-    price: string
-  }) {
-    const TickerPDA = getTickerAddressSync(this.program.programId, name)
-
-    const instructions: TransactionInstruction[] = [
-      ComputeBudgetProgram.setComputeUnitPrice({
-        microLamports: 12000
-      })
-    ]
-
-    instructions.push(
-      await this.program.methods
-        .updateTickerPrice({ price: new BN(price) })
-        .accounts({
-          signer: this.provider.wallet.publicKey,
-          ticker: TickerPDA
-        })
-        .instruction()
-    )
-
-    const { blockhash } = await this.provider.connection.getLatestBlockhash()
-
-    const message = new TransactionMessage({
-      payerKey: this.provider.wallet.publicKey,
-      recentBlockhash: blockhash,
-      instructions
-    }).compileToV0Message()
-
-    return this.provider.sendAndConfirm(new VersionedTransaction(message))
   }
 }
