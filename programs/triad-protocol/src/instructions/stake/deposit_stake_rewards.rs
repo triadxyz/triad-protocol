@@ -30,6 +30,8 @@ pub struct DepositStakeRewards<'info> {
     #[account(
         mut, 
         constraint = from_ata.amount >= args.amount,
+        associated_token::mint = mint,
+        associated_token::authority = signer
     )]
     pub from_ata: Box<InterfaceAccount<'info, TokenAccount>>,
 

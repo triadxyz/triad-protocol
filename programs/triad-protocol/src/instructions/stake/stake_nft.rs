@@ -43,7 +43,9 @@ pub struct StakeNFT<'info> {
 
     #[account(
         mut, 
-        constraint = from_ata.amount >= 1 && signer.key() == from_ata.owner && from_ata.mint == mint.key(),
+        constraint = from_ata.amount >= 1,
+        associated_token::mint = mint,
+        associated_token::authority = signer
     )]
     pub from_ata: Box<InterfaceAccount<'info, TokenAccount>>,
 

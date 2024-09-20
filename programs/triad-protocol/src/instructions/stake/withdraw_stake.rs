@@ -34,7 +34,11 @@ pub struct WithdrawStake<'info> {
     #[account(mut, constraint = is_mint_for_stake(&stake, &mint.key())?)]
     pub mint: Box<InterfaceAccount<'info, Mint>>,
 
-    #[account(mut)]
+    #[account(
+        mut,
+        associated_token::mint = mint,
+        associated_token::authority = stake_vault
+    )]
     pub from_ata: Box<InterfaceAccount<'info, TokenAccount>>,
 
     #[account(

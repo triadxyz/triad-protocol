@@ -42,10 +42,182 @@ export type TriadProtocol = {
         {
           name: 'fromAta'
           writable: true
+          pda: {
+            seeds: [
+              {
+                kind: 'account'
+                path: 'stakeVault'
+              },
+              {
+                kind: 'const'
+                value: [
+                  6,
+                  221,
+                  246,
+                  225,
+                  215,
+                  101,
+                  161,
+                  147,
+                  217,
+                  203,
+                  225,
+                  70,
+                  206,
+                  235,
+                  121,
+                  172,
+                  28,
+                  180,
+                  133,
+                  237,
+                  95,
+                  91,
+                  55,
+                  145,
+                  58,
+                  140,
+                  245,
+                  133,
+                  126,
+                  255,
+                  0,
+                  169
+                ]
+              },
+              {
+                kind: 'account'
+                path: 'mint'
+              }
+            ]
+            program: {
+              kind: 'const'
+              value: [
+                140,
+                151,
+                37,
+                143,
+                78,
+                36,
+                137,
+                241,
+                187,
+                61,
+                16,
+                41,
+                20,
+                142,
+                13,
+                131,
+                11,
+                90,
+                19,
+                153,
+                218,
+                255,
+                16,
+                132,
+                4,
+                142,
+                123,
+                216,
+                219,
+                233,
+                248,
+                89
+              ]
+            }
+          }
         },
         {
           name: 'toAta'
           writable: true
+          pda: {
+            seeds: [
+              {
+                kind: 'account'
+                path: 'signer'
+              },
+              {
+                kind: 'const'
+                value: [
+                  6,
+                  221,
+                  246,
+                  225,
+                  215,
+                  101,
+                  161,
+                  147,
+                  217,
+                  203,
+                  225,
+                  70,
+                  206,
+                  235,
+                  121,
+                  172,
+                  28,
+                  180,
+                  133,
+                  237,
+                  95,
+                  91,
+                  55,
+                  145,
+                  58,
+                  140,
+                  245,
+                  133,
+                  126,
+                  255,
+                  0,
+                  169
+                ]
+              },
+              {
+                kind: 'account'
+                path: 'mint'
+              }
+            ]
+            program: {
+              kind: 'const'
+              value: [
+                140,
+                151,
+                37,
+                143,
+                78,
+                36,
+                137,
+                241,
+                187,
+                61,
+                16,
+                41,
+                20,
+                142,
+                13,
+                131,
+                11,
+                90,
+                19,
+                153,
+                218,
+                255,
+                16,
+                132,
+                4,
+                142,
+                123,
+                216,
+                219,
+                233,
+                248,
+                89
+              ]
+            }
+          }
         },
         {
           name: 'tokenProgram'
@@ -71,106 +243,6 @@ export type TriadProtocol = {
         }
       ]
       returns: 'u64'
-    },
-    {
-      name: 'createTicker'
-      discriminator: [32, 213, 147, 234, 14, 160, 57, 17]
-      accounts: [
-        {
-          name: 'signer'
-          writable: true
-          signer: true
-        },
-        {
-          name: 'ticker'
-          writable: true
-          pda: {
-            seeds: [
-              {
-                kind: 'const'
-                value: [116, 105, 99, 107, 101, 114]
-              },
-              {
-                kind: 'arg'
-                path: 'args.name'
-              }
-            ]
-          }
-        },
-        {
-          name: 'vault'
-          writable: true
-          pda: {
-            seeds: [
-              {
-                kind: 'const'
-                value: [118, 97, 117, 108, 116]
-              },
-              {
-                kind: 'account'
-                path: 'ticker'
-              }
-            ]
-          }
-        },
-        {
-          name: 'payerTokenMint'
-        },
-        {
-          name: 'tokenAccount'
-          writable: true
-          pda: {
-            seeds: [
-              {
-                kind: 'const'
-                value: [
-                  118,
-                  97,
-                  117,
-                  108,
-                  116,
-                  95,
-                  116,
-                  111,
-                  107,
-                  101,
-                  110,
-                  95,
-                  97,
-                  99,
-                  99,
-                  111,
-                  117,
-                  110,
-                  116
-                ]
-              },
-              {
-                kind: 'account'
-                path: 'vault'
-              }
-            ]
-          }
-        },
-        {
-          name: 'systemProgram'
-          address: '11111111111111111111111111111111'
-        },
-        {
-          name: 'tokenProgram'
-          address: 'TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA'
-        }
-      ]
-      args: [
-        {
-          name: 'args'
-          type: {
-            defined: {
-              name: 'createTickerArgs'
-            }
-          }
-        }
-      ]
     },
     {
       name: 'createUser'
@@ -254,10 +326,182 @@ export type TriadProtocol = {
         {
           name: 'fromAta'
           writable: true
+          pda: {
+            seeds: [
+              {
+                kind: 'account'
+                path: 'signer'
+              },
+              {
+                kind: 'const'
+                value: [
+                  6,
+                  221,
+                  246,
+                  225,
+                  215,
+                  101,
+                  161,
+                  147,
+                  217,
+                  203,
+                  225,
+                  70,
+                  206,
+                  235,
+                  121,
+                  172,
+                  28,
+                  180,
+                  133,
+                  237,
+                  95,
+                  91,
+                  55,
+                  145,
+                  58,
+                  140,
+                  245,
+                  133,
+                  126,
+                  255,
+                  0,
+                  169
+                ]
+              },
+              {
+                kind: 'account'
+                path: 'mint'
+              }
+            ]
+            program: {
+              kind: 'const'
+              value: [
+                140,
+                151,
+                37,
+                143,
+                78,
+                36,
+                137,
+                241,
+                187,
+                61,
+                16,
+                41,
+                20,
+                142,
+                13,
+                131,
+                11,
+                90,
+                19,
+                153,
+                218,
+                255,
+                16,
+                132,
+                4,
+                142,
+                123,
+                216,
+                219,
+                233,
+                248,
+                89
+              ]
+            }
+          }
         },
         {
           name: 'toAta'
           writable: true
+          pda: {
+            seeds: [
+              {
+                kind: 'account'
+                path: 'stakeVault'
+              },
+              {
+                kind: 'const'
+                value: [
+                  6,
+                  221,
+                  246,
+                  225,
+                  215,
+                  101,
+                  161,
+                  147,
+                  217,
+                  203,
+                  225,
+                  70,
+                  206,
+                  235,
+                  121,
+                  172,
+                  28,
+                  180,
+                  133,
+                  237,
+                  95,
+                  91,
+                  55,
+                  145,
+                  58,
+                  140,
+                  245,
+                  133,
+                  126,
+                  255,
+                  0,
+                  169
+                ]
+              },
+              {
+                kind: 'account'
+                path: 'mint'
+              }
+            ]
+            program: {
+              kind: 'const'
+              value: [
+                140,
+                151,
+                37,
+                143,
+                78,
+                36,
+                137,
+                241,
+                187,
+                61,
+                16,
+                41,
+                20,
+                142,
+                13,
+                131,
+                11,
+                90,
+                19,
+                153,
+                218,
+                255,
+                16,
+                132,
+                4,
+                142,
+                123,
+                216,
+                219,
+                233,
+                248,
+                89
+              ]
+            }
+          }
         },
         {
           name: 'tokenProgram'
@@ -409,6 +653,92 @@ export type TriadProtocol = {
         {
           name: 'toAta'
           writable: true
+          pda: {
+            seeds: [
+              {
+                kind: 'account'
+                path: 'market'
+              },
+              {
+                kind: 'const'
+                value: [
+                  6,
+                  221,
+                  246,
+                  225,
+                  215,
+                  101,
+                  161,
+                  147,
+                  217,
+                  203,
+                  225,
+                  70,
+                  206,
+                  235,
+                  121,
+                  172,
+                  28,
+                  180,
+                  133,
+                  237,
+                  95,
+                  91,
+                  55,
+                  145,
+                  58,
+                  140,
+                  245,
+                  133,
+                  126,
+                  255,
+                  0,
+                  169
+                ]
+              },
+              {
+                kind: 'account'
+                path: 'mint'
+              }
+            ]
+            program: {
+              kind: 'const'
+              value: [
+                140,
+                151,
+                37,
+                143,
+                78,
+                36,
+                137,
+                241,
+                187,
+                61,
+                16,
+                41,
+                20,
+                142,
+                13,
+                131,
+                11,
+                90,
+                19,
+                153,
+                218,
+                255,
+                16,
+                132,
+                4,
+                142,
+                123,
+                216,
+                219,
+                233,
+                248,
+                89
+              ]
+            }
+          }
         },
         {
           name: 'feeAta'
@@ -613,10 +943,182 @@ export type TriadProtocol = {
         {
           name: 'fromAta'
           writable: true
+          pda: {
+            seeds: [
+              {
+                kind: 'account'
+                path: 'signer'
+              },
+              {
+                kind: 'const'
+                value: [
+                  6,
+                  221,
+                  246,
+                  225,
+                  215,
+                  101,
+                  161,
+                  147,
+                  217,
+                  203,
+                  225,
+                  70,
+                  206,
+                  235,
+                  121,
+                  172,
+                  28,
+                  180,
+                  133,
+                  237,
+                  95,
+                  91,
+                  55,
+                  145,
+                  58,
+                  140,
+                  245,
+                  133,
+                  126,
+                  255,
+                  0,
+                  169
+                ]
+              },
+              {
+                kind: 'account'
+                path: 'mint'
+              }
+            ]
+            program: {
+              kind: 'const'
+              value: [
+                140,
+                151,
+                37,
+                143,
+                78,
+                36,
+                137,
+                241,
+                187,
+                61,
+                16,
+                41,
+                20,
+                142,
+                13,
+                131,
+                11,
+                90,
+                19,
+                153,
+                218,
+                255,
+                16,
+                132,
+                4,
+                142,
+                123,
+                216,
+                219,
+                233,
+                248,
+                89
+              ]
+            }
+          }
         },
         {
           name: 'toAta'
           writable: true
+          pda: {
+            seeds: [
+              {
+                kind: 'account'
+                path: 'stakeVault'
+              },
+              {
+                kind: 'const'
+                value: [
+                  6,
+                  221,
+                  246,
+                  225,
+                  215,
+                  101,
+                  161,
+                  147,
+                  217,
+                  203,
+                  225,
+                  70,
+                  206,
+                  235,
+                  121,
+                  172,
+                  28,
+                  180,
+                  133,
+                  237,
+                  95,
+                  91,
+                  55,
+                  145,
+                  58,
+                  140,
+                  245,
+                  133,
+                  126,
+                  255,
+                  0,
+                  169
+                ]
+              },
+              {
+                kind: 'account'
+                path: 'mint'
+              }
+            ]
+            program: {
+              kind: 'const'
+              value: [
+                140,
+                151,
+                37,
+                143,
+                78,
+                36,
+                137,
+                241,
+                187,
+                61,
+                16,
+                41,
+                20,
+                142,
+                13,
+                131,
+                11,
+                90,
+                19,
+                153,
+                218,
+                255,
+                16,
+                132,
+                4,
+                142,
+                123,
+                216,
+                219,
+                233,
+                248,
+                89
+              ]
+            }
+          }
         },
         {
           name: 'tokenProgram'
@@ -698,10 +1200,182 @@ export type TriadProtocol = {
         {
           name: 'fromAta'
           writable: true
+          pda: {
+            seeds: [
+              {
+                kind: 'account'
+                path: 'signer'
+              },
+              {
+                kind: 'const'
+                value: [
+                  6,
+                  221,
+                  246,
+                  225,
+                  215,
+                  101,
+                  161,
+                  147,
+                  217,
+                  203,
+                  225,
+                  70,
+                  206,
+                  235,
+                  121,
+                  172,
+                  28,
+                  180,
+                  133,
+                  237,
+                  95,
+                  91,
+                  55,
+                  145,
+                  58,
+                  140,
+                  245,
+                  133,
+                  126,
+                  255,
+                  0,
+                  169
+                ]
+              },
+              {
+                kind: 'account'
+                path: 'mint'
+              }
+            ]
+            program: {
+              kind: 'const'
+              value: [
+                140,
+                151,
+                37,
+                143,
+                78,
+                36,
+                137,
+                241,
+                187,
+                61,
+                16,
+                41,
+                20,
+                142,
+                13,
+                131,
+                11,
+                90,
+                19,
+                153,
+                218,
+                255,
+                16,
+                132,
+                4,
+                142,
+                123,
+                216,
+                219,
+                233,
+                248,
+                89
+              ]
+            }
+          }
         },
         {
           name: 'toAta'
           writable: true
+          pda: {
+            seeds: [
+              {
+                kind: 'account'
+                path: 'stakeVault'
+              },
+              {
+                kind: 'const'
+                value: [
+                  6,
+                  221,
+                  246,
+                  225,
+                  215,
+                  101,
+                  161,
+                  147,
+                  217,
+                  203,
+                  225,
+                  70,
+                  206,
+                  235,
+                  121,
+                  172,
+                  28,
+                  180,
+                  133,
+                  237,
+                  95,
+                  91,
+                  55,
+                  145,
+                  58,
+                  140,
+                  245,
+                  133,
+                  126,
+                  255,
+                  0,
+                  169
+                ]
+              },
+              {
+                kind: 'account'
+                path: 'mint'
+              }
+            ]
+            program: {
+              kind: 'const'
+              value: [
+                140,
+                151,
+                37,
+                143,
+                78,
+                36,
+                137,
+                241,
+                187,
+                61,
+                16,
+                41,
+                20,
+                142,
+                13,
+                131,
+                11,
+                90,
+                19,
+                153,
+                218,
+                255,
+                16,
+                132,
+                4,
+                142,
+                123,
+                216,
+                219,
+                233,
+                248,
+                89
+              ]
+            }
+          }
         },
         {
           name: 'tokenProgram'
@@ -779,10 +1453,182 @@ export type TriadProtocol = {
         {
           name: 'fromAta'
           writable: true
+          pda: {
+            seeds: [
+              {
+                kind: 'account'
+                path: 'stakeVault'
+              },
+              {
+                kind: 'const'
+                value: [
+                  6,
+                  221,
+                  246,
+                  225,
+                  215,
+                  101,
+                  161,
+                  147,
+                  217,
+                  203,
+                  225,
+                  70,
+                  206,
+                  235,
+                  121,
+                  172,
+                  28,
+                  180,
+                  133,
+                  237,
+                  95,
+                  91,
+                  55,
+                  145,
+                  58,
+                  140,
+                  245,
+                  133,
+                  126,
+                  255,
+                  0,
+                  169
+                ]
+              },
+              {
+                kind: 'account'
+                path: 'mint'
+              }
+            ]
+            program: {
+              kind: 'const'
+              value: [
+                140,
+                151,
+                37,
+                143,
+                78,
+                36,
+                137,
+                241,
+                187,
+                61,
+                16,
+                41,
+                20,
+                142,
+                13,
+                131,
+                11,
+                90,
+                19,
+                153,
+                218,
+                255,
+                16,
+                132,
+                4,
+                142,
+                123,
+                216,
+                219,
+                233,
+                248,
+                89
+              ]
+            }
+          }
         },
         {
           name: 'toAta'
           writable: true
+          pda: {
+            seeds: [
+              {
+                kind: 'account'
+                path: 'signer'
+              },
+              {
+                kind: 'const'
+                value: [
+                  6,
+                  221,
+                  246,
+                  225,
+                  215,
+                  101,
+                  161,
+                  147,
+                  217,
+                  203,
+                  225,
+                  70,
+                  206,
+                  235,
+                  121,
+                  172,
+                  28,
+                  180,
+                  133,
+                  237,
+                  95,
+                  91,
+                  55,
+                  145,
+                  58,
+                  140,
+                  245,
+                  133,
+                  126,
+                  255,
+                  0,
+                  169
+                ]
+              },
+              {
+                kind: 'account'
+                path: 'mint'
+              }
+            ]
+            program: {
+              kind: 'const'
+              value: [
+                140,
+                151,
+                37,
+                143,
+                78,
+                36,
+                137,
+                241,
+                187,
+                61,
+                16,
+                41,
+                20,
+                142,
+                13,
+                131,
+                11,
+                90,
+                19,
+                153,
+                218,
+                255,
+                16,
+                132,
+                4,
+                142,
+                123,
+                216,
+                219,
+                233,
+                248,
+                89
+              ]
+            }
+          }
         },
         {
           name: 'tokenProgram'
@@ -814,20 +1660,12 @@ export type TriadProtocol = {
       discriminator: [192, 112, 65, 125, 129, 151, 173, 226]
     },
     {
-      name: 'ticker'
-      discriminator: [214, 74, 184, 188, 214, 64, 251, 53]
-    },
-    {
       name: 'user'
       discriminator: [159, 117, 95, 227, 239, 151, 58, 236]
     },
     {
       name: 'userTrade'
       discriminator: [149, 190, 47, 218, 136, 9, 222, 222]
-    },
-    {
-      name: 'vault'
-      discriminator: [211, 8, 232, 43, 2, 152, 117, 119]
     }
   ]
   events: [
@@ -1030,18 +1868,6 @@ export type TriadProtocol = {
       }
     },
     {
-      name: 'createTickerArgs'
-      type: {
-        kind: 'struct'
-        fields: [
-          {
-            name: 'name'
-            type: 'string'
-          }
-        ]
-      }
-    },
-    {
       name: 'createUserArgs'
       type: {
         kind: 'struct'
@@ -1088,7 +1914,7 @@ export type TriadProtocol = {
             type: 'u64'
           },
           {
-            name: 'tickerName'
+            name: 'name'
             docs: ['The event being predicted (e.g., "tJUP/TRD")']
             type: 'string'
           },
@@ -1130,7 +1956,7 @@ export type TriadProtocol = {
           {
             name: 'totalVolume'
             docs: ['Total trading volume (in TRD)']
-            type: 'u64'
+            type: 'u128'
           },
           {
             name: 'vaultTokenAccount'
@@ -1176,10 +2002,6 @@ export type TriadProtocol = {
             name: 'isActive'
             docs: ['Whether the market is currently active for trading']
             type: 'bool'
-          },
-          {
-            name: 'vault'
-            type: 'pubkey'
           },
           {
             name: 'isOfficial'
@@ -1669,46 +2491,6 @@ export type TriadProtocol = {
       }
     },
     {
-      name: 'ticker'
-      type: {
-        kind: 'struct'
-        fields: [
-          {
-            name: 'initTs'
-            type: 'i64'
-          },
-          {
-            name: 'updatedTs'
-            type: 'i64'
-          },
-          {
-            name: 'bump'
-            type: 'u8'
-          },
-          {
-            name: 'authority'
-            type: 'pubkey'
-          },
-          {
-            name: 'name'
-            type: 'string'
-          },
-          {
-            name: 'protocolProgramId'
-            type: 'pubkey'
-          },
-          {
-            name: 'price'
-            type: 'u64'
-          },
-          {
-            name: 'vault'
-            type: 'pubkey'
-          }
-        ]
-      }
-    },
-    {
       name: 'user'
       type: {
         kind: 'struct'
@@ -1817,70 +2599,6 @@ export type TriadProtocol = {
             type: {
               array: ['u8', 64]
             }
-          }
-        ]
-      }
-    },
-    {
-      name: 'vault'
-      type: {
-        kind: 'struct'
-        fields: [
-          {
-            name: 'bump'
-            type: 'u8'
-          },
-          {
-            name: 'authority'
-            type: 'pubkey'
-          },
-          {
-            name: 'name'
-            type: 'string'
-          },
-          {
-            name: 'tokenAccount'
-            type: 'pubkey'
-          },
-          {
-            name: 'tickerAddress'
-            type: 'pubkey'
-          },
-          {
-            name: 'totalDeposited'
-            type: 'u64'
-          },
-          {
-            name: 'totalWithdrawn'
-            type: 'u64'
-          },
-          {
-            name: 'initTs'
-            type: 'i64'
-          },
-          {
-            name: 'netDeposits'
-            type: 'u128'
-          },
-          {
-            name: 'netWithdraws'
-            type: 'u128'
-          },
-          {
-            name: 'longBalance'
-            type: 'u64'
-          },
-          {
-            name: 'shortBalance'
-            type: 'u64'
-          },
-          {
-            name: 'longPositionsOpened'
-            type: 'u64'
-          },
-          {
-            name: 'shortPositionsOpened'
-            type: 'u64'
           }
         ]
       }

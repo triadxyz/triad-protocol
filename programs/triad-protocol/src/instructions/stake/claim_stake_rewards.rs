@@ -26,13 +26,16 @@ pub struct ClaimStakeRewards<'info> {
     #[account(mut, constraint = is_mint_for_stake_vault(&stake_vault, &mint.key())?)]
     pub mint: Box<InterfaceAccount<'info, Mint>>,
 
-    #[account(mut)]
+    #[account(
+        mut,
+        associated_token::mint = mint,
+        associated_token::authority = stake_vault
+    )]
     pub from_ata: Box<InterfaceAccount<'info, TokenAccount>>,
 
     #[account(
         init_if_needed,
         payer = signer,
-        constraint = to_ata.owner == *signer.key && to_ata.mint == mint.key(),
         associated_token::mint = mint,
         associated_token::authority = signer
     )]

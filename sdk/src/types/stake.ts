@@ -42,11 +42,6 @@ export type WithdrawArgs = {
   mint: PublicKey
 }
 
-export type UpdateStakeVaultStatusArgs = {
-  wallet: PublicKey
-  isLocked: boolean
-}
-
 export type ClaimStakeRewardsArgs = {
   wallet: PublicKey
   nftName: string
