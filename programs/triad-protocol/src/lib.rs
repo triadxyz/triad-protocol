@@ -23,10 +23,6 @@ pub mod triad_protocol {
         instructions::open_order(ctx, args)
     }
 
-    pub fn create_ticker(ctx: Context<CreateTicker>, args: CreateTickerArgs) -> Result<()> {
-        instructions::create_ticker(ctx, args)
-    }
-
     pub fn stake_nft(ctx: Context<StakeNFT>, args: StakeNFTArgs) -> Result<()> {
         instructions::stake_nft(ctx, args)
     }

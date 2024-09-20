@@ -11,14 +11,3 @@ pub struct Ticker {
     pub price: u64,
     pub vault: Pubkey,
 }
-
-#[derive(AnchorSerialize, AnchorDeserialize)]
-pub struct CreateTickerArgs {
-    pub name: String,
-}
-
-impl Ticker {
-    pub const PREFIX_SEED: &'static [u8] = b"ticker";
-
-    pub const SPACE: usize = 8 + std::mem::size_of::<Self>();
-}
