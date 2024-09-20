@@ -109,22 +109,22 @@ pub fn open_order(ctx: Context<OpenOrder>, args: OpenOrderArgs) -> Result<()> {
 
     let user_trade = &mut ctx.accounts.user_trade;
     user_trade.orders[order_index] = new_order;
-    user_trade.open_orders = user_trade.open_orders.saturating_add(1);
+    user_trade.open_orders = user_trade.open_orders.checked_add(1).unwrap();
     user_trade.has_open_order = true;
-    user_trade.total_deposits = user_trade.total_deposits.saturating_add(actual_amount);
+    user_trade.total_deposits = user_trade.total_deposits.checked_add(actual_amount).unwrap();
 
     market.open_orders_count += 1;
-    market.total_volume = market.total_volume.saturating_add(actual_amount);
+    market.total_volume = market.total_volume.checked_add(actual_amount as u128).unwrap();
 
     market.update_price(price, args.direction)?;
     match args.direction {
         OrderDirection::Hype => {
-            market.hype_liquidity = market.hype_liquidity.saturating_add(actual_amount);
-            market.total_hype_shares = market.total_hype_shares.saturating_add(shares);
+            market.hype_liquidity = market.hype_liquidity.checked_add(actual_amount).unwrap();
+            market.total_hype_shares = market.total_hype_shares.checked_add(shares).unwrap();
         }
         OrderDirection::Flop => {
-            market.flop_liquidity = market.flop_liquidity.saturating_add(actual_amount);
-            market.total_flop_shares = market.total_flop_shares.saturating_add(shares);
+            market.flop_liquidity = market.flop_liquidity.checked_add(actual_amount).unwrap();
+            market.total_flop_shares = market.total_flop_shares.checked_add(shares).unwrap();
         }
     }
 
@@ -157,10 +157,10 @@ pub fn open_order(ctx: Context<OpenOrder>, args: OpenOrderArgs) -> Result<()> {
 
     match args.direction {
         OrderDirection::Hype => {
-            market.hype_liquidity = market.hype_liquidity.saturating_add(net_amount);
+            market.hype_liquidity = market.hype_liquidity.checked_add(net_amount).unwrap();
         }
         OrderDirection::Flop => {
-            market.flop_liquidity = market.flop_liquidity.saturating_add(net_amount);
+            market.flop_liquidity = market.flop_liquidity.checked_add(net_amount).unwrap();
         }
     }
 
@@ -179,12 +179,12 @@ pub fn open_order(ctx: Context<OpenOrder>, args: OpenOrderArgs) -> Result<()> {
 
     match args.direction {
         OrderDirection::Hype => {
-            market.hype_liquidity = market.hype_liquidity.saturating_add(filled_amount);
-            market.total_hype_shares = market.total_hype_shares.saturating_add(filled_shares);
+            market.hype_liquidity = market.hype_liquidity.checked_add(filled_amount).unwrap();
+            market.total_hype_shares = market.total_hype_shares.checked_add(filled_shares).unwrap();
         }
         OrderDirection::Flop => {
-            market.flop_liquidity = market.flop_liquidity.saturating_add(filled_amount);
-            market.total_flop_shares = market.total_flop_shares.saturating_add(filled_shares);
+            market.flop_liquidity = market.flop_liquidity.checked_add(filled_amount).unwrap();
+            market.total_flop_shares = market.total_flop_shares.checked_add(filled_shares).unwrap();
         }
     }
 
@@ -258,8 +258,8 @@ pub fn fill_order_internal<'info>(
             mint.decimals
         )?;
 
-        order.filled_amount = order.filled_amount.saturating_add(fill_amount);
-        order.filled_shares = order.filled_shares.saturating_add(fill_shares);
+        order.filled_amount = order.filled_amount.checked_add(fill_amount).unwrap();
+        order.filled_shares = order.filled_shares.checked_add(fill_shares).unwrap();
 
         if order.filled_amount == order.total_amount {
             order.status = OrderStatus::Filled;

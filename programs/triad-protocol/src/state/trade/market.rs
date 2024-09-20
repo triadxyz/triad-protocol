@@ -9,7 +9,7 @@ pub struct Market {
     /// Unique identifier for the market
     pub market_id: u64,
     /// The event being predicted (e.g., "tJUP/TRD")
-    pub ticker_name: String,
+    pub name: String,
     /// Current price for Hype outcome (0-1000000, representing 0 to 1 TRD)
     /// 1000000 = 1 TRD, 500000 = 0.5 TRD, etc.
     pub hype_price: u64,
@@ -24,7 +24,7 @@ pub struct Market {
     /// Total number of Flop shares issued
     pub total_flop_shares: u64,
     /// Total trading volume (in TRD)
-    pub total_volume: u64,
+    pub total_volume: u128,
     /// Vault token account of $TRD
     pub vault_token_account: Pubkey,
     /// Mint $TRD token
@@ -43,7 +43,6 @@ pub struct Market {
     pub fee_ata: Pubkey,
     /// Whether the market is currently active for trading
     pub is_active: bool,
-    pub vault: Pubkey,
     pub is_official: bool,
     pub padding: [u8; 240],
 }
@@ -51,6 +50,35 @@ pub struct Market {
 #[derive(AnchorSerialize, AnchorDeserialize)]
 pub struct CreateMarketArgs {
     pub name: String,
+}
+
+impl Default for Market {
+    fn default() -> Self {
+        Self {
+            bump: 0,
+            authority: Pubkey::default(),
+            market_id: 0,
+            name: String::new(),
+            hype_price: 500_000, // Initial price set to 0.5 TRD
+            flop_price: 500_000, // Initial price set to 0.5 TRD
+            hype_liquidity: 0,
+            flop_liquidity: 0,
+            total_hype_shares: 0,
+            total_flop_shares: 0,
+            total_volume: 0,
+            vault_token_account: Pubkey::default(),
+            mint: Pubkey::default(),
+            last_update_ts: 0,
+            open_orders_count: 0,
+            next_order_id: 0,
+            fee_bps: 300, // 3% fee
+            fee_authority: Pubkey::default(),
+            fee_ata: Pubkey::default(),
+            is_active: true,
+            is_official: true,
+            padding: [0; 240],
+        }
+    }
 }
 
 impl Market {
