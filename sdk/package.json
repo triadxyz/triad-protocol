@@ -8,8 +8,7 @@
     "clean": "rimraf dist",
     "build": "yarn run clean && tsc",
     "prepublishOnly": "yarn build",
-    "start": "yarn build && node ./dist/test.js",
-    "test": "rimraf dist && tsc && node ./dist/test.js"
+    "test": "rimraf dist && tsc && node ./dist/local-test.ts"
   },
   "publishConfig": {
     "access": "public"

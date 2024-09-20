@@ -35,12 +35,10 @@ pub struct Market {
     pub open_orders_count: u64,
     /// Next available order ID
     pub next_order_id: u64,
-    /// Fees applied to trades (in basis points, e.g., 300 = 3%)
+    /// Fees applied to trades (in basis points, e.g., 300 = 3%) but 2.869 for the protocol; 0.1 NFT Holders; 0.031 Market
     pub fee_bps: u16,
-    /// Authority to receive fees
-    pub fee_authority: Pubkey,
-    /// Token account of the fee token
-    pub fee_ata: Pubkey,
+    /// Vault to Receive fees
+    pub fee_vault: Pubkey,
     /// Whether the market is currently active for trading
     pub is_active: bool,
     pub is_official: bool,
@@ -50,6 +48,7 @@ pub struct Market {
 #[derive(AnchorSerialize, AnchorDeserialize)]
 pub struct CreateMarketArgs {
     pub name: String,
+    pub market_id: u64,
 }
 
 impl Default for Market {
@@ -72,8 +71,7 @@ impl Default for Market {
             open_orders_count: 0,
             next_order_id: 0,
             fee_bps: 300, // 3% fee
-            fee_authority: Pubkey::default(),
-            fee_ata: Pubkey::default(),
+            fee_vault: Pubkey::default(),
             is_active: true,
             is_official: true,
             padding: [0; 240],

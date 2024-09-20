@@ -393,7 +393,7 @@
             "seeds": [
               {
                 "kind": "account",
-                "path": "market.fee_authority",
+                "path": "market.fee_vault",
                 "account": "Market"
               },
               {
@@ -1226,18 +1226,13 @@
           {
             "name": "fee_bps",
             "docs": [
-              "Fees applied to trades (in basis points, e.g., 300 = 3%)"
+              "Fees applied to trades (in basis points, e.g., 300 = 3%) but 2.869 for the protocol; 0.1 NFT Holders; 0.031 Market"
             ],
             "type": "u16"
           },
           {
-            "name": "fee_authority",
-            "docs": ["Authority to receive fees"],
-            "type": "pubkey"
-          },
-          {
-            "name": "fee_ata",
-            "docs": ["Token account of the fee token"],
+            "name": "fee_vault",
+            "docs": ["Vault to Receive fees"],
             "type": "pubkey"
           },
           {

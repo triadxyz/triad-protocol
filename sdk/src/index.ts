@@ -2,8 +2,7 @@ import { AnchorProvider, Program, Wallet } from '@coral-xyz/anchor'
 import { ComputeBudgetProgram, Connection, PublicKey } from '@solana/web3.js'
 import { TriadProtocol } from './types/triad_protocol'
 import IDL from './types/idl_triad_protocol.json'
-import Ticker from './ticker'
-import Vault from './vault'
+import Trade from './trade'
 import { formatUser, getUserAddressSync } from './utils/helpers'
 import Stake from './stake'
 import { CreateUserArgs, RpcOptions } from './types'
@@ -11,8 +10,7 @@ import { CreateUserArgs, RpcOptions } from './types'
 export default class TriadProtocolClient {
   program: Program<TriadProtocol>
   provider: AnchorProvider
-  ticker: Ticker
-  vault: Vault
+  trade: Trade
   stake: Stake
 
   constructor(connection: Connection, wallet: Wallet) {
@@ -23,8 +21,7 @@ export default class TriadProtocolClient {
     )
 
     this.program = new Program(IDL as TriadProtocol, this.provider)
-    this.ticker = new Ticker(this.program, this.provider)
-    this.vault = new Vault(this.program, this.provider)
+    this.trade = new Trade(this.program, this.provider)
     this.stake = new Stake(this.program, this.provider)
   }
 
@@ -71,14 +68,24 @@ export default class TriadProtocolClient {
    * Get Refferal
    * @param name - User name
    */
-  getRefferal = async (name: string) => {
+  getReferral = async (name: string): Promise<string> => {
     try {
-      const response = await this.program.account.user.all()
+      const users = await this.program.account.user.all([
+        {
+          memcmp: {
+            offset: 8,
+            bytes: Buffer.from(name).toString('base64')
+          }
+        }
+      ])
 
-      const data = response.find((item) => item.account.name === name)
+      if (users.length > 0) {
+        return users[0].publicKey.toString()
+      }
 
-      return data.publicKey
-    } catch {
+      return ''
+    } catch (error) {
+      console.error('Error fetching referral:', error)
       return ''
     }
   }

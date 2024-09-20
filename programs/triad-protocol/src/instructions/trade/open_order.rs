@@ -25,7 +25,7 @@ pub struct OpenOrder<'info> {
     pub market: Box<Account<'info, Market>>,
 
     #[account(mut, constraint = mint.key() == market.mint)]
-    pub mint: InterfaceAccount<'info, Mint>,
+    pub mint: Box<InterfaceAccount<'info, Mint>>,
 
     #[account(
      mut, 
@@ -33,20 +33,20 @@ pub struct OpenOrder<'info> {
      associated_token::mint = mint,
      associated_token::authority = signer
     )]
-    pub from_ata: InterfaceAccount<'info, TokenAccount>,
+    pub from_ata: Box<InterfaceAccount<'info, TokenAccount>>,
 
     #[account(
         mut,
         associated_token::mint = mint,
         associated_token::authority = market
     )]
-    pub to_ata: InterfaceAccount<'info, TokenAccount>,
+    pub to_ata: Box<InterfaceAccount<'info, TokenAccount>>,
 
     #[account(mut,
       associated_token::mint = mint,
-      associated_token::authority = market.fee_authority
+      associated_token::authority = market.fee_vault
     )]
-    pub fee_ata: InterfaceAccount<'info, TokenAccount>,
+    pub fee_ata: Box<InterfaceAccount<'info, TokenAccount>>,
 
     pub token_program: Program<'info, Token2022>,
     pub associated_token_program: Program<'info, AssociatedToken>,

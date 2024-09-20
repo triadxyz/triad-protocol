@@ -747,7 +747,7 @@ export type TriadProtocol = {
             seeds: [
               {
                 kind: 'account'
-                path: 'market.fee_authority'
+                path: 'market.fee_vault'
                 account: 'market'
               },
               {
@@ -1985,17 +1985,14 @@ export type TriadProtocol = {
           },
           {
             name: 'feeBps'
-            docs: ['Fees applied to trades (in basis points, e.g., 300 = 3%)']
+            docs: [
+              'Fees applied to trades (in basis points, e.g., 300 = 3%) but 2.869 for the protocol; 0.1 NFT Holders; 0.031 Market'
+            ]
             type: 'u16'
           },
           {
-            name: 'feeAuthority'
-            docs: ['Authority to receive fees']
-            type: 'pubkey'
-          },
-          {
-            name: 'feeAta'
-            docs: ['Token account of the fee token']
+            name: 'feeVault'
+            docs: ['Vault to Receive fees']
             type: 'pubkey'
           },
           {
