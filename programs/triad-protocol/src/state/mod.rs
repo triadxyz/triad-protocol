@@ -3,7 +3,7 @@ mod stake;
 mod ticker;
 mod user;
 mod vault;
-mod trade;
+pub mod trade;
 
 pub use position::*;
 pub use stake::*;

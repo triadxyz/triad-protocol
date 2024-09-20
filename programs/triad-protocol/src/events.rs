@@ -1,29 +1,31 @@
 use anchor_lang::prelude::*;
 
+use crate::state::trade::{ OrderDirection, OrderStatus, OrderType };
+
 #[event]
-pub struct OpenPositionRecord {
-    pub amount: u64,
-    pub ticker: Pubkey,
-    pub entry_price: u64,
-    pub ts: i64,
-    pub is_long: bool,
-    pub user: Pubkey,
+pub struct PriceUpdate {
+    pub market_id: u64,
+    pub hype_price: u64,
+    pub flop_price: u64,
+    pub market_price: u64,
+    pub timestamp: i64,
+    pub comment: Option<[u8; 64]>,
 }
 
 #[event]
-pub struct ClosePositionRecord {
-    pub amount: u64,
-    pub ticker: Pubkey,
-    pub close_price: u64,
-    pub ts: i64,
-    pub is_long: bool,
-    pub pnl: i64,
+pub struct OrderUpdate {
     pub user: Pubkey,
-}
-
-#[event]
-pub struct TickerPriceUpdateRecord {
+    pub market_id: u64,
+    pub order_id: u64,
+    pub direction: OrderDirection,
+    pub order_type: OrderType,
+    pub order_status: OrderStatus,
     pub price: u64,
-    pub ts: i64,
-    pub ticker: Pubkey,
+    pub total_shares: u64,
+    pub filled_shares: u64,
+    pub total_amount: u64,
+    pub filled_amount: u64,
+    pub comment: Option<[u8; 64]>,
+    pub refund_amount: Option<u64>,
+    pub timestamp: i64,
 }

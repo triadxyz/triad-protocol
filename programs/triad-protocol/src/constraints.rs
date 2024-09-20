@@ -1,6 +1,6 @@
 use std::str::FromStr;
 
-use crate::{ constants::{ ADMIN, VERIFIER }, StakeV2, StakeVault, UserPosition };
+use crate::{ constants::{ ADMIN, VERIFIER }, StakeV2, StakeVault };
 
 use anchor_lang::prelude::*;
 
@@ -10,20 +10,6 @@ pub fn is_admin(signer: &Signer) -> anchor_lang::Result<bool> {
 
 pub fn is_verifier(signer: &Signer) -> anchor_lang::Result<bool> {
     Ok(Pubkey::from_str(VERIFIER).unwrap().eq(signer.key))
-}
-
-pub fn is_authority_for_user_position(
-    user_position: &Account<UserPosition>,
-    signer: &Signer
-) -> anchor_lang::Result<bool> {
-    Ok(user_position.authority.eq(signer.key))
-}
-
-pub fn is_token_mint_for_vault(
-    vault_token_mint: &Pubkey,
-    token_mint: &Pubkey
-) -> anchor_lang::Result<bool> {
-    Ok(vault_token_mint.eq(token_mint))
 }
 
 pub fn is_authority_for_stake(

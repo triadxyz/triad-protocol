@@ -9,7 +9,7 @@ mod events;
 pub mod instructions;
 pub mod state;
 
-declare_id!("TRDwq3BN4mP3m9KsuNUWSN6QDff93VKGSwE95Jbr9Ss");
+declare_id!("3ZmkveqMGGwf4coSRmJuYHCxaQjX1YXjbvM87v71J2P9");
 
 #[program]
 pub mod triad_protocol {
@@ -19,23 +19,14 @@ pub mod triad_protocol {
         instructions::create_user(ctx, args)
     }
 
-    pub fn create_user_position(ctx: Context<CreateUserPosition>) -> Result<()> {
-        instructions::create_user_position(ctx)
+    pub fn open_order(ctx: Context<OpenOrder>, args: OpenOrderArgs) -> Result<()> {
+        instructions::open_order(ctx, args)
     }
 
     pub fn create_ticker(ctx: Context<CreateTicker>, args: CreateTickerArgs) -> Result<()> {
         instructions::create_ticker(ctx, args)
     }
 
-    pub fn open_position(ctx: Context<OpenPosition>, args: OpenPositionArgs) -> Result<()> {
-        instructions::open_position(ctx, args)
-    }
-
-    pub fn close_position(ctx: Context<ClosePosition>, args: ClosePositionArgs) -> Result<()> {
-        instructions::close_position(ctx, args)
-    }
-
-    // Stake instructions
     pub fn stake_nft(ctx: Context<StakeNFT>, args: StakeNFTArgs) -> Result<()> {
         instructions::stake_nft(ctx, args)
     }

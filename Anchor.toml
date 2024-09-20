@@ -1,11 +1,14 @@
 [features]
 skip-lint = false
 
-[programs.localnet]
+[programs.mainnet]
 triad_protocol = "TRDwq3BN4mP3m9KsuNUWSN6QDff93VKGSwE95Jbr9Ss"
 
+[programs.devnet]
+triad_protocol = "3ZmkveqMGGwf4coSRmJuYHCxaQjX1YXjbvM87v71J2P9"
+
 [provider]
-cluster = "localnet"
+cluster = "devnet"
 wallet = "/Users/dannpl/.config/solana/id.json"
 
 [scripts]

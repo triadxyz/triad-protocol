@@ -73,4 +73,34 @@ pub enum TriadProtocolError {
 
     #[msg("No rewards available")]
     NoRewardsAvailable,
+
+    #[msg("Invalid price")]
+    InvalidPrice,
+
+    #[msg("Invalid order size")]
+    InvalidOrderSize,
+
+    #[msg("Maximum number of open orders reached")]
+    MaxOpenOrdersReached,
+
+    #[msg("No available order slot")]
+    NoAvailableOrderSlot,
+
+    #[msg("Market is inactive")]
+    MarketInactive,
+
+    #[msg("Invalid order type")]
+    InvalidOrderType,
+
+    #[msg("Invalid order direction")]
+    InvalidOrderDirection,
+
+    #[msg("Order not found")]
+    OrderNotFound,
+
+    #[msg("Invalid order status")]
+    InvalidOrderStatus,
+
+    #[msg("Arithmetic overflow")]
+    ArithmeticOverflow,
 }
