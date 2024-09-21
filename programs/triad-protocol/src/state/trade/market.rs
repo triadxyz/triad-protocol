@@ -46,7 +46,7 @@ pub struct Market {
 }
 
 #[derive(AnchorSerialize, AnchorDeserialize)]
-pub struct CreateMarketArgs {
+pub struct InitializeMarketArgs {
     pub name: String,
     pub market_id: u64,
 }

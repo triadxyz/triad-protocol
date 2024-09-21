@@ -1,6 +1,7 @@
 import { AnchorProvider, Program } from '@coral-xyz/anchor'
 import { TriadProtocol } from './types/triad_protocol'
 import { Market } from './types/trade'
+import BN from 'bn.js'
 import { PublicKey } from '@solana/web3.js'
 
 export default class Trade {

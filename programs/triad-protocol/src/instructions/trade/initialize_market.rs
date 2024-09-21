@@ -2,10 +2,10 @@ use anchor_lang::prelude::*;
 use anchor_spl::token_2022::Token2022;
 use anchor_spl::{ associated_token::AssociatedToken, token_interface::{ Mint, TokenAccount } };
 
-use crate::{ state::trade::{ Market, CreateMarketArgs, FeeVault }, constants::TRD_MINT };
+use crate::{ state::trade::{ Market, InitializeMarketArgs, FeeVault }, constants::TRD_MINT };
 
 #[derive(Accounts)]
-#[instruction(args: CreateMarketArgs)]
+#[instruction(args: InitializeMarketArgs)]
 pub struct InitializeMarket<'info> {
     #[account(mut)]
     pub signer: Signer<'info>,
@@ -47,7 +47,7 @@ pub struct InitializeMarket<'info> {
     pub system_program: Program<'info, System>,
 }
 
-pub fn initialize_market(ctx: Context<InitializeMarket>, args: CreateMarketArgs) -> Result<()> {
+pub fn initialize_market(ctx: Context<InitializeMarket>, args: InitializeMarketArgs) -> Result<()> {
     let market = &mut ctx.accounts.market;
     let fee_vault = &mut ctx.accounts.fee_vault;
 

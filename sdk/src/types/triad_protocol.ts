@@ -528,6 +528,169 @@ export type TriadProtocol = {
       ]
     },
     {
+      name: 'initializeMarket'
+      discriminator: [35, 35, 189, 193, 155, 48, 170, 203]
+      accounts: [
+        {
+          name: 'signer'
+          writable: true
+          signer: true
+        },
+        {
+          name: 'market'
+          writable: true
+          pda: {
+            seeds: [
+              {
+                kind: 'const'
+                value: [109, 97, 114, 107, 101, 116]
+              },
+              {
+                kind: 'arg'
+                path: 'args.market_id'
+              },
+              {
+                kind: 'arg'
+                path: 'args.name'
+              }
+            ]
+          }
+        },
+        {
+          name: 'feeVault'
+          writable: true
+          pda: {
+            seeds: [
+              {
+                kind: 'const'
+                value: [102, 101, 101, 95, 118, 97, 117, 108, 116]
+              },
+              {
+                kind: 'account'
+                path: 'market'
+              }
+            ]
+          }
+        },
+        {
+          name: 'mint'
+          writable: true
+        },
+        {
+          name: 'vaultTokenAccount'
+          writable: true
+          pda: {
+            seeds: [
+              {
+                kind: 'account'
+                path: 'market'
+              },
+              {
+                kind: 'const'
+                value: [
+                  6,
+                  221,
+                  246,
+                  225,
+                  215,
+                  101,
+                  161,
+                  147,
+                  217,
+                  203,
+                  225,
+                  70,
+                  206,
+                  235,
+                  121,
+                  172,
+                  28,
+                  180,
+                  133,
+                  237,
+                  95,
+                  91,
+                  55,
+                  145,
+                  58,
+                  140,
+                  245,
+                  133,
+                  126,
+                  255,
+                  0,
+                  169
+                ]
+              },
+              {
+                kind: 'account'
+                path: 'mint'
+              }
+            ]
+            program: {
+              kind: 'const'
+              value: [
+                140,
+                151,
+                37,
+                143,
+                78,
+                36,
+                137,
+                241,
+                187,
+                61,
+                16,
+                41,
+                20,
+                142,
+                13,
+                131,
+                11,
+                90,
+                19,
+                153,
+                218,
+                255,
+                16,
+                132,
+                4,
+                142,
+                123,
+                216,
+                219,
+                233,
+                248,
+                89
+              ]
+            }
+          }
+        },
+        {
+          name: 'tokenProgram'
+          address: 'TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb'
+        },
+        {
+          name: 'associatedTokenProgram'
+          address: 'ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL'
+        },
+        {
+          name: 'systemProgram'
+          address: '11111111111111111111111111111111'
+        }
+      ]
+      args: [
+        {
+          name: 'args'
+          type: {
+            defined: {
+              name: 'initializeMarketArgs'
+            }
+          }
+        }
+      ]
+    },
+    {
       name: 'openOrder'
       discriminator: [206, 88, 88, 143, 38, 136, 50, 224]
       accounts: [
@@ -1648,6 +1811,10 @@ export type TriadProtocol = {
   ]
   accounts: [
     {
+      name: 'feeVault'
+      discriminator: [192, 178, 69, 232, 58, 149, 157, 132]
+    },
+    {
       name: 'market'
       discriminator: [219, 190, 213, 55, 0, 227, 198, 154]
     },
@@ -1891,6 +2058,84 @@ export type TriadProtocol = {
           {
             name: 'stakeVault'
             type: 'string'
+          }
+        ]
+      }
+    },
+    {
+      name: 'feeVault'
+      type: {
+        kind: 'struct'
+        fields: [
+          {
+            name: 'bump'
+            type: 'u8'
+          },
+          {
+            name: 'authority'
+            type: 'pubkey'
+          },
+          {
+            name: 'market'
+            type: 'pubkey'
+          },
+          {
+            name: 'deposited'
+            type: 'u128'
+          },
+          {
+            name: 'withdrawn'
+            type: 'u128'
+          },
+          {
+            name: 'netBalance'
+            type: 'u64'
+          },
+          {
+            name: 'projectAvailable'
+            type: 'u64'
+          },
+          {
+            name: 'projectClaimed'
+            type: 'u128'
+          },
+          {
+            name: 'nftHoldersAvailable'
+            type: 'u64'
+          },
+          {
+            name: 'nftHoldersClaimed'
+            type: 'u128'
+          },
+          {
+            name: 'marketAvailable'
+            type: 'u64'
+          },
+          {
+            name: 'marketClaimed'
+            type: 'u128'
+          },
+          {
+            name: 'padding'
+            type: {
+              array: ['u8', 56]
+            }
+          }
+        ]
+      }
+    },
+    {
+      name: 'initializeMarketArgs'
+      type: {
+        kind: 'struct'
+        fields: [
+          {
+            name: 'name'
+            type: 'string'
+          },
+          {
+            name: 'marketId'
+            type: 'u64'
           }
         ]
       }

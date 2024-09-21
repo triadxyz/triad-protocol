@@ -290,6 +290,111 @@
       ]
     },
     {
+      "name": "initialize_market",
+      "discriminator": [35, 35, 189, 193, 155, 48, 170, 203],
+      "accounts": [
+        {
+          "name": "signer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "market",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [109, 97, 114, 107, 101, 116]
+              },
+              {
+                "kind": "arg",
+                "path": "args.market_id"
+              },
+              {
+                "kind": "arg",
+                "path": "args.name"
+              }
+            ]
+          }
+        },
+        {
+          "name": "fee_vault",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [102, 101, 101, 95, 118, 97, 117, 108, 116]
+              },
+              {
+                "kind": "account",
+                "path": "market"
+              }
+            ]
+          }
+        },
+        {
+          "name": "mint",
+          "writable": true
+        },
+        {
+          "name": "vault_token_account",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "account",
+                "path": "market"
+              },
+              {
+                "kind": "const",
+                "value": [
+                  6, 221, 246, 225, 215, 101, 161, 147, 217, 203, 225, 70, 206,
+                  235, 121, 172, 28, 180, 133, 237, 95, 91, 55, 145, 58, 140,
+                  245, 133, 126, 255, 0, 169
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "mint"
+              }
+            ],
+            "program": {
+              "kind": "const",
+              "value": [
+                140, 151, 37, 143, 78, 36, 137, 241, 187, 61, 16, 41, 20, 142,
+                13, 131, 11, 90, 19, 153, 218, 255, 16, 132, 4, 142, 123, 216,
+                219, 233, 248, 89
+              ]
+            }
+          }
+        },
+        {
+          "name": "token_program",
+          "address": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb"
+        },
+        {
+          "name": "associated_token_program",
+          "address": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "args",
+          "type": {
+            "defined": {
+              "name": "InitializeMarketArgs"
+            }
+          }
+        }
+      ]
+    },
+    {
       "name": "open_order",
       "discriminator": [206, 88, 88, 143, 38, 136, 50, 224],
       "accounts": [
@@ -888,6 +993,10 @@
   ],
   "accounts": [
     {
+      "name": "FeeVault",
+      "discriminator": [192, 178, 69, 232, 58, 149, 157, 132]
+    },
+    {
       "name": "Market",
       "discriminator": [219, 190, 213, 55, 0, 227, 198, 154]
     },
@@ -1131,6 +1240,84 @@
           {
             "name": "stake_vault",
             "type": "string"
+          }
+        ]
+      }
+    },
+    {
+      "name": "FeeVault",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "bump",
+            "type": "u8"
+          },
+          {
+            "name": "authority",
+            "type": "pubkey"
+          },
+          {
+            "name": "market",
+            "type": "pubkey"
+          },
+          {
+            "name": "deposited",
+            "type": "u128"
+          },
+          {
+            "name": "withdrawn",
+            "type": "u128"
+          },
+          {
+            "name": "net_balance",
+            "type": "u64"
+          },
+          {
+            "name": "project_available",
+            "type": "u64"
+          },
+          {
+            "name": "project_claimed",
+            "type": "u128"
+          },
+          {
+            "name": "nft_holders_available",
+            "type": "u64"
+          },
+          {
+            "name": "nft_holders_claimed",
+            "type": "u128"
+          },
+          {
+            "name": "market_available",
+            "type": "u64"
+          },
+          {
+            "name": "market_claimed",
+            "type": "u128"
+          },
+          {
+            "name": "padding",
+            "type": {
+              "array": ["u8", 56]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "InitializeMarketArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "name": "market_id",
+            "type": "u64"
           }
         ]
       }
