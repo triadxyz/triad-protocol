@@ -103,4 +103,7 @@ pub enum TriadProtocolError {
 
     #[msg("Arithmetic overflow")]
     ArithmeticOverflow,
+
+    #[msg("Order size too large")]
+    OrderSizeTooLarge,
 }

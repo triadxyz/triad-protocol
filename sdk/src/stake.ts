@@ -16,7 +16,7 @@ import {
 } from './utils/helpers'
 import { RpcOptions } from './types'
 import {
-  DepositStakeRewardsArgs,
+  UpdateStakeVaultArgs,
   StakeNftArgs,
   RequestWithdrawArgs,
   WithdrawArgs,
@@ -167,7 +167,7 @@ export default class Stake {
    *  @param items - NFT items
    *
    */
-  public async stakeNft({ wallet, items }: StakeNftArgs, options?: RpcOptions) {
+  async stakeNft({ wallet, items }: StakeNftArgs, options?: RpcOptions) {
     let ixs: TransactionInstruction[] = []
 
     for (let i = 0; i < items.length; i++) {
@@ -197,18 +197,20 @@ export default class Stake {
 
     const { blockhash } = await this.provider.connection.getLatestBlockhash()
 
-    const messageV0 = new TransactionMessage({
-      instructions: ixs,
-      recentBlockhash: blockhash,
-      payerKey: wallet
-    }).compileToV0Message()
-
-    const tx = new VersionedTransaction(messageV0)
-
-    return this.provider.sendAndConfirm(tx, [], {
-      skipPreflight: options?.skipPreflight,
-      commitment: 'confirmed'
-    })
+    return this.provider.sendAndConfirm(
+      new VersionedTransaction(
+        new TransactionMessage({
+          instructions: ixs,
+          recentBlockhash: blockhash,
+          payerKey: wallet
+        }).compileToV0Message()
+      ),
+      [],
+      {
+        skipPreflight: options?.skipPreflight,
+        commitment: 'confirmed'
+      }
+    )
   }
 
   /**
@@ -218,7 +220,7 @@ export default class Stake {
    *  @param amount - Amount to stake
    *
    */
-  public async stakeToken(
+  async stakeToken(
     { name, wallet, amount }: StakeTokenArgs,
     options?: RpcOptions
   ) {
@@ -248,24 +250,25 @@ export default class Stake {
   }
 
   /**
-   *  Deposit Stake Rewards
+   *  Update Stake Vault
    *  @param wallet - User wallet
-   *  @param mint - NFT mint
-   *  @param amount - Reward amount
+   *  @param amount - Reward amount to deposit (optional)
+   *  @param status - Status of the stake vault (optional)
    *
    */
-  public async depositStakeRewards(
-    { wallet, mint, amount }: DepositStakeRewardsArgs,
+  async updateStakeVault(
+    { wallet, amount, status }: UpdateStakeVaultArgs,
     options?: RpcOptions
   ) {
     const method = this.program.methods
-      .depositStakeRewards({
+      .updateStakeVault({
         amount,
+        status,
         stakeVault: this.stakeVaultName
       })
       .accounts({
         signer: wallet,
-        mint: mint
+        mint: TRD_MINT
       })
 
     if (options?.microLamports) {
@@ -285,7 +288,7 @@ export default class Stake {
    *  @param name - Stake name
    *
    */
-  public async requestWithdraw(
+  async requestWithdraw(
     { wallet, name, mint }: RequestWithdrawArgs,
     options?: RpcOptions
   ) {
@@ -322,7 +325,7 @@ export default class Stake {
    *  @param mint - NFT mint
    *
    */
-  public async withdrawStake(
+  async withdrawStake(
     { wallet, name, mint }: WithdrawArgs,
     options?: RpcOptions
   ) {
@@ -360,7 +363,7 @@ export default class Stake {
    *  @param nftName - Name of the nft
    *
    */
-  public async claimStakeRewards(
+  async claimStakeRewards(
     { wallet, nftName, collections, rank }: ClaimStakeRewardsArgs,
     options?: RpcOptions
   ) {
@@ -404,10 +407,7 @@ export default class Stake {
    *  @param nfts - Name of the nfts
    *
    */
-  public async updateBoost(
-    { wallet, nfts }: UpdateBoostArgs,
-    options?: RpcOptions
-  ) {
+  async updateBoost({ wallet, nfts }: UpdateBoostArgs, options?: RpcOptions) {
     const ixs = []
 
     for (const nft of nfts) {

@@ -24,10 +24,10 @@ export type InitializeStakeArgs = {
   collection: string
 }
 
-export type DepositStakeRewardsArgs = {
+export type UpdateStakeVaultArgs = {
   wallet: PublicKey
-  amount: BN
-  mint: PublicKey
+  amount?: BN
+  status?: boolean
 }
 
 export type RequestWithdrawArgs = {

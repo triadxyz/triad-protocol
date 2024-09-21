@@ -29,7 +29,7 @@ export default class TriadProtocolClient {
    * Get User by wallet
    * @param wallet - User wallet
    */
-  getUser = async (wallet: PublicKey) => {
+  async getUser(wallet: PublicKey) {
     const UserPDA = getUserAddressSync(this.program.programId, wallet)
     const response = await this.program.account.user.fetch(UserPDA)
 
@@ -40,7 +40,7 @@ export default class TriadProtocolClient {
    * Get User by wallet
    * @param wallet - User wallet
    */
-  getUsers = async () => {
+  async getUsers() {
     const response = await this.program.account.user.all()
 
     return response
@@ -52,7 +52,7 @@ export default class TriadProtocolClient {
    * Check if user exists
    * @param username - User name
    */
-  hasUser = async (wallet: PublicKey) => {
+  async hasUser(wallet: PublicKey) {
     try {
       await this.program.account.user.fetch(
         getUserAddressSync(this.program.programId, wallet)
@@ -68,7 +68,7 @@ export default class TriadProtocolClient {
    * Get Refferal
    * @param name - User name
    */
-  getReferral = async (name: string): Promise<string> => {
+  async getReferral(name: string) {
     try {
       const users = await this.program.account.user.all([
         {
@@ -97,10 +97,10 @@ export default class TriadProtocolClient {
    *  @param referral - user referral
    *
    */
-  createUser = (
+  async createUser(
     { wallet, name, referral }: CreateUserArgs,
     options?: RpcOptions
-  ) => {
+  ) {
     const method = this.program.methods
       .createUser({
         name

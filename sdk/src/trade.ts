@@ -1,8 +1,16 @@
 import { AnchorProvider, Program } from '@coral-xyz/anchor'
 import { TriadProtocol } from './types/triad_protocol'
-import { Market } from './types/trade'
+import { ComputeBudgetProgram, PublicKey } from '@solana/web3.js'
+import { Market, OrderDirection, OrderType } from './types/trade'
+import { RpcOptions } from './types'
 import BN from 'bn.js'
-import { PublicKey } from '@solana/web3.js'
+import { TRD_DECIMALS, TRD_MINT, TRD_MINT_DEVNET } from './utils/constants'
+import {
+  encodeString,
+  getATASync,
+  getFeeVaultAddressSync,
+  getMarketAddressSync
+} from './utils/helpers'
 
 export default class Trade {
   program: Program<TriadProtocol>
@@ -32,7 +40,8 @@ export default class Trade {
         totalVolume: account.totalVolume.toNumber(),
         vaultTokenAccount: account.vaultTokenAccount.toString(),
         mint: account.mint.toString(),
-        lastUpdateTs: account.lastUpdateTs.toNumber(),
+        ts: account.ts.toNumber(),
+        updateTs: account.updateTs.toNumber(),
         openOrdersCount: account.openOrdersCount.toNumber(),
         nextOrderId: account.nextOrderId.toNumber(),
         feeBps: account.feeBps,
@@ -43,9 +52,6 @@ export default class Trade {
     )
   }
 
-  /**
-   * Get Market By Address
-   */
   async getMarketByAddress(address: PublicKey): Promise<Market> {
     const account = await this.program.account.market.fetch(address)
 
@@ -63,7 +69,8 @@ export default class Trade {
       totalVolume: account.totalVolume.toNumber(),
       vaultTokenAccount: account.vaultTokenAccount.toString(),
       mint: account.mint.toString(),
-      lastUpdateTs: account.lastUpdateTs.toNumber(),
+      ts: account.ts.toNumber(),
+      updateTs: account.updateTs.toNumber(),
       openOrdersCount: account.openOrdersCount.toNumber(),
       nextOrderId: account.nextOrderId.toNumber(),
       feeBps: account.feeBps,
@@ -71,5 +78,74 @@ export default class Trade {
       isActive: account.isActive,
       isOfficial: account.isOfficial
     }
+  }
+
+  /**
+   * Initialize Market
+   * @param market id - new markert id - length + 1
+   * @param name - PYTH/TRD JUP/TRD DRIFT/TRD
+   *
+   */
+  async initializeMarket(
+    { marketId, name }: { marketId: number; name: string },
+    options?: RpcOptions
+  ): Promise<string> {
+    const method = this.program.methods
+      .initializeMarket({
+        marketId: new BN(marketId),
+        name: name
+      })
+      .accounts({
+        signer: this.provider.publicKey,
+        mint: TRD_MINT
+      })
+
+    if (options?.microLamports) {
+      method.postInstructions([
+        ComputeBudgetProgram.setComputeUnitPrice({
+          microLamports: options.microLamports
+        })
+      ])
+    }
+
+    return method.rpc({ skipPreflight: options?.skipPreflight })
+  }
+
+  async openOrder(
+    marketId: number,
+    args: {
+      amount: number
+      direction: OrderDirection
+      orderType: OrderType
+      price?: number
+      comment?: string
+    },
+    options?: RpcOptions
+  ): Promise<string> {
+    const marketPDA = getMarketAddressSync(this.program.programId, marketId)
+
+    const method = this.program.methods
+      .openOrder({
+        amount: new BN(args.amount / 10 ** TRD_DECIMALS),
+        direction: args.direction,
+        orderType: args.orderType,
+        price: args.price ? new BN(args.price / 10 ** TRD_DECIMALS) : undefined,
+        comment: encodeString(args.comment, 64)
+      })
+      .accounts({
+        signer: this.provider.publicKey,
+        market: marketPDA,
+        mint: TRD_MINT
+      })
+
+    if (options?.microLamports) {
+      method.postInstructions([
+        ComputeBudgetProgram.setComputeUnitPrice({
+          microLamports: options.microLamports
+        })
+      ])
+    }
+
+    return method.rpc({ skipPreflight: options?.skipPreflight })
   }
 }

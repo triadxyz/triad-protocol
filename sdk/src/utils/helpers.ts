@@ -24,8 +24,9 @@ export const getTickerAddressSync = (
   return TickerPDA
 }
 
-export const encodeString = (value: string): number[] => {
-  const buffer = Buffer.alloc(32)
+export const encodeString = (value: string, alloc = 32): number[] => {
+  const buffer = Buffer.alloc(alloc)
+
   buffer.fill(value)
   buffer.fill(' ', value.length)
 
@@ -37,51 +38,28 @@ export const decodeString = (bytes: number[]): string => {
   return buffer.toString('utf8').trim()
 }
 
-export const getVaultAddressSync = (
+export const getMarketAddressSync = (
   programId: PublicKey,
-  tickerAddress: PublicKey
+  marketId: number
 ): PublicKey => {
-  const [VaultPDA] = PublicKey.findProgramAddressSync(
-    [
-      Buffer.from(anchor.utils.bytes.utf8.encode('vault')),
-      tickerAddress.toBuffer()
-    ],
+  const [MarketPDA] = PublicKey.findProgramAddressSync(
+    [Buffer.from('market'), new BN(marketId).toArrayLike(Buffer, 'le', 8)],
     programId
   )
 
-  return VaultPDA
+  return MarketPDA
 }
 
-export const getTokenVaultAddressSync = (
+export const getFeeVaultAddressSync = (
   programId: PublicKey,
-  vault: PublicKey
-) => {
-  const [VaultTokenPDA] = PublicKey.findProgramAddressSync(
-    [
-      Buffer.from(anchor.utils.bytes.utf8.encode('vault_token_account')),
-      vault.toBuffer()
-    ],
+  market: PublicKey
+): PublicKey => {
+  const [FeeVaultPDA] = PublicKey.findProgramAddressSync(
+    [Buffer.from('fee_vault'), market.toBuffer()],
     programId
   )
 
-  return VaultTokenPDA
-}
-
-export function getUserPositionAddressSync(
-  programId: PublicKey,
-  authority: PublicKey,
-  ticker: PublicKey
-): PublicKey {
-  const [UserPositionPDA] = PublicKey.findProgramAddressSync(
-    [
-      Buffer.from(anchor.utils.bytes.utf8.encode('user_position')),
-      authority.toBuffer(),
-      ticker.toBuffer()
-    ],
-    programId
-  )
-
-  return UserPositionPDA
+  return FeeVaultPDA
 }
 
 export const getStakeVaultAddressSync = (

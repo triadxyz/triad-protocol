@@ -46,11 +46,11 @@ pub mod triad_protocol {
         instructions::withdraw_stake(ctx)
     }
 
-    pub fn deposit_stake_rewards(
-        ctx: Context<DepositStakeRewards>,
-        args: DepositStakeRewardsArgs
+    pub fn update_stake_vault(
+        ctx: Context<UpdateStakeVault>,
+        args: UpdateStakeVaultArgs
     ) -> Result<()> {
-        instructions::deposit_stake_rewards(ctx, args)
+        instructions::update_stake_vault(ctx, args)
     }
 
     pub fn claim_stake_rewards(

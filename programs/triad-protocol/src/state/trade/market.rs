@@ -1,6 +1,6 @@
 use anchor_lang::prelude::*;
 
-use crate::{ errors::TriadProtocolError, state::trade::user_trade::OrderDirection };
+use crate::{ state::{ Order, OrderDirection, OrderStatus }, errors::TriadProtocolError };
 
 #[account]
 pub struct Market {
@@ -29,8 +29,8 @@ pub struct Market {
     pub vault_token_account: Pubkey,
     /// Mint $TRD token
     pub mint: Pubkey,
-    /// Timestamp of the last update
-    pub last_update_ts: i64,
+    /// Timestamp of the init
+    pub ts: i64,
     /// Total number of open orders in this market
     pub open_orders_count: u64,
     /// Next available order ID
@@ -42,7 +42,8 @@ pub struct Market {
     /// Whether the market is currently active for trading
     pub is_active: bool,
     pub is_official: bool,
-    pub padding: [u8; 240],
+    pub update_ts: i64,
+    pub padding: [u8; 232],
 }
 
 #[derive(AnchorSerialize, AnchorDeserialize)]
@@ -67,14 +68,15 @@ impl Default for Market {
             total_volume: 0,
             vault_token_account: Pubkey::default(),
             mint: Pubkey::default(),
-            last_update_ts: 0,
+            ts: 0,
             open_orders_count: 0,
             next_order_id: 0,
             fee_bps: 300, // 3% fee
             fee_vault: Pubkey::default(),
             is_active: true,
             is_official: true,
-            padding: [0; 240],
+            update_ts: 0,
+            padding: [0; 232],
         }
     }
 }
@@ -124,7 +126,7 @@ impl Market {
             }
         }
 
-        self.last_update_ts = Clock::get()?.unix_timestamp;
+        self.update_ts = Clock::get()?.unix_timestamp;
 
         Ok(())
     }
@@ -137,5 +139,48 @@ impl Market {
         } else {
             None // Prices are equal, no clear winner
         }
+    }
+
+    pub fn fill_order_internal<'info>(
+        &mut self,
+        order: &mut Order,
+        amount: u64
+    ) -> Result<(u64, u64)> {
+        let current_price = match order.direction {
+            OrderDirection::Hype => self.hype_price,
+            OrderDirection::Flop => self.flop_price,
+        };
+
+        let available_liquidity = match order.direction {
+            OrderDirection::Hype => self.flop_liquidity,
+            OrderDirection::Flop => self.hype_liquidity,
+        };
+
+        let fill_amount = amount.min(available_liquidity);
+        let fill_shares = (((fill_amount as u128) * 1_000_000) / (current_price as u128)) as u64;
+
+        if fill_amount > 0 {
+            order.filled_amount = order.filled_amount.checked_add(fill_amount).unwrap();
+            order.filled_shares = order.filled_shares.checked_add(fill_shares).unwrap();
+
+            if order.filled_amount == order.total_amount {
+                order.status = OrderStatus::Filled;
+            }
+
+            self.update_price(current_price, order.direction)?;
+
+            match order.direction {
+                OrderDirection::Hype => {
+                    self.hype_liquidity = self.hype_liquidity.checked_add(fill_amount).unwrap();
+                    self.flop_liquidity = self.flop_liquidity.checked_sub(fill_amount).unwrap();
+                }
+                OrderDirection::Flop => {
+                    self.flop_liquidity = self.flop_liquidity.checked_add(fill_amount).unwrap();
+                    self.hype_liquidity = self.hype_liquidity.checked_sub(fill_amount).unwrap();
+                }
+            }
+        }
+
+        Ok((fill_amount, fill_shares))
     }
 }

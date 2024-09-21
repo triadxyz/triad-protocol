@@ -3,7 +3,16 @@ use anchor_spl::token_2022::{ Token2022, transfer_checked, TransferChecked };
 use anchor_spl::{ associated_token::AssociatedToken, token_interface::{ Mint, TokenAccount } };
 
 use crate::{
-    state::{ Market, UserTrade, Order, OrderDirection, OrderStatus, OrderType, OpenOrderArgs },
+    state::{
+        Market,
+        UserTrade,
+        Order,
+        OrderDirection,
+        OrderStatus,
+        OrderType,
+        OpenOrderArgs,
+        FeeVault,
+    },
     errors::TriadProtocolError,
     events::{ OrderUpdate, PriceUpdate },
 };
@@ -29,12 +38,12 @@ pub struct OpenOrder<'info> {
 
     #[account(
         mut, 
-        constraint = from_ata.amount >= args.amount,
+        constraint = user_from_ata.amount >= args.amount,
         associated_token::mint = mint,
         associated_token::authority = signer,
         associated_token::token_program = token_program
     )]
-    pub from_ata: Box<InterfaceAccount<'info, TokenAccount>>,
+    pub user_from_ata: Box<InterfaceAccount<'info, TokenAccount>>,
 
     #[account(
         mut,
@@ -42,11 +51,18 @@ pub struct OpenOrder<'info> {
         associated_token::authority = market,
         associated_token::token_program = token_program
     )]
-    pub to_ata: Box<InterfaceAccount<'info, TokenAccount>>,
+    pub market_to_ata: Box<InterfaceAccount<'info, TokenAccount>>,
+
+    #[account(
+        mut,
+        seeds = [FeeVault::PREFIX_SEED, market.key().as_ref()],
+        bump = fee_vault.bump,
+    )]
+    pub fee_vault: Box<Account<'info, FeeVault>>,
 
     #[account(mut,
       associated_token::mint = mint,
-      associated_token::authority = market.fee_vault
+      associated_token::authority = fee_vault.key()
     )]
     pub fee_ata: Box<InterfaceAccount<'info, TokenAccount>>,
 
@@ -58,6 +74,7 @@ pub struct OpenOrder<'info> {
 pub fn open_order(ctx: Context<OpenOrder>, args: OpenOrderArgs) -> Result<()> {
     let user_trade = &mut ctx.accounts.user_trade;
     let market = &mut ctx.accounts.market;
+    let fee_vault = &mut ctx.accounts.fee_vault;
 
     // Save old prices
     let old_hype_price = market.hype_price;
@@ -70,8 +87,15 @@ pub fn open_order(ctx: Context<OpenOrder>, args: OpenOrderArgs) -> Result<()> {
 
     let price = match args.order_type {
         OrderType::Market => current_price,
-        OrderType::Limit => args.price.ok_or(TriadProtocolError::InvalidPrice)?,
+        OrderType::Limit => args.limit_price.ok_or(TriadProtocolError::InvalidPrice)?,
     };
+
+    // Check if order size is less than or equal to 1 share
+    let shares = market.calculate_shares(args.amount, args.direction);
+    if shares > 1_000_000 {
+        // Assuming 1 share = 1_000_000 units
+        return Err(TriadProtocolError::OrderSizeTooLarge.into());
+    }
 
     if price > 1_000_000 || args.amount < current_price {
         return Err(TriadProtocolError::InvalidPrice.into());
@@ -100,8 +124,8 @@ pub fn open_order(ctx: Context<OpenOrder>, args: OpenOrderArgs) -> Result<()> {
         status: OrderStatus::Open,
         price,
         total_amount: actual_amount,
-        filled_amount: 0,
         total_shares: shares,
+        filled_amount: 0,
         filled_shares: 0,
         order_type: args.order_type,
         direction: args.direction,
@@ -114,6 +138,12 @@ pub fn open_order(ctx: Context<OpenOrder>, args: OpenOrderArgs) -> Result<()> {
     user_trade.open_orders = user_trade.open_orders.checked_add(1).unwrap();
     user_trade.has_open_order = true;
     user_trade.total_deposits = user_trade.total_deposits.checked_add(actual_amount).unwrap();
+
+    // Update user's position
+    user_trade.position = match args.direction {
+        OrderDirection::Hype => user_trade.position.checked_add(shares as i64).unwrap(),
+        OrderDirection::Flop => user_trade.position.checked_sub(shares as i64).unwrap(),
+    };
 
     market.open_orders_count += 1;
     market.total_volume = market.total_volume.checked_add(actual_amount as u128).unwrap();
@@ -136,7 +166,7 @@ pub fn open_order(ctx: Context<OpenOrder>, args: OpenOrderArgs) -> Result<()> {
     // Transfer fee to fee account
     transfer_checked(
         CpiContext::new(ctx.accounts.token_program.to_account_info(), TransferChecked {
-            from: ctx.accounts.from_ata.to_account_info(),
+            from: ctx.accounts.user_from_ata.to_account_info(),
             mint: ctx.accounts.mint.to_account_info(),
             to: ctx.accounts.fee_ata.to_account_info(),
             authority: ctx.accounts.signer.to_account_info(),
@@ -145,12 +175,27 @@ pub fn open_order(ctx: Context<OpenOrder>, args: OpenOrderArgs) -> Result<()> {
         ctx.accounts.mint.decimals
     )?;
 
+    // Update FeeVault state
+    fee_vault.deposited = fee_vault.deposited.checked_add(fee_amount as u128).unwrap();
+    fee_vault.net_balance = fee_vault.net_balance.checked_add(fee_amount).unwrap();
+
+    // Calculate fee distribution (3% total fee)
+    let project_fee = (fee_amount * 2869) / 3000; // 2.869% of the 3% fee
+    let nft_holders_fee = (fee_amount * 100) / 3000; // 0.1% of the 3% fee
+    let market_fee = fee_amount - project_fee - nft_holders_fee; // Remaining 0.031% of the 3% fee
+
+    fee_vault.project_available = fee_vault.project_available.checked_add(project_fee).unwrap();
+    fee_vault.nft_holders_available = fee_vault.nft_holders_available
+        .checked_add(nft_holders_fee)
+        .unwrap();
+    fee_vault.market_available = fee_vault.market_available.checked_add(market_fee).unwrap();
+
     // Transfer net amount to market vault
     transfer_checked(
         CpiContext::new(ctx.accounts.token_program.to_account_info(), TransferChecked {
-            from: ctx.accounts.from_ata.to_account_info(),
+            from: ctx.accounts.user_from_ata.to_account_info(),
             mint: ctx.accounts.mint.to_account_info(),
-            to: ctx.accounts.to_ata.to_account_info(),
+            to: ctx.accounts.market_to_ata.to_account_info(),
             authority: ctx.accounts.signer.to_account_info(),
         }),
         net_amount,
@@ -168,15 +213,9 @@ pub fn open_order(ctx: Context<OpenOrder>, args: OpenOrderArgs) -> Result<()> {
 
     market.update_ts = Clock::get()?.unix_timestamp;
 
-    let (filled_amount, filled_shares) = fill_order_internal(
-        market,
+    let (filled_amount, filled_shares) = market.fill_order_internal(
         &mut user_trade.orders[order_index],
-        args.amount,
-        &ctx.accounts.token_program,
-        &ctx.accounts.from_ata.to_account_info(),
-        &ctx.accounts.to_ata.to_account_info(),
-        &ctx.accounts.mint,
-        &ctx.accounts.signer
+        args.amount
     )?;
 
     match args.direction {
@@ -223,52 +262,4 @@ pub fn open_order(ctx: Context<OpenOrder>, args: OpenOrderArgs) -> Result<()> {
     });
 
     Ok(())
-}
-
-pub fn fill_order_internal<'info>(
-    market: &mut Market,
-    order: &mut Order,
-    amount: u64,
-    token_program: &Program<'info, Token2022>,
-    from_ata: &AccountInfo<'info>,
-    to_ata: &AccountInfo<'info>,
-    mint: &InterfaceAccount<'info, Mint>,
-    user: &Signer<'info>
-) -> Result<(u64, u64)> {
-    let current_price = match order.direction {
-        OrderDirection::Hype => market.hype_price,
-        OrderDirection::Flop => market.flop_price,
-    };
-
-    let available_liquidity = match order.direction {
-        OrderDirection::Hype => market.flop_liquidity,
-        OrderDirection::Flop => market.hype_liquidity,
-    };
-
-    let fill_amount = amount.min(available_liquidity);
-    let fill_shares = (((fill_amount as u128) * 1_000_000) / (current_price as u128)) as u64;
-
-    if fill_amount > 0 {
-        transfer_checked(
-            CpiContext::new(token_program.to_account_info(), TransferChecked {
-                from: from_ata.to_account_info(),
-                mint: mint.to_account_info(),
-                to: to_ata.to_account_info(),
-                authority: user.to_account_info(),
-            }),
-            fill_amount,
-            mint.decimals
-        )?;
-
-        order.filled_amount = order.filled_amount.checked_add(fill_amount).unwrap();
-        order.filled_shares = order.filled_shares.checked_add(fill_shares).unwrap();
-
-        if order.filled_amount == order.total_amount {
-            order.status = OrderStatus::Filled;
-        }
-
-        market.update_price(current_price, order.direction)?;
-    }
-
-    Ok((fill_amount, fill_shares))
 }

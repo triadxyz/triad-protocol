@@ -12,7 +12,8 @@ export type Market = {
   totalVolume: number
   vaultTokenAccount: string
   mint: string
-  lastUpdateTs: number
+  ts: number
+  updateTs: number
   openOrdersCount: number
   nextOrderId: number
   feeBps: number
@@ -20,3 +21,36 @@ export type Market = {
   isActive: boolean
   isOfficial: boolean
 }
+
+export type OrderDirection =
+  | {
+      hype: {}
+    }
+  | {
+      flop: {}
+    }
+
+export type OrderStatus =
+  | {
+      init: {}
+    }
+  | {
+      open: {}
+    }
+  | {
+      filled: {}
+    }
+  | {
+      canceled: {}
+    }
+  | {
+      closed: {}
+    }
+
+export type OrderType =
+  | {
+      limit: {}
+    }
+  | {
+      market: {}
+    }
