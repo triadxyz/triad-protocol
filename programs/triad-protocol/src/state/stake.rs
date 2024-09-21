@@ -57,8 +57,9 @@ pub struct StakeTokenArgs {
 }
 
 #[derive(AnchorSerialize, AnchorDeserialize, Clone)]
-pub struct DepositStakeRewardsArgs {
-    pub amount: u64,
+pub struct UpdateStakeVaultArgs {
+    pub amount: Option<u64>,
+    pub status: Option<bool>,
     pub stake_vault: String,
 }
 

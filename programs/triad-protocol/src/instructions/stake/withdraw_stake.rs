@@ -37,7 +37,8 @@ pub struct WithdrawStake<'info> {
     #[account(
         mut,
         associated_token::mint = mint,
-        associated_token::authority = stake_vault
+        associated_token::authority = stake_vault,
+        associated_token::token_program = token_program
     )]
     pub from_ata: Box<InterfaceAccount<'info, TokenAccount>>,
 
@@ -45,7 +46,8 @@ pub struct WithdrawStake<'info> {
         init_if_needed,
         payer = signer,
         associated_token::mint = mint,
-        associated_token::authority = signer
+        associated_token::authority = signer,
+        associated_token::token_program = token_program
     )]
     pub to_ata: Box<InterfaceAccount<'info, TokenAccount>>,
 

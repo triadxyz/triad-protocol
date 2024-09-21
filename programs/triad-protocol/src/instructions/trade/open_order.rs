@@ -28,17 +28,19 @@ pub struct OpenOrder<'info> {
     pub mint: Box<InterfaceAccount<'info, Mint>>,
 
     #[account(
-     mut, 
-     constraint = from_ata.amount >= args.amount,
-     associated_token::mint = mint,
-     associated_token::authority = signer
+        mut, 
+        constraint = from_ata.amount >= args.amount,
+        associated_token::mint = mint,
+        associated_token::authority = signer,
+        associated_token::token_program = token_program
     )]
     pub from_ata: Box<InterfaceAccount<'info, TokenAccount>>,
 
     #[account(
         mut,
         associated_token::mint = mint,
-        associated_token::authority = market
+        associated_token::authority = market,
+        associated_token::token_program = token_program
     )]
     pub to_ata: Box<InterfaceAccount<'info, TokenAccount>>,
 
@@ -164,7 +166,7 @@ pub fn open_order(ctx: Context<OpenOrder>, args: OpenOrderArgs) -> Result<()> {
         }
     }
 
-    market.last_update_ts = Clock::get()?.unix_timestamp;
+    market.update_ts = Clock::get()?.unix_timestamp;
 
     let (filled_amount, filled_shares) = fill_order_internal(
         market,

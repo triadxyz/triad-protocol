@@ -2,19 +2,20 @@ use anchor_lang::prelude::*;
 use anchor_spl::token_2022::Token2022;
 use anchor_spl::{ associated_token::AssociatedToken, token_interface::{ Mint, TokenAccount } };
 
-use crate::{ state::trade::{ Market, InitializeMarketArgs, FeeVault }, constants::TRD_MINT };
+use crate::constraints::is_admin;
+use crate::state::trade::{ Market, InitializeMarketArgs, FeeVault };
 
 #[derive(Accounts)]
 #[instruction(args: InitializeMarketArgs)]
 pub struct InitializeMarket<'info> {
-    #[account(mut)]
+    #[account(mut, constraint = is_admin(&signer)?)]
     pub signer: Signer<'info>,
 
     #[account(
         init,
         payer = signer,
         space = Market::SPACE,
-        seeds = [Market::PREFIX_SEED, args.market_id.to_string().as_bytes(), args.name.as_bytes()],
+        seeds = [Market::PREFIX_SEED, &args.market_id.to_le_bytes()],
         bump
     )]
     pub market: Box<Account<'info, Market>>,
@@ -28,17 +29,15 @@ pub struct InitializeMarket<'info> {
     )]
     pub fee_vault: Box<Account<'info, FeeVault>>,
 
-    #[account(
-        mut,
-        constraint = mint.key().to_string().eq(TRD_MINT)
-    )]
+    #[account(mut)]
     pub mint: Box<InterfaceAccount<'info, Mint>>,
 
     #[account(
         init,
         payer = signer,
         associated_token::mint = mint,
-        associated_token::authority = market
+        associated_token::authority = market,
+        associated_token::token_program = token_program
     )]
     pub vault_token_account: Box<InterfaceAccount<'info, TokenAccount>>,
 
@@ -67,6 +66,8 @@ pub fn initialize_market(ctx: Context<InitializeMarket>, args: InitializeMarketA
         padding: [0; 56],
     });
 
+    let ts = Clock::get()?.unix_timestamp;
+
     market.set_inner(Market {
         bump: ctx.bumps.market,
         authority: ctx.accounts.signer.key(),
@@ -74,7 +75,8 @@ pub fn initialize_market(ctx: Context<InitializeMarket>, args: InitializeMarketA
         name: args.name,
         vault_token_account: ctx.accounts.vault_token_account.key(),
         mint: ctx.accounts.mint.key(),
-        last_update_ts: Clock::get()?.unix_timestamp,
+        ts,
+        update_ts: ts,
         fee_vault: fee_vault.key(),
         ..Default::default()
     });
