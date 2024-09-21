@@ -234,7 +234,7 @@ pub fn open_order(ctx: Context<OpenOrder>, args: OpenOrderArgs) -> Result<()> {
             market_id: market.market_id,
             hype_price: market.hype_price,
             flop_price: market.flop_price,
-            order_type: args.order_type,
+            direction: args.direction,
             market_price: market.hype_price.max(market.flop_price),
             timestamp: Clock::get()?.unix_timestamp,
             comment: if args.order_type == OrderType::Market {

@@ -2122,10 +2122,10 @@ export type TriadProtocol = {
             type: 'u64'
           },
           {
-            name: 'orderType'
+            name: 'direction'
             type: {
               defined: {
-                name: 'orderType'
+                name: 'orderDirection'
               }
             }
           },

@@ -1681,10 +1681,10 @@
             "type": "u64"
           },
           {
-            "name": "order_type",
+            "name": "direction",
             "type": {
               "defined": {
-                "name": "OrderType"
+                "name": "OrderDirection"
               }
             }
           },
