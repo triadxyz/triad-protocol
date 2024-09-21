@@ -388,7 +388,7 @@ export type TriadProtocol = {
           writable: true
         },
         {
-          name: 'fromAta'
+          name: 'userFromAta'
           writable: true
           pda: {
             seeds: [
@@ -445,7 +445,7 @@ export type TriadProtocol = {
           }
         },
         {
-          name: 'toAta'
+          name: 'marketToAta'
           writable: true
           pda: {
             seeds: [
@@ -502,14 +502,29 @@ export type TriadProtocol = {
           }
         },
         {
+          name: 'feeVault'
+          writable: true
+          pda: {
+            seeds: [
+              {
+                kind: 'const'
+                value: [102, 101, 101, 95, 118, 97, 117, 108, 116]
+              },
+              {
+                kind: 'account'
+                path: 'market'
+              }
+            ]
+          }
+        },
+        {
           name: 'feeAta'
           writable: true
           pda: {
             seeds: [
               {
                 kind: 'account'
-                path: 'market.fee_vault'
-                account: 'market'
+                path: 'feeVault'
               },
               {
                 kind: 'const'
@@ -1582,6 +1597,11 @@ export type TriadProtocol = {
       code: 6033
       name: 'arithmeticOverflow'
       msg: 'Arithmetic overflow'
+    },
+    {
+      code: 6034
+      name: 'orderSizeTooLarge'
+      msg: 'Order size too large'
     }
   ]
   types: [
@@ -1820,7 +1840,6 @@ export type TriadProtocol = {
         fields: [
           {
             name: 'amount'
-            docs: ['The amount of TRD to commit to this order']
             type: 'u64'
           },
           {
@@ -1840,7 +1859,7 @@ export type TriadProtocol = {
             }
           },
           {
-            name: 'price'
+            name: 'limitPrice'
             type: {
               option: 'u64'
             }
@@ -1898,16 +1917,16 @@ export type TriadProtocol = {
             type: 'u64'
           },
           {
+            name: 'totalShares'
+            docs: ['The total number of shares to be purchased']
+            type: 'u64'
+          },
+          {
             name: 'filledAmount'
             docs: [
               'The amount of TRD that has been filled',
               'precision: QUOTE_PRECISION'
             ]
-            type: 'u64'
-          },
-          {
-            name: 'totalShares'
-            docs: ['The total number of shares to be purchased']
             type: 'u64'
           },
           {
@@ -2101,6 +2120,14 @@ export type TriadProtocol = {
           {
             name: 'marketPrice'
             type: 'u64'
+          },
+          {
+            name: 'orderType'
+            type: {
+              defined: {
+                name: 'orderType'
+              }
+            }
           },
           {
             name: 'timestamp'
@@ -2411,9 +2438,13 @@ export type TriadProtocol = {
                     name: 'order'
                   }
                 },
-                13
+                10
               ]
             }
+          },
+          {
+            name: 'position'
+            type: 'i64'
           },
           {
             name: 'padding'

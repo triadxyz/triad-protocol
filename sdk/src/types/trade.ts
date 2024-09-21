@@ -1,4 +1,5 @@
 export type Market = {
+  address: string
   bump: number
   authority: string
   marketId: number

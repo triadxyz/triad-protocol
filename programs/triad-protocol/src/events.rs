@@ -8,6 +8,7 @@ pub struct PriceUpdate {
     pub hype_price: u64,
     pub flop_price: u64,
     pub market_price: u64,
+    pub order_type: OrderType,
     pub timestamp: i64,
     pub comment: Option<[u8; 64]>,
 }

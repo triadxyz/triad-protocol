@@ -295,7 +295,7 @@
           "writable": true
         },
         {
-          "name": "from_ata",
+          "name": "user_from_ata",
           "writable": true,
           "pda": {
             "seeds": [
@@ -323,7 +323,7 @@
           }
         },
         {
-          "name": "to_ata",
+          "name": "market_to_ata",
           "writable": true,
           "pda": {
             "seeds": [
@@ -351,14 +351,29 @@
           }
         },
         {
+          "name": "fee_vault",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [102, 101, 101, 95, 118, 97, 117, 108, 116]
+              },
+              {
+                "kind": "account",
+                "path": "market"
+              }
+            ]
+          }
+        },
+        {
           "name": "fee_ata",
           "writable": true,
           "pda": {
             "seeds": [
               {
                 "kind": "account",
-                "path": "market.fee_vault",
-                "account": "Market"
+                "path": "fee_vault"
               },
               {
                 "kind": "const",
@@ -1141,6 +1156,11 @@
       "code": 6033,
       "name": "ArithmeticOverflow",
       "msg": "Arithmetic overflow"
+    },
+    {
+      "code": 6034,
+      "name": "OrderSizeTooLarge",
+      "msg": "Order size too large"
     }
   ],
   "types": [
@@ -1379,7 +1399,6 @@
         "fields": [
           {
             "name": "amount",
-            "docs": ["The amount of TRD to commit to this order"],
             "type": "u64"
           },
           {
@@ -1399,7 +1418,7 @@
             }
           },
           {
-            "name": "price",
+            "name": "limit_price",
             "type": {
               "option": "u64"
             }
@@ -1457,16 +1476,16 @@
             "type": "u64"
           },
           {
+            "name": "total_shares",
+            "docs": ["The total number of shares to be purchased"],
+            "type": "u64"
+          },
+          {
             "name": "filled_amount",
             "docs": [
               "The amount of TRD that has been filled",
               "precision: QUOTE_PRECISION"
             ],
-            "type": "u64"
-          },
-          {
-            "name": "total_shares",
-            "docs": ["The total number of shares to be purchased"],
             "type": "u64"
           },
           {
@@ -1660,6 +1679,14 @@
           {
             "name": "market_price",
             "type": "u64"
+          },
+          {
+            "name": "order_type",
+            "type": {
+              "defined": {
+                "name": "OrderType"
+              }
+            }
           },
           {
             "name": "timestamp",
@@ -1970,9 +1997,13 @@
                     "name": "Order"
                   }
                 },
-                13
+                10
               ]
             }
+          },
+          {
+            "name": "position",
+            "type": "i64"
           },
           {
             "name": "padding",

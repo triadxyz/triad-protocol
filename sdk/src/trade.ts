@@ -26,8 +26,9 @@ export default class Trade {
    */
   async getMarkets(): Promise<Market[]> {
     return this.program.account.market.all().then((markets) =>
-      markets.map(({ account }) => ({
+      markets.map(({ account, publicKey }) => ({
         bump: account.bump,
+        address: publicKey.toString(),
         authority: account.authority.toString(),
         marketId: account.marketId.toNumber(),
         name: account.name,
@@ -57,6 +58,7 @@ export default class Trade {
 
     return {
       bump: account.bump,
+      address: address.toString(),
       authority: account.authority.toString(),
       marketId: account.marketId.toNumber(),
       name: account.name,
@@ -117,7 +119,7 @@ export default class Trade {
       amount: number
       direction: OrderDirection
       orderType: OrderType
-      price?: number
+      limitPrice?: number
       comment?: string
     },
     options?: RpcOptions
@@ -129,7 +131,9 @@ export default class Trade {
         amount: new BN(args.amount / 10 ** TRD_DECIMALS),
         direction: args.direction,
         orderType: args.orderType,
-        price: args.price ? new BN(args.price / 10 ** TRD_DECIMALS) : undefined,
+        limitPrice: args.limitPrice
+          ? new BN(args.limitPrice / 10 ** TRD_DECIMALS)
+          : undefined,
         comment: encodeString(args.comment, 64)
       })
       .accounts({
