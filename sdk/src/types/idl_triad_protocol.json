@@ -165,6 +165,38 @@
       ]
     },
     {
+      "name": "create_user_trade",
+      "discriminator": [232, 235, 58, 194, 135, 248, 153, 1],
+      "accounts": [
+        {
+          "name": "signer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "user_trade",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [117, 115, 101, 114, 95, 116, 114, 97, 100, 101]
+              },
+              {
+                "kind": "account",
+                "path": "signer"
+              }
+            ]
+          }
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": []
+    },
+    {
       "name": "initialize_market",
       "discriminator": [35, 35, 189, 193, 155, 48, 170, 203],
       "accounts": [

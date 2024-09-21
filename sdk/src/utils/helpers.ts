@@ -62,6 +62,18 @@ export const getFeeVaultAddressSync = (
   return FeeVaultPDA
 }
 
+export const getUserTradeAddressSync = (
+  programId: PublicKey,
+  wallet: PublicKey
+) => {
+  const [UserTradePDA] = PublicKey.findProgramAddressSync(
+    [Buffer.from('user_trade'), wallet.toBuffer()],
+    programId
+  )
+
+  return UserTradePDA
+}
+
 export const getStakeVaultAddressSync = (
   programId: PublicKey,
   vaultName: string

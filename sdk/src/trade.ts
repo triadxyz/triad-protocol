@@ -1,15 +1,20 @@
 import { AnchorProvider, Program } from '@coral-xyz/anchor'
 import { TriadProtocol } from './types/triad_protocol'
-import { ComputeBudgetProgram, PublicKey } from '@solana/web3.js'
+import {
+  ComputeBudgetProgram,
+  PublicKey,
+  TransactionInstruction,
+  VersionedTransaction,
+  TransactionMessage
+} from '@solana/web3.js'
 import { Market, OrderDirection, OrderType } from './types/trade'
 import { RpcOptions } from './types'
 import BN from 'bn.js'
 import { TRD_DECIMALS, TRD_MINT, TRD_MINT_DEVNET } from './utils/constants'
 import {
   encodeString,
-  getATASync,
-  getFeeVaultAddressSync,
-  getMarketAddressSync
+  getMarketAddressSync,
+  getUserTradeAddressSync
 } from './utils/helpers'
 
 export default class Trade {
@@ -126,30 +131,67 @@ export default class Trade {
   ): Promise<string> {
     const marketPDA = getMarketAddressSync(this.program.programId, marketId)
 
-    const method = this.program.methods
-      .openOrder({
-        amount: new BN(args.amount / 10 ** TRD_DECIMALS),
-        direction: args.direction,
-        orderType: args.orderType,
-        limitPrice: args.limitPrice
-          ? new BN(args.limitPrice / 10 ** TRD_DECIMALS)
-          : undefined,
-        comment: encodeString(args.comment, 64)
-      })
-      .accounts({
-        signer: this.provider.publicKey,
-        market: marketPDA,
-        mint: TRD_MINT
-      })
+    const ixs: TransactionInstruction[] = []
+
+    try {
+      const userTradePDA = getUserTradeAddressSync(
+        this.program.programId,
+        this.provider.publicKey
+      )
+      this.program.account.userTrade.fetch(userTradePDA)
+    } catch {
+      ixs.push(
+        await this.program.methods
+          .createUserTrade()
+          .accounts({
+            signer: this.provider.publicKey
+          })
+          .instruction()
+      )
+    }
+
+    ixs.push(
+      await this.program.methods
+        .openOrder({
+          amount: new BN(args.amount / 10 ** TRD_DECIMALS),
+          direction: args.direction,
+          orderType: args.orderType,
+          limitPrice: args.limitPrice
+            ? new BN(args.limitPrice / 10 ** TRD_DECIMALS)
+            : undefined,
+          comment: args.comment ? encodeString(args.comment, 64) : undefined
+        })
+        .accounts({
+          signer: this.provider.publicKey,
+          market: marketPDA,
+          mint: TRD_MINT_DEVNET
+        })
+        .instruction()
+    )
 
     if (options?.microLamports) {
-      method.postInstructions([
+      ixs.push(
         ComputeBudgetProgram.setComputeUnitPrice({
           microLamports: options.microLamports
         })
-      ])
+      )
     }
 
-    return method.rpc({ skipPreflight: options?.skipPreflight })
+    const { blockhash } = await this.provider.connection.getLatestBlockhash()
+
+    return this.provider.sendAndConfirm(
+      new VersionedTransaction(
+        new TransactionMessage({
+          instructions: ixs,
+          recentBlockhash: blockhash,
+          payerKey: this.provider.publicKey
+        }).compileToV0Message()
+      ),
+      [],
+      {
+        skipPreflight: options?.skipPreflight,
+        commitment: 'confirmed'
+      }
+    )
   }
 }

@@ -26,6 +26,10 @@ pub mod triad_protocol {
         instructions::create_user(ctx, args)
     }
 
+    pub fn create_user_trade(ctx: Context<CreateUserTrade>) -> Result<()> {
+        instructions::create_user_trade(ctx)
+    }
+
     pub fn open_order(ctx: Context<OpenOrder>, args: OpenOrderArgs) -> Result<()> {
         instructions::open_order(ctx, args)
     }
