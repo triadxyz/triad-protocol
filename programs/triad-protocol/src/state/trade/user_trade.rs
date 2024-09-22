@@ -91,3 +91,12 @@ impl UserTrade {
 
     pub const SPACE: usize = 8 + std::mem::size_of::<Self>();
 }
+
+impl OrderDirection {
+    pub fn opposite(&self) -> Self {
+        match self {
+            OrderDirection::Hype => OrderDirection::Flop,
+            OrderDirection::Flop => OrderDirection::Hype,
+        }
+    }
+}

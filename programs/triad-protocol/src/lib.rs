@@ -34,6 +34,10 @@ pub mod triad_protocol {
         instructions::open_order(ctx, args)
     }
 
+    pub fn close_order(ctx: Context<CloseOrder>, order_id: u64) -> Result<()> {
+        instructions::close_order(ctx, order_id)
+    }
+
     pub fn stake_nft(ctx: Context<StakeNFT>, args: StakeNFTArgs) -> Result<()> {
         instructions::stake_nft(ctx, args)
     }

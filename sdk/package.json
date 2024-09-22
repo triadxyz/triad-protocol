@@ -1,6 +1,6 @@
 {
   "name": "@triadxyz/triad-protocol",
-  "version": "0.5.9-beta.devnet",
+  "version": "0.6.4-beta.devnet",
   "main": "./dist/index.js",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",

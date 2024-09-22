@@ -20,6 +20,7 @@ import {
 export default class Trade {
   program: Program<TriadProtocol>
   provider: AnchorProvider
+  mint: PublicKey = TRD_MINT_DEVNET
 
   constructor(program: Program<TriadProtocol>, provider: AnchorProvider) {
     this.provider = provider
@@ -118,6 +119,15 @@ export default class Trade {
     return method.rpc({ skipPreflight: options?.skipPreflight })
   }
 
+  async getUserTrade() {
+    const userTradePDA = getUserTradeAddressSync(
+      this.program.programId,
+      this.provider.publicKey
+    )
+
+    return this.program.account.userTrade.fetch(userTradePDA)
+  }
+
   async openOrder(
     marketId: number,
     args: {
@@ -138,7 +148,7 @@ export default class Trade {
         this.program.programId,
         this.provider.publicKey
       )
-      this.program.account.userTrade.fetch(userTradePDA)
+      await this.program.account.userTrade.fetch(userTradePDA)
     } catch {
       ixs.push(
         await this.program.methods
@@ -153,18 +163,16 @@ export default class Trade {
     ixs.push(
       await this.program.methods
         .openOrder({
-          amount: new BN(args.amount / 10 ** TRD_DECIMALS),
+          amount: new BN(args.amount * 10 ** TRD_DECIMALS),
           direction: args.direction,
           orderType: args.orderType,
-          limitPrice: args.limitPrice
-            ? new BN(args.limitPrice / 10 ** TRD_DECIMALS)
-            : undefined,
-          comment: args.comment ? encodeString(args.comment, 64) : undefined
+          limitPrice: new BN(args.limitPrice * 10 ** TRD_DECIMALS),
+          comment: encodeString(args.comment, 64)
         })
         .accounts({
           signer: this.provider.publicKey,
           market: marketPDA,
-          mint: TRD_MINT_DEVNET
+          mint: this.mint
         })
         .instruction()
     )
@@ -193,5 +201,28 @@ export default class Trade {
         commitment: 'confirmed'
       }
     )
+  }
+
+  async closeOrder(
+    { marketId, orderId }: { marketId: number; orderId: number },
+    options?: RpcOptions
+  ): Promise<string> {
+    const marketPDA = getMarketAddressSync(this.program.programId, marketId)
+
+    const method = this.program.methods.closeOrder(new BN(orderId)).accounts({
+      signer: this.provider.publicKey,
+      market: marketPDA,
+      mint: this.mint
+    })
+
+    if (options?.microLamports) {
+      method.postInstructions([
+        ComputeBudgetProgram.setComputeUnitPrice({
+          microLamports: options.microLamports
+        })
+      ])
+    }
+
+    return method.rpc({ skipPreflight: options?.skipPreflight })
   }
 }

@@ -29,6 +29,15 @@ pub struct InitializeMarket<'info> {
     )]
     pub fee_vault: Box<Account<'info, FeeVault>>,
 
+    #[account(
+        init,
+        payer = signer,
+        associated_token::mint = mint,
+        associated_token::authority = fee_vault,
+        associated_token::token_program = token_program
+    )]
+    pub fee_vault_token_account: Box<InterfaceAccount<'info, TokenAccount>>,
+
     #[account(mut)]
     pub mint: Box<InterfaceAccount<'info, Mint>>,
 

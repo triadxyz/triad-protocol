@@ -14,7 +14,7 @@ use crate::{
         FeeVault,
     },
     errors::TriadProtocolError,
-    events::{ OrderUpdate, PriceUpdate },
+    events::OrderUpdate,
 };
 
 #[derive(Accounts)]
@@ -60,9 +60,11 @@ pub struct OpenOrder<'info> {
     )]
     pub fee_vault: Box<Account<'info, FeeVault>>,
 
-    #[account(mut,
-      associated_token::mint = mint,
-      associated_token::authority = fee_vault.key()
+    #[account(
+        mut,
+        associated_token::mint = mint,
+        associated_token::authority = fee_vault,
+        associated_token::token_program = token_program
     )]
     pub fee_ata: Box<InterfaceAccount<'info, TokenAccount>>,
 
@@ -72,13 +74,8 @@ pub struct OpenOrder<'info> {
 }
 
 pub fn open_order(ctx: Context<OpenOrder>, args: OpenOrderArgs) -> Result<()> {
-    let user_trade = &mut ctx.accounts.user_trade;
     let market = &mut ctx.accounts.market;
     let fee_vault = &mut ctx.accounts.fee_vault;
-
-    // Save old prices
-    let old_hype_price = market.hype_price;
-    let old_flop_price = market.flop_price;
 
     let current_price = match args.direction {
         OrderDirection::Hype => market.hype_price,
@@ -90,19 +87,16 @@ pub fn open_order(ctx: Context<OpenOrder>, args: OpenOrderArgs) -> Result<()> {
         OrderType::Limit => args.limit_price.ok_or(TriadProtocolError::InvalidPrice)?,
     };
 
+    msg!("current_price: {}", price);
+
     // Check if order size is less than or equal to 1 share
     let shares = market.calculate_shares(args.amount, args.direction);
-    if shares > 1_000_000 {
-        // Assuming 1 share = 1_000_000 units
-        return Err(TriadProtocolError::OrderSizeTooLarge.into());
-    }
 
-    if price > 1_000_000 || args.amount < current_price {
+    msg!("shares: {}", shares);
+    msg!("amount: {}", args.amount);
+
+    if price > 1_000_000 {
         return Err(TriadProtocolError::InvalidPrice.into());
-    }
-
-    if user_trade.open_orders >= 20 {
-        return Err(TriadProtocolError::MaxOpenOrdersReached.into());
     }
 
     let shares = market.calculate_shares(args.amount, args.direction);
@@ -114,7 +108,9 @@ pub fn open_order(ctx: Context<OpenOrder>, args: OpenOrderArgs) -> Result<()> {
 
     let order_index = ctx.accounts.user_trade.orders
         .iter()
-        .position(|order| order.status == OrderStatus::Init)
+        .position(
+            |order| (order.status == OrderStatus::Init || order.status == OrderStatus::Closed)
+        )
         .ok_or(TriadProtocolError::NoAvailableOrderSlot)?;
 
     let new_order = Order {
@@ -125,8 +121,8 @@ pub fn open_order(ctx: Context<OpenOrder>, args: OpenOrderArgs) -> Result<()> {
         price,
         total_amount: actual_amount,
         total_shares: shares,
-        filled_amount: 0,
-        filled_shares: 0,
+        filled_amount: actual_amount,
+        filled_shares: shares,
         order_type: args.order_type,
         direction: args.direction,
         settled_pnl: 0,
@@ -139,16 +135,10 @@ pub fn open_order(ctx: Context<OpenOrder>, args: OpenOrderArgs) -> Result<()> {
     user_trade.has_open_order = true;
     user_trade.total_deposits = user_trade.total_deposits.checked_add(actual_amount).unwrap();
 
-    // Update user's position
-    user_trade.position = match args.direction {
-        OrderDirection::Hype => user_trade.position.checked_add(shares as i64).unwrap(),
-        OrderDirection::Flop => user_trade.position.checked_sub(shares as i64).unwrap(),
-    };
-
     market.open_orders_count += 1;
     market.total_volume = market.total_volume.checked_add(actual_amount as u128).unwrap();
 
-    market.update_price(price, args.direction)?;
+    market.update_price(price, args.direction, args.order_type, args.comment)?;
     match args.direction {
         OrderDirection::Hype => {
             market.hype_liquidity = market.hype_liquidity.checked_add(actual_amount).unwrap();
@@ -227,22 +217,6 @@ pub fn open_order(ctx: Context<OpenOrder>, args: OpenOrderArgs) -> Result<()> {
             market.flop_liquidity = market.flop_liquidity.checked_add(filled_amount).unwrap();
             market.total_flop_shares = market.total_flop_shares.checked_add(filled_shares).unwrap();
         }
-    }
-
-    if market.hype_price != old_hype_price || market.flop_price != old_flop_price {
-        emit!(PriceUpdate {
-            market_id: market.market_id,
-            hype_price: market.hype_price,
-            flop_price: market.flop_price,
-            direction: args.direction,
-            market_price: market.hype_price.max(market.flop_price),
-            timestamp: Clock::get()?.unix_timestamp,
-            comment: if args.order_type == OrderType::Market {
-                args.comment
-            } else {
-                None
-            },
-        });
     }
 
     emit!(OrderUpdate {

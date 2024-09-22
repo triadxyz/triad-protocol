@@ -1,6 +1,6 @@
 use anchor_lang::prelude::*;
 
-use crate::{ state::{ Order, OrderDirection, OrderStatus }, errors::TriadProtocolError };
+use crate::{ state::{ Order, OrderDirection, OrderStatus, OrderType }, events::PriceUpdate };
 
 #[account]
 pub struct Market {
@@ -112,21 +112,46 @@ impl Market {
         }
     }
 
-    pub fn update_price(&mut self, new_price: u64, direction: OrderDirection) -> Result<()> {
-        if new_price > 1_000_000 {
-            return Err(TriadProtocolError::InvalidPrice.into());
-        }
+    pub fn update_price(
+        &mut self,
+        amount: u64,
+        direction: OrderDirection,
+        order_type: OrderType,
+        comment: Option<[u8; 64]>
+    ) -> Result<()> {
+        let price_impact = ((amount as f64) / 1_000_000.0).min(0.1); // Max 10% impact
 
         match direction {
             OrderDirection::Hype => {
-                self.hype_price = new_price;
+                let new_hype_price = ((self.hype_price as f64) * (1.0 + price_impact)) as u64;
+                self.hype_price = new_hype_price.min(1_000_000);
+                self.flop_price = 1_000_000 - self.hype_price;
             }
             OrderDirection::Flop => {
-                self.flop_price = new_price;
+                let new_flop_price = ((self.flop_price as f64) * (1.0 + price_impact)) as u64;
+                self.flop_price = new_flop_price.min(1_000_000);
+                self.hype_price = 1_000_000 - self.flop_price;
             }
         }
 
+        self.hype_price = self.hype_price.max(1);
+        self.flop_price = self.flop_price.max(1);
+
         self.update_ts = Clock::get()?.unix_timestamp;
+
+        emit!(PriceUpdate {
+            market_id: self.market_id,
+            hype_price: self.hype_price,
+            flop_price: self.flop_price,
+            direction: direction,
+            market_price: self.hype_price.max(self.flop_price),
+            timestamp: Clock::get()?.unix_timestamp,
+            comment: if order_type == OrderType::Market {
+                comment
+            } else {
+                None
+            },
+        });
 
         Ok(())
     }
@@ -167,7 +192,7 @@ impl Market {
                 order.status = OrderStatus::Filled;
             }
 
-            self.update_price(current_price, order.direction)?;
+            self.update_price(current_price, order.direction, order.order_type, None)?;
 
             match order.direction {
                 OrderDirection::Hype => {
