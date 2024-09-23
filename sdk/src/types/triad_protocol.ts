@@ -1986,9 +1986,13 @@ export type TriadProtocol = {
             type: 'bool'
           },
           {
+            name: 'marketPrice'
+            type: 'u64'
+          },
+          {
             name: 'padding'
             type: {
-              array: ['u8', 232]
+              array: ['u8', 224]
             }
           }
         ]

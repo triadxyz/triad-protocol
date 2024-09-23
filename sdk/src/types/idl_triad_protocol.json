@@ -1516,9 +1516,13 @@
             "type": "bool"
           },
           {
+            "name": "market_price",
+            "type": "u64"
+          },
+          {
             "name": "padding",
             "type": {
-              "array": ["u8", 232]
+              "array": ["u8", 224]
             }
           }
         ]

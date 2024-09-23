@@ -54,6 +54,7 @@ export default class Trade {
         feeBps: account.feeBps,
         feeVault: account.feeVault.toBase58(),
         isActive: account.isActive,
+        marketPrice: account.marketPrice.toNumber(),
         isOfficial: account.isOfficial
       }))
     )
@@ -83,6 +84,7 @@ export default class Trade {
       feeBps: account.feeBps,
       feeVault: account.feeVault.toBase58(),
       isActive: account.isActive,
+      marketPrice: account.marketPrice.toNumber(),
       isOfficial: account.isOfficial
     }
   }

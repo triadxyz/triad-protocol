@@ -19,6 +19,7 @@ export type Market = {
   feeBps: number
   feeVault: string
   isActive: boolean
+  marketPrice: number
   isOfficial: boolean
 }
 

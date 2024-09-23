@@ -41,7 +41,8 @@ pub struct Market {
     /// Whether the market is currently active for trading
     pub is_active: bool,
     pub is_official: bool,
-    pub padding: [u8; 232],
+    pub market_price: u64,
+    pub padding: [u8; 224],
 }
 
 #[derive(AnchorSerialize, AnchorDeserialize)]
@@ -73,7 +74,8 @@ impl Default for Market {
             fee_vault: Pubkey::default(),
             is_active: true,
             is_official: true,
-            padding: [0; 232],
+            market_price: 0,
+            padding: [0; 224],
         }
     }
 }
@@ -136,12 +138,15 @@ impl Market {
 
         self.update_ts = Clock::get()?.unix_timestamp;
 
+        let market_price = self.hype_price.max(self.flop_price);
+        self.market_price = market_price;
+
         emit!(PriceUpdate {
             market_id: self.market_id,
             hype_price: self.hype_price,
             flop_price: self.flop_price,
             direction: direction,
-            market_price: self.hype_price.max(self.flop_price),
+            market_price: market_price,
             timestamp: Clock::get()?.unix_timestamp,
             comment: if order_type == OrderType::Market {
                 comment
