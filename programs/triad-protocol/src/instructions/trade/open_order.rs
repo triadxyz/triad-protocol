@@ -33,6 +33,13 @@ pub struct OpenOrder<'info> {
     #[account(mut)]
     pub market: Box<Account<'info, Market>>,
 
+    #[account(
+        mut,
+        seeds = [FeeVault::PREFIX_SEED, market.key().as_ref()],
+        bump = fee_vault.bump,
+    )]
+    pub fee_vault: Box<Account<'info, FeeVault>>,
+
     #[account(mut, constraint = mint.key() == market.mint)]
     pub mint: Box<InterfaceAccount<'info, Mint>>,
 
@@ -46,19 +53,13 @@ pub struct OpenOrder<'info> {
     pub user_from_ata: Box<InterfaceAccount<'info, TokenAccount>>,
 
     #[account(
-        mut,
+        init_if_needed,
+        payer = signer,
         associated_token::mint = mint,
         associated_token::authority = market,
         associated_token::token_program = token_program
     )]
     pub market_to_ata: Box<InterfaceAccount<'info, TokenAccount>>,
-
-    #[account(
-        mut,
-        seeds = [FeeVault::PREFIX_SEED, market.key().as_ref()],
-        bump = fee_vault.bump,
-    )]
-    pub fee_vault: Box<Account<'info, FeeVault>>,
 
     #[account(
         mut,
@@ -136,7 +137,7 @@ pub fn open_order(ctx: Context<OpenOrder>, args: OpenOrderArgs) -> Result<()> {
     user_trade.total_deposits = user_trade.total_deposits.checked_add(actual_amount).unwrap();
 
     market.open_orders_count += 1;
-    market.total_volume = market.total_volume.checked_add(actual_amount as u128).unwrap();
+    market.total_volume = market.total_volume.checked_add(actual_amount).unwrap();
 
     market.update_price(price, args.direction, args.order_type, args.comment)?;
     match args.direction {
@@ -150,7 +151,7 @@ pub fn open_order(ctx: Context<OpenOrder>, args: OpenOrderArgs) -> Result<()> {
         }
     }
 
-    let fee_amount = (((actual_amount as u128) * (market.fee_bps as u128)) / 10000) as u64;
+    let fee_amount = (((actual_amount as u64) * (market.fee_bps as u64)) / 10000) as u64;
     let net_amount = actual_amount.saturating_sub(fee_amount);
 
     // Transfer fee to fee account
@@ -166,7 +167,7 @@ pub fn open_order(ctx: Context<OpenOrder>, args: OpenOrderArgs) -> Result<()> {
     )?;
 
     // Update FeeVault state
-    fee_vault.deposited = fee_vault.deposited.checked_add(fee_amount as u128).unwrap();
+    fee_vault.deposited = fee_vault.deposited.checked_add(fee_amount).unwrap();
     fee_vault.net_balance = fee_vault.net_balance.checked_add(fee_amount).unwrap();
 
     // Calculate fee distribution (3% total fee)

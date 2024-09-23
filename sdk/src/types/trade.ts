@@ -11,7 +11,6 @@ export type Market = {
   totalHypeShares: number
   totalFlopShares: number
   totalVolume: number
-  vaultTokenAccount: string
   mint: string
   ts: number
   updateTs: number

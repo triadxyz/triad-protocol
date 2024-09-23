@@ -2,8 +2,7 @@ use anchor_lang::prelude::*;
 use anchor_spl::token_2022::Token2022;
 use anchor_spl::{ associated_token::AssociatedToken, token_interface::{ Mint, TokenAccount } };
 
-use crate::constraints::is_admin;
-use crate::state::trade::{ Market, InitializeMarketArgs, FeeVault };
+use crate::{ state::{ Market, InitializeMarketArgs, FeeVault }, constraints::is_admin };
 
 #[derive(Accounts)]
 #[instruction(args: InitializeMarketArgs)]
@@ -36,19 +35,10 @@ pub struct InitializeMarket<'info> {
         associated_token::authority = fee_vault,
         associated_token::token_program = token_program
     )]
-    pub fee_vault_token_account: Box<InterfaceAccount<'info, TokenAccount>>,
+    pub fee_vault_ata: Box<InterfaceAccount<'info, TokenAccount>>,
 
     #[account(mut)]
     pub mint: Box<InterfaceAccount<'info, Mint>>,
-
-    #[account(
-        init,
-        payer = signer,
-        associated_token::mint = mint,
-        associated_token::authority = market,
-        associated_token::token_program = token_program
-    )]
-    pub vault_token_account: Box<InterfaceAccount<'info, TokenAccount>>,
 
     pub token_program: Program<'info, Token2022>,
     pub associated_token_program: Program<'info, AssociatedToken>,
@@ -82,7 +72,6 @@ pub fn initialize_market(ctx: Context<InitializeMarket>, args: InitializeMarketA
         authority: ctx.accounts.signer.key(),
         market_id: args.market_id,
         name: args.name,
-        vault_token_account: ctx.accounts.vault_token_account.key(),
         mint: ctx.accounts.mint.key(),
         ts,
         update_ts: ts,

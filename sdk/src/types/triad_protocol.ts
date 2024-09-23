@@ -5,7 +5,7 @@
  * IDL can be found at `target/idl/triad_protocol.json`.
  */
 export type TriadProtocol = {
-  address: '3ZmkveqMGGwf4coSRmJuYHCxaQjX1YXjbvM87v71J2P9'
+  address: '7nGGR51pBSUrpMPYVf9LWnNwaApz7N9VaJfDAJrihXts'
   metadata: {
     name: 'triadProtocol'
     version: '0.1.4'
@@ -469,7 +469,7 @@ export type TriadProtocol = {
           }
         },
         {
-          name: 'feeVaultTokenAccount'
+          name: 'feeVaultAta'
           writable: true
           pda: {
             seeds: [
@@ -530,63 +530,6 @@ export type TriadProtocol = {
           writable: true
         },
         {
-          name: 'vaultTokenAccount'
-          writable: true
-          pda: {
-            seeds: [
-              {
-                kind: 'account'
-                path: 'market'
-              },
-              {
-                kind: 'account'
-                path: 'tokenProgram'
-              },
-              {
-                kind: 'account'
-                path: 'mint'
-              }
-            ]
-            program: {
-              kind: 'const'
-              value: [
-                140,
-                151,
-                37,
-                143,
-                78,
-                36,
-                137,
-                241,
-                187,
-                61,
-                16,
-                41,
-                20,
-                142,
-                13,
-                131,
-                11,
-                90,
-                19,
-                153,
-                218,
-                255,
-                16,
-                132,
-                4,
-                142,
-                123,
-                216,
-                219,
-                233,
-                248,
-                89
-              ]
-            }
-          }
-        },
-        {
           name: 'tokenProgram'
           address: 'TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb'
         },
@@ -638,6 +581,22 @@ export type TriadProtocol = {
         {
           name: 'market'
           writable: true
+        },
+        {
+          name: 'feeVault'
+          writable: true
+          pda: {
+            seeds: [
+              {
+                kind: 'const'
+                value: [102, 101, 101, 95, 118, 97, 117, 108, 116]
+              },
+              {
+                kind: 'account'
+                path: 'market'
+              }
+            ]
+          }
         },
         {
           name: 'mint'
@@ -755,22 +714,6 @@ export type TriadProtocol = {
                 89
               ]
             }
-          }
-        },
-        {
-          name: 'feeVault'
-          writable: true
-          pda: {
-            seeds: [
-              {
-                kind: 'const'
-                value: [102, 101, 101, 95, 118, 97, 117, 108, 116]
-              },
-              {
-                kind: 'account'
-                path: 'market'
-              }
-            ]
           }
         },
         {
@@ -1875,11 +1818,11 @@ export type TriadProtocol = {
           },
           {
             name: 'deposited'
-            type: 'u128'
+            type: 'u64'
           },
           {
             name: 'withdrawn'
-            type: 'u128'
+            type: 'u64'
           },
           {
             name: 'netBalance'
@@ -1891,7 +1834,7 @@ export type TriadProtocol = {
           },
           {
             name: 'projectClaimed'
-            type: 'u128'
+            type: 'u64'
           },
           {
             name: 'nftHoldersAvailable'
@@ -1899,7 +1842,7 @@ export type TriadProtocol = {
           },
           {
             name: 'nftHoldersClaimed'
-            type: 'u128'
+            type: 'u64'
           },
           {
             name: 'marketAvailable'
@@ -1907,7 +1850,7 @@ export type TriadProtocol = {
           },
           {
             name: 'marketClaimed'
-            type: 'u128'
+            type: 'u64'
           },
           {
             name: 'padding'
@@ -1995,12 +1938,7 @@ export type TriadProtocol = {
           {
             name: 'totalVolume'
             docs: ['Total trading volume (in TRD)']
-            type: 'u128'
-          },
-          {
-            name: 'vaultTokenAccount'
-            docs: ['Vault token account of $TRD']
-            type: 'pubkey'
+            type: 'u64'
           },
           {
             name: 'mint'
@@ -2010,6 +1948,10 @@ export type TriadProtocol = {
           {
             name: 'ts'
             docs: ['Timestamp of the init']
+            type: 'i64'
+          },
+          {
+            name: 'updateTs'
             type: 'i64'
           },
           {
@@ -2042,10 +1984,6 @@ export type TriadProtocol = {
           {
             name: 'isOfficial'
             type: 'bool'
-          },
-          {
-            name: 'updateTs'
-            type: 'i64'
           },
           {
             name: 'padding'

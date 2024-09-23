@@ -24,13 +24,12 @@ pub struct Market {
     /// Total number of Flop shares issued
     pub total_flop_shares: u64,
     /// Total trading volume (in TRD)
-    pub total_volume: u128,
-    /// Vault token account of $TRD
-    pub vault_token_account: Pubkey,
+    pub total_volume: u64,
     /// Mint $TRD token
     pub mint: Pubkey,
     /// Timestamp of the init
     pub ts: i64,
+    pub update_ts: i64,
     /// Total number of open orders in this market
     pub open_orders_count: u64,
     /// Next available order ID
@@ -42,7 +41,6 @@ pub struct Market {
     /// Whether the market is currently active for trading
     pub is_active: bool,
     pub is_official: bool,
-    pub update_ts: i64,
     pub padding: [u8; 232],
 }
 
@@ -66,16 +64,15 @@ impl Default for Market {
             total_hype_shares: 0,
             total_flop_shares: 0,
             total_volume: 0,
-            vault_token_account: Pubkey::default(),
             mint: Pubkey::default(),
             ts: 0,
+            update_ts: 0,
             open_orders_count: 0,
             next_order_id: 0,
             fee_bps: 300, // 3% fee
             fee_vault: Pubkey::default(),
             is_active: true,
             is_official: true,
-            update_ts: 0,
             padding: [0; 232],
         }
     }
@@ -182,7 +179,7 @@ impl Market {
         };
 
         let fill_amount = amount.min(available_liquidity);
-        let fill_shares = (((fill_amount as u128) * 1_000_000) / (current_price as u128)) as u64;
+        let fill_shares = ((fill_amount * 1_000_000) / current_price) as u64;
 
         if fill_amount > 0 {
             order.filled_amount = order.filled_amount.checked_add(fill_amount).unwrap();

@@ -10,9 +10,10 @@ import {
 import { Market, OrderDirection, OrderType } from './types/trade'
 import { RpcOptions } from './types'
 import BN from 'bn.js'
-import { TRD_DECIMALS, TRD_MINT, TRD_MINT_DEVNET } from './utils/constants'
+import { TRD_DECIMALS, TRD_MINT_DEVNET } from './utils/constants'
 import {
   encodeString,
+  getFeeVaultAddressSync,
   getMarketAddressSync,
   getUserTradeAddressSync
 } from './utils/helpers'
@@ -45,7 +46,6 @@ export default class Trade {
         totalHypeShares: account.totalHypeShares.toNumber(),
         totalFlopShares: account.totalFlopShares.toNumber(),
         totalVolume: account.totalVolume.toNumber(),
-        vaultTokenAccount: account.vaultTokenAccount.toString(),
         mint: account.mint.toString(),
         ts: account.ts.toNumber(),
         updateTs: account.updateTs.toNumber(),
@@ -75,7 +75,6 @@ export default class Trade {
       totalHypeShares: account.totalHypeShares.toNumber(),
       totalFlopShares: account.totalFlopShares.toNumber(),
       totalVolume: account.totalVolume.toNumber(),
-      vaultTokenAccount: account.vaultTokenAccount.toString(),
       mint: account.mint.toString(),
       ts: account.ts.toNumber(),
       updateTs: account.updateTs.toNumber(),
@@ -105,7 +104,7 @@ export default class Trade {
       })
       .accounts({
         signer: this.provider.publicKey,
-        mint: TRD_MINT
+        mint: this.mint
       })
 
     if (options?.microLamports) {
@@ -140,6 +139,14 @@ export default class Trade {
     options?: RpcOptions
   ): Promise<string> {
     const marketPDA = getMarketAddressSync(this.program.programId, marketId)
+    const feeVualtPDA = getFeeVaultAddressSync(
+      this.program.programId,
+      marketPDA
+    )
+    const userTradePDA = getUserTradeAddressSync(
+      this.program.programId,
+      this.provider.publicKey
+    )
 
     const ixs: TransactionInstruction[] = []
 
