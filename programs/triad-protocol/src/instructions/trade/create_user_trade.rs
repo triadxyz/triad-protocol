@@ -30,11 +30,9 @@ pub fn create_user_trade(ctx: Context<CreateUserTrade>) -> Result<()> {
         authority: ctx.accounts.signer.key(),
         total_deposits: 0,
         total_withdraws: 0,
-        open_orders: 0,
-        has_open_order: false,
+        opened_orders: 0,
         orders: [Order::default(); 10],
-        position: 0,
-        padding: [0; 64],
+        padding: [0; 32],
     });
 
     Ok(())

@@ -83,22 +83,21 @@ pub fn open_order(ctx: Context<OpenOrder>, args: OpenOrderArgs) -> Result<()> {
         OrderDirection::Flop => market.flop_price,
     };
 
-    // Check if order size is less than or equal to 1 share
-    let shares = market.calculate_shares(args.amount, args.direction);
-
-    msg!("shares: {}", shares);
-    msg!("amount: {}", args.amount);
-
     if price > 1_000_000 {
         return Err(TriadProtocolError::InvalidPrice.into());
     }
 
-    let shares = market.calculate_shares(args.amount, args.direction);
-    if shares == 0 {
+    // Check if order size is less than or equal to 1 share
+    let total_shares = market.calculate_shares(args.amount, args.direction);
+
+    msg!("total_shares: {}", total_shares);
+    msg!("amount: {}", args.amount);
+
+    if total_shares == 0 {
         return Err(TriadProtocolError::InsufficientFunds.into());
     }
 
-    let actual_amount = args.amount;
+    let total_amount = args.amount;
 
     let order_index = ctx.accounts.user_trade.orders
         .iter()
@@ -113,39 +112,36 @@ pub fn open_order(ctx: Context<OpenOrder>, args: OpenOrderArgs) -> Result<()> {
         market_id: market.market_id,
         status: OrderStatus::Filled,
         price,
-        total_amount: actual_amount,
-        total_shares: shares,
-        filled_amount: actual_amount,
-        filled_shares: shares,
-        order_type: OrderType::Market, // Default to market order
+        total_amount,
+        total_shares,
+        order_type: OrderType::Market,
         direction: args.direction,
         settled_pnl: 0,
-        padding: [0; 16],
+        padding: [0; 32],
     };
 
     let user_trade = &mut ctx.accounts.user_trade;
     user_trade.orders[order_index] = new_order;
-    user_trade.open_orders = user_trade.open_orders.checked_add(1).unwrap();
-    user_trade.has_open_order = true;
-    user_trade.total_deposits = user_trade.total_deposits.checked_add(actual_amount).unwrap();
+    user_trade.opened_orders = user_trade.opened_orders.checked_add(1).unwrap();
+    user_trade.total_deposits = user_trade.total_deposits.checked_add(total_amount).unwrap();
 
     market.open_orders_count += 1;
-    market.total_volume = market.total_volume.checked_add(actual_amount).unwrap();
+    market.total_volume = market.total_volume.checked_add(total_amount).unwrap();
 
     market.update_price(price, args.direction, args.comment)?;
     match args.direction {
         OrderDirection::Hype => {
-            market.hype_liquidity = market.hype_liquidity.checked_add(actual_amount).unwrap();
-            market.total_hype_shares = market.total_hype_shares.checked_add(shares).unwrap();
+            market.hype_liquidity = market.hype_liquidity.checked_add(total_amount).unwrap();
+            market.total_hype_shares = market.total_hype_shares.checked_add(total_shares).unwrap();
         }
         OrderDirection::Flop => {
-            market.flop_liquidity = market.flop_liquidity.checked_add(actual_amount).unwrap();
-            market.total_flop_shares = market.total_flop_shares.checked_add(shares).unwrap();
+            market.flop_liquidity = market.flop_liquidity.checked_add(total_amount).unwrap();
+            market.total_flop_shares = market.total_flop_shares.checked_add(total_shares).unwrap();
         }
     }
 
-    let fee_amount = (((actual_amount as u64) * (market.fee_bps as u64)) / 10000) as u64;
-    let net_amount = actual_amount.saturating_sub(fee_amount);
+    let fee_amount = (((total_amount as u64) * (market.fee_bps as u64)) / 10000) as u64;
+    let net_amount = total_amount.saturating_sub(fee_amount);
 
     // Transfer fee to fee account
     transfer_checked(
@@ -212,20 +208,18 @@ pub fn open_order(ctx: Context<OpenOrder>, args: OpenOrderArgs) -> Result<()> {
     }
 
     emit!(OrderUpdate {
+        timestamp: new_order.ts,
         user: *ctx.accounts.signer.key,
-        market_id: market.market_id,
+        market_id: new_order.market_id,
         order_id: new_order.order_id,
-        direction: args.direction,
+        direction: new_order.direction,
         order_type: new_order.order_type,
-        order_status: OrderStatus::Filled,
+        order_status: new_order.status,
+        total_shares: new_order.total_shares,
+        total_amount: new_order.total_amount,
         price,
-        total_shares: shares,
-        filled_shares: 0,
-        total_amount: actual_amount,
-        filled_amount: 0,
         comment: args.comment,
         refund_amount: None,
-        timestamp: Clock::get()?.unix_timestamp,
     });
 
     Ok(())

@@ -52,9 +52,6 @@ pub fn close_order(ctx: Context<CloseOrder>, order_id: u64) -> Result<()> {
     let market = &mut ctx.accounts.market;
     let user_trade = &mut ctx.accounts.user_trade;
 
-    user_trade.open_orders = user_trade.open_orders.checked_sub(1).unwrap();
-    user_trade.has_open_order = user_trade.open_orders > 0;
-
     // Find the order
     let order_index = user_trade.orders
         .iter()
@@ -97,13 +94,13 @@ pub fn close_order(ctx: Context<CloseOrder>, order_id: u64) -> Result<()> {
             OrderDirection::Hype => {
                 market.hype_liquidity = market.hype_liquidity.saturating_sub(refund_amount);
                 market.total_hype_shares = market.total_hype_shares.saturating_sub(
-                    total_shares.saturating_sub(order.filled_shares)
+                    total_shares.saturating_sub(order.total_shares)
                 );
             }
             OrderDirection::Flop => {
                 market.flop_liquidity = market.flop_liquidity.saturating_sub(refund_amount);
                 market.total_flop_shares = market.total_flop_shares.saturating_sub(
-                    total_shares.saturating_sub(order.filled_shares)
+                    total_shares.saturating_sub(order.total_shares)
                 );
             }
         }
@@ -128,9 +125,7 @@ pub fn close_order(ctx: Context<CloseOrder>, order_id: u64) -> Result<()> {
         order_status: OrderStatus::Closed,
         price,
         total_shares,
-        filled_shares: order.filled_shares,
         total_amount,
-        filled_amount: order.filled_amount,
         comment: None,
         refund_amount: Some(refund_amount),
         timestamp: Clock::get()?.unix_timestamp,

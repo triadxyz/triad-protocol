@@ -10,13 +10,10 @@ pub struct UserTrade {
     /// The total value of withdrawals the user has made (in TRD)
     /// precision: QUOTE_PRECISION
     pub total_withdraws: u64,
-    /// Number of open orders
-    pub open_orders: u8,
-    /// Whether or not user has open order
-    pub has_open_order: bool,
+    /// The number of orders the user has opened
+    pub opened_orders: u64,
     pub orders: [Order; 10],
-    pub position: i64,
-    pub padding: [u8; 64],
+    pub padding: [u8; 32],
 }
 
 #[derive(AnchorSerialize, AnchorDeserialize, Clone, Copy, Default)]
@@ -33,17 +30,12 @@ pub struct Order {
     pub total_amount: u64,
     /// The total number of shares to be purchased
     pub total_shares: u64,
-    /// The amount of TRD that has been filled
-    /// precision: QUOTE_PRECISION
-    pub filled_amount: u64,
-    /// The number of shares that have been filled
-    pub filled_shares: u64,
     pub order_type: OrderType,
     pub direction: OrderDirection,
     /// The amount of pnl settled in this market since opening the position (in TRD)
     /// precision: QUOTE_PRECISION
     pub settled_pnl: i64,
-    pub padding: [u8; 16],
+    pub padding: [u8; 32],
 }
 
 #[derive(Clone, Copy, AnchorSerialize, AnchorDeserialize, PartialEq, Eq, Debug, Default)]
