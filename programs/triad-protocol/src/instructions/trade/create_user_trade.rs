@@ -1,10 +1,14 @@
 use anchor_lang::prelude::*;
-use crate::state::{ UserTrade, Order };
+
+use crate::{ state::{ User, UserTrade, Order }, constraints::is_authority_for_user };
 
 #[derive(Accounts)]
 pub struct CreateUserTrade<'info> {
     #[account(mut)]
     pub signer: Signer<'info>,
+
+    #[account(mut, constraint = is_authority_for_user(&user, &signer)?)]
+    pub user: Box<Account<'info, User>>,
 
     #[account(
         init,
