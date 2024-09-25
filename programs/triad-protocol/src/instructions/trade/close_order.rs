@@ -109,7 +109,7 @@ pub fn close_order(ctx: Context<CloseOrder>, order_id: u64) -> Result<()> {
         }
 
         // Update price
-        market.update_price(refund_amount, direction.opposite(), order_type, None)?;
+        market.update_price(refund_amount, direction.opposite(), None)?;
 
         user_trade.total_withdraws = user_trade.total_withdraws.checked_add(refund_amount).unwrap();
     }

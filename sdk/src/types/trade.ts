@@ -2,24 +2,24 @@ export type Market = {
   address: string
   bump: number
   authority: string
-  marketId: number
+  marketId: string
   name: string
-  hypePrice: number
-  flopPrice: number
-  hypeLiquidity: number
-  flopLiquidity: number
-  totalHypeShares: number
-  totalFlopShares: number
-  totalVolume: number
+  hypePrice: string
+  flopPrice: string
+  hypeLiquidity: string
+  flopLiquidity: string
+  totalHypeShares: string
+  totalFlopShares: string
+  totalVolume: string
   mint: string
-  ts: number
-  updateTs: number
-  openOrdersCount: number
-  nextOrderId: number
+  ts: string
+  updateTs: string
+  openOrdersCount: string
+  nextOrderId: string
   feeBps: number
   feeVault: string
   isActive: boolean
-  marketPrice: number
+  marketPrice: string
   isOfficial: boolean
 }
 

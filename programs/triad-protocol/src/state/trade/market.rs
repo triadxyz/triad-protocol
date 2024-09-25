@@ -1,6 +1,6 @@
 use anchor_lang::prelude::*;
 
-use crate::{ state::{ Order, OrderDirection, OrderStatus, OrderType }, events::PriceUpdate };
+use crate::{ state::OrderDirection, events::PriceUpdate };
 
 #[account]
 pub struct Market {
@@ -115,10 +115,9 @@ impl Market {
         &mut self,
         amount: u64,
         direction: OrderDirection,
-        order_type: OrderType,
         comment: Option<[u8; 64]>
     ) -> Result<()> {
-        let price_impact = ((amount as f64) / 1_000_000.0).min(0.1); // Max 10% impact
+        let price_impact = ((amount as f64) / 1_000_000.0).min(0.01); // Max 1% impact
 
         match direction {
             OrderDirection::Hype => {
@@ -148,11 +147,7 @@ impl Market {
             direction: direction,
             market_price: market_price,
             timestamp: Clock::get()?.unix_timestamp,
-            comment: if order_type == OrderType::Market {
-                comment
-            } else {
-                None
-            },
+            comment: comment,
         });
 
         Ok(())
@@ -166,48 +161,5 @@ impl Market {
         } else {
             None // Prices are equal, no clear winner
         }
-    }
-
-    pub fn fill_order_internal<'info>(
-        &mut self,
-        order: &mut Order,
-        amount: u64
-    ) -> Result<(u64, u64)> {
-        let current_price = match order.direction {
-            OrderDirection::Hype => self.hype_price,
-            OrderDirection::Flop => self.flop_price,
-        };
-
-        let available_liquidity = match order.direction {
-            OrderDirection::Hype => self.flop_liquidity,
-            OrderDirection::Flop => self.hype_liquidity,
-        };
-
-        let fill_amount = amount.min(available_liquidity);
-        let fill_shares = ((fill_amount * 1_000_000) / current_price) as u64;
-
-        if fill_amount > 0 {
-            order.filled_amount = order.filled_amount.checked_add(fill_amount).unwrap();
-            order.filled_shares = order.filled_shares.checked_add(fill_shares).unwrap();
-
-            if order.filled_amount == order.total_amount {
-                order.status = OrderStatus::Filled;
-            }
-
-            self.update_price(current_price, order.direction, order.order_type, None)?;
-
-            match order.direction {
-                OrderDirection::Hype => {
-                    self.hype_liquidity = self.hype_liquidity.checked_add(fill_amount).unwrap();
-                    self.flop_liquidity = self.flop_liquidity.checked_sub(fill_amount).unwrap();
-                }
-                OrderDirection::Flop => {
-                    self.flop_liquidity = self.flop_liquidity.checked_add(fill_amount).unwrap();
-                    self.hype_liquidity = self.hype_liquidity.checked_sub(fill_amount).unwrap();
-                }
-            }
-        }
-
-        Ok((fill_amount, fill_shares))
     }
 }

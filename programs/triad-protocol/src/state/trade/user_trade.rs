@@ -81,8 +81,6 @@ pub enum OrderType {
 pub struct OpenOrderArgs {
     pub amount: u64,
     pub direction: OrderDirection,
-    pub order_type: OrderType,
-    pub limit_price: Option<u64>, // Used for limit orders
     pub comment: Option<[u8; 64]>,
 }
 

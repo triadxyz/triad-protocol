@@ -1,6 +1,6 @@
 use anchor_lang::prelude::*;
 
-use crate::state::trade::{ OrderDirection, OrderStatus, OrderType };
+use crate::state::{ OrderDirection, OrderStatus, OrderType };
 
 #[event]
 pub struct PriceUpdate {

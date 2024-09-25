@@ -1,13 +1,9 @@
-mod position;
 mod stake;
-mod ticker;
 mod user;
-mod vault;
-pub mod trade;
+mod trade;
+mod v1;
 
-pub use position::*;
+pub use v1::*;
 pub use stake::*;
-pub use ticker::*;
 pub use user::*;
-pub use vault::*;
 pub use trade::*;

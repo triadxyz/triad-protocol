@@ -78,17 +78,10 @@ pub fn open_order(ctx: Context<OpenOrder>, args: OpenOrderArgs) -> Result<()> {
     let market = &mut ctx.accounts.market;
     let fee_vault = &mut ctx.accounts.fee_vault;
 
-    let current_price = match args.direction {
+    let price = match args.direction {
         OrderDirection::Hype => market.hype_price,
         OrderDirection::Flop => market.flop_price,
     };
-
-    let price = match args.order_type {
-        OrderType::Market => current_price,
-        OrderType::Limit => args.limit_price.ok_or(TriadProtocolError::InvalidPrice)?,
-    };
-
-    msg!("current_price: {}", price);
 
     // Check if order size is less than or equal to 1 share
     let shares = market.calculate_shares(args.amount, args.direction);
@@ -118,13 +111,13 @@ pub fn open_order(ctx: Context<OpenOrder>, args: OpenOrderArgs) -> Result<()> {
         ts: Clock::get()?.unix_timestamp,
         order_id: market.next_order_id(),
         market_id: market.market_id,
-        status: OrderStatus::Open,
+        status: OrderStatus::Filled,
         price,
         total_amount: actual_amount,
         total_shares: shares,
         filled_amount: actual_amount,
         filled_shares: shares,
-        order_type: args.order_type,
+        order_type: OrderType::Market, // Default to market order
         direction: args.direction,
         settled_pnl: 0,
         padding: [0; 16],
@@ -139,7 +132,7 @@ pub fn open_order(ctx: Context<OpenOrder>, args: OpenOrderArgs) -> Result<()> {
     market.open_orders_count += 1;
     market.total_volume = market.total_volume.checked_add(actual_amount).unwrap();
 
-    market.update_price(price, args.direction, args.order_type, args.comment)?;
+    market.update_price(price, args.direction, args.comment)?;
     match args.direction {
         OrderDirection::Hype => {
             market.hype_liquidity = market.hype_liquidity.checked_add(actual_amount).unwrap();
@@ -204,10 +197,8 @@ pub fn open_order(ctx: Context<OpenOrder>, args: OpenOrderArgs) -> Result<()> {
 
     market.update_ts = Clock::get()?.unix_timestamp;
 
-    let (filled_amount, filled_shares) = market.fill_order_internal(
-        &mut user_trade.orders[order_index],
-        args.amount
-    )?;
+    let filled_amount = 0;
+    let filled_shares = 0;
 
     match args.direction {
         OrderDirection::Hype => {
@@ -225,8 +216,8 @@ pub fn open_order(ctx: Context<OpenOrder>, args: OpenOrderArgs) -> Result<()> {
         market_id: market.market_id,
         order_id: new_order.order_id,
         direction: args.direction,
-        order_type: args.order_type,
-        order_status: OrderStatus::Open,
+        order_type: new_order.order_type,
+        order_status: OrderStatus::Filled,
         price,
         total_shares: shares,
         filled_shares: 0,
