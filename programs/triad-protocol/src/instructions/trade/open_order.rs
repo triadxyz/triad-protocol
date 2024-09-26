@@ -109,6 +109,7 @@ pub fn open_order(ctx: Context<OpenOrder>, args: OpenOrderArgs) -> Result<()> {
     let new_order = Order {
         ts: Clock::get()?.unix_timestamp,
         order_id: market.next_order_id(),
+        week_id: market.current_week_id,
         market_id: market.market_id,
         status: OrderStatus::Filled,
         price,
@@ -159,10 +160,10 @@ pub fn open_order(ctx: Context<OpenOrder>, args: OpenOrderArgs) -> Result<()> {
     fee_vault.deposited = fee_vault.deposited.checked_add(fee_amount).unwrap();
     fee_vault.net_balance = fee_vault.net_balance.checked_add(fee_amount).unwrap();
 
-    // Calculate fee distribution (3% total fee)
-    let project_fee = (fee_amount * 2869) / 3000; // 2.869% of the 3% fee
-    let nft_holders_fee = (fee_amount * 100) / 3000; // 0.1% of the 3% fee
-    let market_fee = fee_amount - project_fee - nft_holders_fee; // Remaining 0.031% of the 3% fee
+    // Calculate fee distribution (1.131% total fee)
+    let project_fee = (fee_amount * 100) / 10000; // 1% of the fee 1.131%
+    let nft_holders_fee = (fee_amount * 10) / 10000; // 0.1% of the fee 1.131%
+    let market_fee = fee_amount - project_fee - nft_holders_fee; // Remaining 0.031% of the 1.131% fee
 
     fee_vault.project_available = fee_vault.project_available.checked_add(project_fee).unwrap();
     fee_vault.nft_holders_available = fee_vault.nft_holders_available

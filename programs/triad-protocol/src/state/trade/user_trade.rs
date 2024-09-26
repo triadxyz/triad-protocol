@@ -20,6 +20,7 @@ pub struct UserTrade {
 pub struct Order {
     pub ts: i64,
     pub order_id: u64,
+    pub week_id: u8,
     pub market_id: u64,
     pub status: OrderStatus,
     /// The price of the order (in TRD)

@@ -44,7 +44,7 @@ pub struct Market {
     pub market_price: u64,
     pub weekly_results: [WeeklyResult; 4],
     /// Index of the current week in the weekly_results array initialized with default values
-    pub current_week_index: u8,
+    pub current_week_id: u8,
     /// Start timestamp of the current week if 7 days have passed since the start of the week
     pub current_week_start: i64,
     /// The question or prediction topic for the current week
@@ -112,7 +112,7 @@ impl Default for Market {
             is_official: true,
             market_price: 0,
             weekly_results: [WeeklyResult::default(); 4],
-            current_week_index: 0,
+            current_week_id: 0,
             current_week_start: 0,
             current_question: [0; 120],
             padding: [0; 224],
