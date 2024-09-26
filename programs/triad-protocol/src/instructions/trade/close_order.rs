@@ -8,6 +8,8 @@ use crate::{
     events::OrderUpdate,
 };
 
+// Need check the current status of the Market and of the question to pay the PNL or just close position for the user liquideted
+
 #[derive(Accounts)]
 pub struct CloseOrder<'info> {
     #[account(mut)]
@@ -122,6 +124,7 @@ pub fn close_order(ctx: Context<CloseOrder>, order_id: u64) -> Result<()> {
         order_id,
         direction,
         order_type,
+        question_id: order.question_id,
         order_status: OrderStatus::Closed,
         price,
         total_shares,
@@ -129,6 +132,8 @@ pub fn close_order(ctx: Context<CloseOrder>, order_id: u64) -> Result<()> {
         comment: None,
         refund_amount: Some(refund_amount),
         timestamp: Clock::get()?.unix_timestamp,
+        is_question_winner: None,
+        pnl: order.pnl,
     });
 
     Ok(())

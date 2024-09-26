@@ -91,7 +91,7 @@ pub fn open_order(ctx: Context<OpenOrder>, args: OpenOrderArgs) -> Result<()> {
     msg!("total_shares: {}", total_shares);
     msg!("amount: {}", total_amount);
 
-    if total_shares == 0 {
+    if total_shares.eq(&0) {
         return Err(TriadProtocolError::InsufficientFunds.into());
     }
 
@@ -105,15 +105,15 @@ pub fn open_order(ctx: Context<OpenOrder>, args: OpenOrderArgs) -> Result<()> {
     user_trade.orders[order_index] = Order {
         ts,
         order_id: market.next_order_id(),
-        week_id: market.current_week_id,
+        question_id: market.current_question_id,
         market_id: market.market_id,
-        status: OrderStatus::Filled,
+        status: OrderStatus::Open,
         price,
         total_amount,
         total_shares,
         order_type: OrderType::Market,
         direction: args.direction,
-        settled_pnl: 0,
+        pnl: 0,
         padding: [0; 32],
     };
     user_trade.opened_orders = user_trade.opened_orders.checked_add(1).unwrap();
@@ -183,6 +183,7 @@ pub fn open_order(ctx: Context<OpenOrder>, args: OpenOrderArgs) -> Result<()> {
     emit!(OrderUpdate {
         timestamp: current_order.ts,
         user: user_trade.authority,
+        question_id: current_order.question_id,
         market_id: current_order.market_id,
         order_id: current_order.order_id,
         direction: current_order.direction,
@@ -190,9 +191,11 @@ pub fn open_order(ctx: Context<OpenOrder>, args: OpenOrderArgs) -> Result<()> {
         order_status: current_order.status,
         total_shares: current_order.total_shares,
         total_amount: current_order.total_amount,
+        pnl: current_order.pnl,
         price,
         comment: args.comment,
         refund_amount: None,
+        is_question_winner: None,
     });
 
     Ok(())

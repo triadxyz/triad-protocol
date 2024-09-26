@@ -23,7 +23,7 @@ pub struct Market {
     pub total_hype_shares: u64,
     /// Total number of Flop shares issued
     pub total_flop_shares: u64,
-    /// Total trading volume (in TRD)
+    /// Total trading volume (in TRD) for all resolutions
     pub total_volume: u64,
     /// Mint $TRD token
     pub mint: Pubkey,
@@ -42,31 +42,37 @@ pub struct Market {
     pub is_active: bool,
     pub is_official: bool,
     pub market_price: u64,
-    pub weekly_results: [WeeklyResult; 4],
+    pub resolved_questions: [ResolvedQuestion; 4],
     /// Index of the current week in the weekly_results array initialized with default values
-    pub current_week_id: u8,
+    pub current_question_id: u64,
     /// Start timestamp of the current week if 7 days have passed since the start of the week
-    pub current_week_start: i64,
+    pub current_question_start: i64,
+    pub current_question_end: i64,
     /// The question or prediction topic for the current week
     pub current_question: [u8; 120],
-    pub padding: [u8; 224],
+    pub padding: [u8; 232],
 }
 
 #[derive(AnchorSerialize, AnchorDeserialize, Clone, Copy)]
-pub struct WeeklyResult {
+pub struct ResolvedQuestion {
     /// The question or prediction topic for this week
     pub question: [u8; 120],
     /// Start timestamp of the week
     pub start_time: i64,
     /// End timestamp of the week
     pub end_time: i64,
-    /// The winning direction (Hype or Flop)
+    /// Total liquidity for Hype (in TRD)
+    pub hype_liquidity: u64,
+    /// Total liquidity for Flop (in TRD)
+    pub flop_liquidity: u64,
+    /// The winning direction (Hype, Flop or None)
     pub winning_direction: WinningDirection,
     pub market_price: u64,
     /// Final price for Hype outcome at the end of the week
     pub final_hype_price: u64,
     /// Final price for Flop outcome at the end of the week
     pub final_flop_price: u64,
+    pub padding: [u8; 100],
 }
 
 #[derive(AnchorSerialize, AnchorDeserialize, Clone, Copy)]
@@ -82,16 +88,19 @@ pub struct InitializeMarketArgs {
     pub market_id: u64,
 }
 
-impl Default for WeeklyResult {
+impl Default for ResolvedQuestion {
     fn default() -> Self {
         Self {
             question: [0; 120],
             start_time: 0,
             end_time: 0,
+            hype_liquidity: 0,
+            flop_liquidity: 0,
             winning_direction: WinningDirection::Hype,
             market_price: 0,
             final_hype_price: 500_000,
             final_flop_price: 500_000,
+            padding: [0; 100],
         }
     }
 }
@@ -120,11 +129,12 @@ impl Default for Market {
             is_active: true,
             is_official: true,
             market_price: 0,
-            weekly_results: [WeeklyResult::default(); 4],
-            current_week_id: 0,
-            current_week_start: 0,
+            resolved_questions: [ResolvedQuestion::default(); 4],
+            current_question_id: 0,
+            current_question_start: 0,
+            current_question_end: 0,
             current_question: [0; 120],
-            padding: [0; 224],
+            padding: [0; 232],
         }
     }
 }

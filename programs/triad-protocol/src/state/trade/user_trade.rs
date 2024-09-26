@@ -20,22 +20,20 @@ pub struct UserTrade {
 pub struct Order {
     pub ts: i64,
     pub order_id: u64,
-    pub week_id: u8,
+    pub question_id: u64,
     pub market_id: u64,
     pub status: OrderStatus,
     /// The price of the order (in TRD)
     /// precision: PRICE_PRECISION (e.g., 1_000_000 = 1 TRD)
     pub price: u64,
     /// The total amount of TRD committed to this order
-    /// precision: QUOTE_PRECISION
     pub total_amount: u64,
     /// The total number of shares to be purchased
     pub total_shares: u64,
     pub order_type: OrderType,
     pub direction: OrderDirection,
     /// The amount of pnl settled in this market since opening the position (in TRD)
-    /// precision: QUOTE_PRECISION
-    pub settled_pnl: i64,
+    pub pnl: i64,
     pub padding: [u8; 32],
 }
 
@@ -55,10 +53,6 @@ pub enum OrderStatus {
     Init,
     /// Order is open
     Open,
-    /// Order has been filled
-    Filled,
-    /// Order has been canceled
-    Canceled,
     /// Order has been closed
     Closed,
 }
