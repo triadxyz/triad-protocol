@@ -233,11 +233,6 @@
           "signer": true
         },
         {
-          "name": "payer",
-          "writable": true,
-          "signer": true
-        },
-        {
           "name": "referral",
           "writable": true
         },
@@ -249,6 +244,22 @@
               {
                 "kind": "const",
                 "value": [117, 115, 101, 114]
+              },
+              {
+                "kind": "account",
+                "path": "signer"
+              }
+            ]
+          }
+        },
+        {
+          "name": "user_trade",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [117, 115, 101, 114, 95, 116, 114, 97, 100, 101]
               },
               {
                 "kind": "account",
@@ -281,6 +292,10 @@
           "name": "signer",
           "writable": true,
           "signer": true
+        },
+        {
+          "name": "user",
+          "writable": true
         },
         {
           "name": "user_trade",
@@ -1546,20 +1561,6 @@
             }
           },
           {
-            "name": "order_type",
-            "type": {
-              "defined": {
-                "name": "OrderType"
-              }
-            }
-          },
-          {
-            "name": "limit_price",
-            "type": {
-              "option": "u64"
-            }
-          },
-          {
             "name": "comment",
             "type": {
               "option": {
@@ -1617,19 +1618,6 @@
             "type": "u64"
           },
           {
-            "name": "filled_amount",
-            "docs": [
-              "The amount of TRD that has been filled",
-              "precision: QUOTE_PRECISION"
-            ],
-            "type": "u64"
-          },
-          {
-            "name": "filled_shares",
-            "docs": ["The number of shares that have been filled"],
-            "type": "u64"
-          },
-          {
             "name": "order_type",
             "type": {
               "defined": {
@@ -1656,7 +1644,7 @@
           {
             "name": "padding",
             "type": {
-              "array": ["u8", 16]
+              "array": ["u8", 32]
             }
           }
         ]
@@ -1763,15 +1751,7 @@
             "type": "u64"
           },
           {
-            "name": "filled_shares",
-            "type": "u64"
-          },
-          {
             "name": "total_amount",
-            "type": "u64"
-          },
-          {
-            "name": "filled_amount",
             "type": "u64"
           },
           {
@@ -2115,14 +2095,9 @@
             "type": "u64"
           },
           {
-            "name": "open_orders",
-            "docs": ["Number of open orders"],
-            "type": "u8"
-          },
-          {
-            "name": "has_open_order",
-            "docs": ["Whether or not user has open order"],
-            "type": "bool"
+            "name": "opened_orders",
+            "docs": ["The number of orders the user has opened"],
+            "type": "u64"
           },
           {
             "name": "orders",
@@ -2138,13 +2113,9 @@
             }
           },
           {
-            "name": "position",
-            "type": "i64"
-          },
-          {
             "name": "padding",
             "type": {
-              "array": ["u8", 64]
+              "array": ["u8", 32]
             }
           }
         ]

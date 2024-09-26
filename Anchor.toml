@@ -2,7 +2,7 @@
 skip-lint = false
 
 [programs.devnet]
-triad_protocol = "7nGGR51pBSUrpMPYVf9LWnNwaApz7N9VaJfDAJrihXts"
+triad_protocol = "D6CzYj9FxGa8HeQeF1JYu9hDakEuEeMJkSG2awGPuCXG"
 
 [programs.mainnet]
 triad_protocol = "TRDwq3BN4mP3m9KsuNUWSN6QDff93VKGSwE95Jbr9Ss"

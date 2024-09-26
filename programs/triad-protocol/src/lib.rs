@@ -9,7 +9,7 @@ mod events;
 pub mod instructions;
 pub mod state;
 
-declare_id!("7nGGR51pBSUrpMPYVf9LWnNwaApz7N9VaJfDAJrihXts");
+declare_id!("D6CzYj9FxGa8HeQeF1JYu9hDakEuEeMJkSG2awGPuCXG");
 
 #[program]
 pub mod triad_protocol {

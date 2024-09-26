@@ -355,11 +355,6 @@ export type TriadProtocol = {
           signer: true
         },
         {
-          name: 'payer'
-          writable: true
-          signer: true
-        },
-        {
           name: 'referral'
           writable: true
         },
@@ -371,6 +366,22 @@ export type TriadProtocol = {
               {
                 kind: 'const'
                 value: [117, 115, 101, 114]
+              },
+              {
+                kind: 'account'
+                path: 'signer'
+              }
+            ]
+          }
+        },
+        {
+          name: 'userTrade'
+          writable: true
+          pda: {
+            seeds: [
+              {
+                kind: 'const'
+                value: [117, 115, 101, 114, 95, 116, 114, 97, 100, 101]
               },
               {
                 kind: 'account'
@@ -403,6 +414,10 @@ export type TriadProtocol = {
           name: 'signer'
           writable: true
           signer: true
+        },
+        {
+          name: 'user'
+          writable: true
         },
         {
           name: 'userTrade'
@@ -2016,20 +2031,6 @@ export type TriadProtocol = {
             }
           },
           {
-            name: 'orderType'
-            type: {
-              defined: {
-                name: 'orderType'
-              }
-            }
-          },
-          {
-            name: 'limitPrice'
-            type: {
-              option: 'u64'
-            }
-          },
-          {
             name: 'comment'
             type: {
               option: {
@@ -2087,19 +2088,6 @@ export type TriadProtocol = {
             type: 'u64'
           },
           {
-            name: 'filledAmount'
-            docs: [
-              'The amount of TRD that has been filled',
-              'precision: QUOTE_PRECISION'
-            ]
-            type: 'u64'
-          },
-          {
-            name: 'filledShares'
-            docs: ['The number of shares that have been filled']
-            type: 'u64'
-          },
-          {
             name: 'orderType'
             type: {
               defined: {
@@ -2126,7 +2114,7 @@ export type TriadProtocol = {
           {
             name: 'padding'
             type: {
-              array: ['u8', 16]
+              array: ['u8', 32]
             }
           }
         ]
@@ -2233,15 +2221,7 @@ export type TriadProtocol = {
             type: 'u64'
           },
           {
-            name: 'filledShares'
-            type: 'u64'
-          },
-          {
             name: 'totalAmount'
-            type: 'u64'
-          },
-          {
-            name: 'filledAmount'
             type: 'u64'
           },
           {
@@ -2585,14 +2565,9 @@ export type TriadProtocol = {
             type: 'u64'
           },
           {
-            name: 'openOrders'
-            docs: ['Number of open orders']
-            type: 'u8'
-          },
-          {
-            name: 'hasOpenOrder'
-            docs: ['Whether or not user has open order']
-            type: 'bool'
+            name: 'openedOrders'
+            docs: ['The number of orders the user has opened']
+            type: 'u64'
           },
           {
             name: 'orders'
@@ -2608,13 +2583,9 @@ export type TriadProtocol = {
             }
           },
           {
-            name: 'position'
-            type: 'i64'
-          },
-          {
             name: 'padding'
             type: {
-              array: ['u8', 64]
+              array: ['u8', 32]
             }
           }
         ]

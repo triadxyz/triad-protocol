@@ -34,7 +34,7 @@ pub struct Market {
     pub open_orders_count: u64,
     /// Next available order ID
     pub next_order_id: u64,
-    /// Fees applied to trades (in basis points, e.g., 300 = 3%) but 2.869 for the protocol; 0.1 NFT Holders; 0.031 Market
+    /// Fees applied to trades (in basis points, e.g., 1.131% fee)
     pub fee_bps: u16,
     /// Vault to Receive fees
     pub fee_vault: Pubkey,
@@ -42,13 +42,49 @@ pub struct Market {
     pub is_active: bool,
     pub is_official: bool,
     pub market_price: u64,
+    pub weekly_results: [WeeklyResult; 4],
+    /// Index of the current week in the weekly_results array initialized with default values
+    pub current_week_index: u8,
+    /// Start timestamp of the current week if 7 days have passed since the start of the week
+    pub current_week_start: i64,
+    /// The question or prediction topic for the current week
+    pub current_question: [u8; 120],
     pub padding: [u8; 224],
+}
+
+#[derive(AnchorSerialize, AnchorDeserialize, Clone, Copy)]
+pub struct WeeklyResult {
+    /// The question or prediction topic for this week
+    pub question: [u8; 120],
+    /// Start timestamp of the week
+    pub start_time: i64,
+    /// End timestamp of the week
+    pub end_time: i64,
+    /// The winning direction (Hype or Flop)
+    pub winning_direction: OrderDirection,
+    /// Final price for Hype outcome at the end of the week
+    pub final_hype_price: u64,
+    /// Final price for Flop outcome at the end of the week
+    pub final_flop_price: u64,
 }
 
 #[derive(AnchorSerialize, AnchorDeserialize)]
 pub struct InitializeMarketArgs {
     pub name: String,
     pub market_id: u64,
+}
+
+impl Default for WeeklyResult {
+    fn default() -> Self {
+        Self {
+            question: [0; 120],
+            start_time: 0,
+            end_time: 0,
+            winning_direction: OrderDirection::Hype,
+            final_hype_price: 500_000,
+            final_flop_price: 500_000,
+        }
+    }
 }
 
 impl Default for Market {
@@ -70,11 +106,15 @@ impl Default for Market {
             update_ts: 0,
             open_orders_count: 0,
             next_order_id: 0,
-            fee_bps: 300, // 3% fee
+            fee_bps: 1131, // 1.131% fee
             fee_vault: Pubkey::default(),
             is_active: true,
             is_official: true,
             market_price: 0,
+            weekly_results: [WeeklyResult::default(); 4],
+            current_week_index: 0,
+            current_week_start: 0,
+            current_question: [0; 120],
             padding: [0; 224],
         }
     }
