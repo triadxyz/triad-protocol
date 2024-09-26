@@ -5,7 +5,7 @@
  * IDL can be found at `target/idl/triad_protocol.json`.
  */
 export type TriadProtocol = {
-  address: '7nGGR51pBSUrpMPYVf9LWnNwaApz7N9VaJfDAJrihXts'
+  address: 'D6CzYj9FxGa8HeQeF1JYu9hDakEuEeMJkSG2awGPuCXG'
   metadata: {
     name: 'triadProtocol'
     version: '0.1.4'
@@ -477,8 +477,8 @@ export type TriadProtocol = {
                 value: [102, 101, 101, 95, 118, 97, 117, 108, 116]
               },
               {
-                kind: 'account'
-                path: 'market'
+                kind: 'arg'
+                path: 'args.market_id'
               }
             ]
           }
@@ -580,18 +580,6 @@ export type TriadProtocol = {
         {
           name: 'userTrade'
           writable: true
-          pda: {
-            seeds: [
-              {
-                kind: 'const'
-                value: [117, 115, 101, 114, 95, 116, 114, 97, 100, 101]
-              },
-              {
-                kind: 'account'
-                path: 'signer'
-              }
-            ]
-          }
         },
         {
           name: 'market'
@@ -600,18 +588,6 @@ export type TriadProtocol = {
         {
           name: 'feeVault'
           writable: true
-          pda: {
-            seeds: [
-              {
-                kind: 'const'
-                value: [102, 101, 101, 95, 118, 97, 117, 108, 116]
-              },
-              {
-                kind: 'account'
-                path: 'market'
-              }
-            ]
-          }
         },
         {
           name: 'mint'
@@ -1981,9 +1957,7 @@ export type TriadProtocol = {
           },
           {
             name: 'feeBps'
-            docs: [
-              'Fees applied to trades (in basis points, e.g., 300 = 3%) but 2.869 for the protocol; 0.1 NFT Holders; 0.031 Market'
-            ]
+            docs: ['Fees applied to trades (in basis points, e.g., 1.131% fee)']
             type: 'u16'
           },
           {
@@ -2003,6 +1977,40 @@ export type TriadProtocol = {
           {
             name: 'marketPrice'
             type: 'u64'
+          },
+          {
+            name: 'weeklyResults'
+            type: {
+              array: [
+                {
+                  defined: {
+                    name: 'weeklyResult'
+                  }
+                },
+                4
+              ]
+            }
+          },
+          {
+            name: 'currentWeekId'
+            docs: [
+              'Index of the current week in the weekly_results array initialized with default values'
+            ]
+            type: 'u8'
+          },
+          {
+            name: 'currentWeekStart'
+            docs: [
+              'Start timestamp of the current week if 7 days have passed since the start of the week'
+            ]
+            type: 'i64'
+          },
+          {
+            name: 'currentQuestion'
+            docs: ['The question or prediction topic for the current week']
+            type: {
+              array: ['u8', 120]
+            }
           },
           {
             name: 'padding'
@@ -2053,6 +2061,10 @@ export type TriadProtocol = {
           {
             name: 'orderId'
             type: 'u64'
+          },
+          {
+            name: 'weekId'
+            type: 'u8'
           },
           {
             name: 'marketId'
@@ -2587,6 +2599,50 @@ export type TriadProtocol = {
             type: {
               array: ['u8', 32]
             }
+          }
+        ]
+      }
+    },
+    {
+      name: 'weeklyResult'
+      type: {
+        kind: 'struct'
+        fields: [
+          {
+            name: 'question'
+            docs: ['The question or prediction topic for this week']
+            type: {
+              array: ['u8', 120]
+            }
+          },
+          {
+            name: 'startTime'
+            docs: ['Start timestamp of the week']
+            type: 'i64'
+          },
+          {
+            name: 'endTime'
+            docs: ['End timestamp of the week']
+            type: 'i64'
+          },
+          {
+            name: 'winningDirection'
+            docs: ['The winning direction (Hype or Flop)']
+            type: {
+              defined: {
+                name: 'orderDirection'
+              }
+            }
+          },
+          {
+            name: 'finalHypePrice'
+            docs: ['Final price for Hype outcome at the end of the week']
+            type: 'u64'
+          },
+          {
+            name: 'finalFlopPrice'
+            docs: ['Final price for Flop outcome at the end of the week']
+            type: 'u64'
           }
         ]
       }

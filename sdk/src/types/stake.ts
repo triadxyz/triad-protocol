@@ -73,15 +73,7 @@ export enum RARITY_WEIGHT {
   MYTHIC = 6
 }
 
-export enum COLLECTION_MUlTIPLIER {
-  ALLIGATORS = 1.5,
-  COLETA = 1.5,
-  UNDEAD = 1.5,
-  UNDEAD_TRIADFI = 2.5,
-  PYTH = 1.5
-}
-
-export type StakeVaultResponse = {
+export type StakeVault = {
   name: string
   collection: string
   authority: string
@@ -98,7 +90,7 @@ export type StakeVaultResponse = {
   endTs: number
 }
 
-export type StakeResponse = {
+export type Stake = {
   name: string
   stakeVault: string
   authority: string
@@ -110,15 +102,4 @@ export type StakeResponse = {
   claimed: number
   available: number
   amount: number
-}
-
-export type UserResponse = {
-  ts: number
-  authority: string
-  referral: string
-  referred: number
-  name: string
-  swapsMade: number
-  swaps: number
-  staked: number
 }

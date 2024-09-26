@@ -7,24 +7,20 @@ import {
   VersionedTransaction
 } from '@solana/web3.js'
 import { TriadProtocol } from './types/triad_protocol'
-import {
-  formatStake,
-  formatStakeVault,
-  getStakeAddressSync,
-  getStakeVaultAddressSync,
-  getUserAddressSync
-} from './utils/helpers'
+import { formatStake, formatStakeVault } from './utils/helpers'
 import { RpcOptions } from './types'
 import {
   UpdateStakeVaultArgs,
   StakeNftArgs,
   RequestWithdrawArgs,
   WithdrawArgs,
-  StakeResponse,
+  Stake as StakeResponse,
   ClaimStakeRewardsArgs,
   StakeTokenArgs,
   UpdateBoostArgs
 } from './types/stake'
+import { getStakeVaultPDA, getStakePDA } from './utils/pda/stake'
+import { getUserPDA } from './utils/pda'
 import {
   STAKE_VAULT_NAME,
   TRD_DECIMALS,
@@ -33,7 +29,7 @@ import {
   TRIAD_ADMIN
 } from './utils/constants'
 import { toByteArray } from 'base64-js'
-import { getRarityRank } from './utils/getRarity'
+import getRarityRank from './utils/getRarityRank'
 
 export default class Stake {
   program: Program<TriadProtocol>
@@ -63,15 +59,11 @@ export default class Stake {
     collections,
     rank
   }: ClaimStakeRewardsArgs) {
-    const stakeVaultPDA = getStakeVaultAddressSync(
+    const stakeVaultPDA = getStakeVaultPDA(
       this.program.programId,
       this.stakeVaultName
     )
-    const stakePDA = getStakeAddressSync(
-      this.program.programId,
-      wallet,
-      nftName
-    )
+    const stakePDA = getStakePDA(this.program.programId, wallet, nftName)
 
     const method = await this.program.methods
       .claimStakeRewards({
@@ -137,7 +129,7 @@ export default class Stake {
     const data: StakeResponse[] = []
 
     for (const stake of response) {
-      const getRank = getRarityRank(ranks, stake.mint, stake.name)
+      const rank = getRarityRank(ranks, stake.mint, stake.name)
 
       let available = 0
 
@@ -147,7 +139,7 @@ export default class Stake {
         available = await this.getStakeRewards({
           wallet,
           nftName: stake.name,
-          rank: getRank,
+          rank,
           collections
         })
       } catch {}
@@ -224,7 +216,7 @@ export default class Stake {
     { name, wallet, amount }: StakeTokenArgs,
     options?: RpcOptions
   ) {
-    const userPDA = getUserAddressSync(this.program.programId, wallet)
+    const userPDA = getUserPDA(this.program.programId, wallet)
 
     const method = this.program.methods
       .stakeToken({
@@ -292,12 +284,12 @@ export default class Stake {
     { wallet, name, mint }: RequestWithdrawArgs,
     options?: RpcOptions
   ) {
-    const stakeVaultPDA = getStakeVaultAddressSync(
+    const stakeVaultPDA = getStakeVaultPDA(
       this.program.programId,
       this.stakeVaultName
     )
-    const stakePDA = getStakeAddressSync(this.program.programId, wallet, name)
-    const userPDA = getUserAddressSync(this.program.programId, wallet)
+    const stakePDA = getStakePDA(this.program.programId, wallet, name)
+    const userPDA = getUserPDA(this.program.programId, wallet)
 
     const method = this.program.methods.requestWithdrawStake().accounts({
       signer: wallet,
@@ -329,12 +321,12 @@ export default class Stake {
     { wallet, name, mint }: WithdrawArgs,
     options?: RpcOptions
   ) {
-    const stakeVaultPDA = getStakeVaultAddressSync(
+    const stakeVaultPDA = getStakeVaultPDA(
       this.program.programId,
       this.stakeVaultName
     )
-    const userPDA = getUserAddressSync(this.program.programId, wallet)
-    const stakePDA = getStakeAddressSync(this.program.programId, wallet, name)
+    const userPDA = getUserPDA(this.program.programId, wallet)
+    const stakePDA = getStakePDA(this.program.programId, wallet, name)
 
     const method = this.program.methods.withdrawStake().accounts({
       signer: wallet,
@@ -367,15 +359,11 @@ export default class Stake {
     { wallet, nftName, collections, rank }: ClaimStakeRewardsArgs,
     options?: RpcOptions
   ) {
-    const stakeVaultPDA = getStakeVaultAddressSync(
+    const stakeVaultPDA = getStakeVaultPDA(
       this.program.programId,
       this.stakeVaultName
     )
-    const stakePDA = getStakeAddressSync(
-      this.program.programId,
-      wallet,
-      nftName
-    )
+    const stakePDA = getStakePDA(this.program.programId, wallet, nftName)
 
     const method = this.program.methods
       .claimStakeRewards({
@@ -411,7 +399,7 @@ export default class Stake {
     const ixs = []
 
     for (const nft of nfts) {
-      const Stake = getStakeAddressSync(
+      const stakePDA = getStakePDA(
         this.program.programId,
         new PublicKey(nft.wallet),
         nft.name
@@ -422,7 +410,7 @@ export default class Stake {
           .updateStakeBoost()
           .accounts({
             signer: wallet,
-            stake: Stake
+            stake: stakePDA
           })
           .instruction()
       )

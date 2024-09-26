@@ -10,3 +10,14 @@ export type CreateUserArgs = {
   name: string
   referral?: PublicKey
 }
+
+export type User = {
+  ts: number
+  authority: string
+  referral: string
+  referred: number
+  name: string
+  swapsMade: number
+  swaps: number
+  staked: number
+}

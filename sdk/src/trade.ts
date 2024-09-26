@@ -11,12 +11,13 @@ import { Market, OrderDirection, OrderType } from './types/trade'
 import { RpcOptions } from './types'
 import BN from 'bn.js'
 import { TRD_DECIMALS, TRD_MINT_DEVNET } from './utils/constants'
+import { encodeString } from './utils/helpers'
 import {
-  encodeString,
-  getFeeVaultAddressSync,
-  getMarketAddressSync,
-  getUserTradeAddressSync
-} from './utils/helpers'
+  getFeeVaultPDA,
+  getMarketPDA,
+  getUserTradePDA
+} from './utils/pda/trade'
+import { getUserPDA } from './utils/pda'
 
 export default class Trade {
   program: Program<TriadProtocol>
@@ -121,7 +122,7 @@ export default class Trade {
   }
 
   async getUserTrade() {
-    const userTradePDA = getUserTradeAddressSync(
+    const userTradePDA = getUserTradePDA(
       this.program.programId,
       this.provider.publicKey
     )
@@ -140,30 +141,25 @@ export default class Trade {
     },
     options?: RpcOptions
   ): Promise<string> {
-    const marketPDA = getMarketAddressSync(this.program.programId, marketId)
-    const feeVualtPDA = getFeeVaultAddressSync(
-      this.program.programId,
-      marketPDA
-    )
-    const userTradePDA = getUserTradeAddressSync(
+    const marketPDA = getMarketPDA(this.program.programId, marketId)
+    const feeVualtPDA = getFeeVaultPDA(this.program.programId, marketId)
+    const userTradePDA = getUserTradePDA(
       this.program.programId,
       this.provider.publicKey
     )
+    const userPDA = getUserPDA(this.program.programId, this.provider.publicKey)
 
     const ixs: TransactionInstruction[] = []
 
     try {
-      const userTradePDA = getUserTradeAddressSync(
-        this.program.programId,
-        this.provider.publicKey
-      )
       await this.program.account.userTrade.fetch(userTradePDA)
     } catch {
       ixs.push(
         await this.program.methods
           .createUserTrade()
           .accounts({
-            signer: this.provider.publicKey
+            signer: this.provider.publicKey,
+            user: userPDA
           })
           .instruction()
       )
@@ -174,13 +170,13 @@ export default class Trade {
         .openOrder({
           amount: new BN(args.amount * 10 ** TRD_DECIMALS),
           direction: args.direction,
-          orderType: args.orderType,
-          limitPrice: new BN(args.limitPrice * 10 ** TRD_DECIMALS),
           comment: encodeString(args.comment, 64)
         })
         .accounts({
           signer: this.provider.publicKey,
           market: marketPDA,
+          feeVault: feeVualtPDA,
+          userTrade: userTradePDA,
           mint: this.mint
         })
         .instruction()
@@ -216,7 +212,7 @@ export default class Trade {
     { marketId, orderId }: { marketId: number; orderId: number },
     options?: RpcOptions
   ): Promise<string> {
-    const marketPDA = getMarketAddressSync(this.program.programId, marketId)
+    const marketPDA = getMarketPDA(this.program.programId, marketId)
 
     const method = this.program.methods.closeOrder(new BN(orderId)).accounts({
       signer: this.provider.publicKey,

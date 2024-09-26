@@ -3,7 +3,8 @@ import { ComputeBudgetProgram, Connection, PublicKey } from '@solana/web3.js'
 import { TriadProtocol } from './types/triad_protocol'
 import IDL from './types/idl_triad_protocol.json'
 import Trade from './trade'
-import { formatUser, getUserAddressSync } from './utils/helpers'
+import { formatUser } from './utils/helpers'
+import { getUserPDA } from './utils/pda'
 import Stake from './stake'
 import { CreateUserArgs, RpcOptions } from './types'
 
@@ -30,10 +31,9 @@ export default class TriadProtocolClient {
    * @param wallet - User wallet
    */
   async getUser(wallet: PublicKey) {
-    const UserPDA = getUserAddressSync(this.program.programId, wallet)
-    const response = await this.program.account.user.fetch(UserPDA)
+    const userPDA = getUserPDA(this.program.programId, wallet)
 
-    return formatUser(response)
+    return formatUser(await this.program.account.user.fetch(userPDA))
   }
 
   /**
@@ -55,7 +55,7 @@ export default class TriadProtocolClient {
   async hasUser(wallet: PublicKey) {
     try {
       await this.program.account.user.fetch(
-        getUserAddressSync(this.program.programId, wallet)
+        getUserPDA(this.program.programId, wallet)
       )
 
       return true
@@ -107,7 +107,6 @@ export default class TriadProtocolClient {
       })
       .accounts({
         signer: wallet,
-        payer: wallet,
         referral
       })
 

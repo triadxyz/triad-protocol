@@ -1,5 +1,5 @@
 {
-  "address": "7nGGR51pBSUrpMPYVf9LWnNwaApz7N9VaJfDAJrihXts",
+  "address": "D6CzYj9FxGa8HeQeF1JYu9hDakEuEeMJkSG2awGPuCXG",
   "metadata": {
     "name": "triad_protocol",
     "version": "0.1.4",
@@ -355,8 +355,8 @@
                 "value": [102, 101, 101, 95, 118, 97, 117, 108, 116]
               },
               {
-                "kind": "account",
-                "path": "market"
+                "kind": "arg",
+                "path": "args.market_id"
               }
             ]
           }
@@ -428,19 +428,7 @@
         },
         {
           "name": "user_trade",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [117, 115, 101, 114, 95, 116, 114, 97, 100, 101]
-              },
-              {
-                "kind": "account",
-                "path": "signer"
-              }
-            ]
-          }
+          "writable": true
         },
         {
           "name": "market",
@@ -448,19 +436,7 @@
         },
         {
           "name": "fee_vault",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [102, 101, 101, 95, 118, 97, 117, 108, 116]
-              },
-              {
-                "kind": "account",
-                "path": "market"
-              }
-            ]
-          }
+          "writable": true
         },
         {
           "name": "mint",
@@ -1512,7 +1488,7 @@
           {
             "name": "fee_bps",
             "docs": [
-              "Fees applied to trades (in basis points, e.g., 300 = 3%) but 2.869 for the protocol; 0.1 NFT Holders; 0.031 Market"
+              "Fees applied to trades (in basis points, e.g., 1.131% fee)"
             ],
             "type": "u16"
           },
@@ -1533,6 +1509,40 @@
           {
             "name": "market_price",
             "type": "u64"
+          },
+          {
+            "name": "weekly_results",
+            "type": {
+              "array": [
+                {
+                  "defined": {
+                    "name": "WeeklyResult"
+                  }
+                },
+                4
+              ]
+            }
+          },
+          {
+            "name": "current_week_id",
+            "docs": [
+              "Index of the current week in the weekly_results array initialized with default values"
+            ],
+            "type": "u8"
+          },
+          {
+            "name": "current_week_start",
+            "docs": [
+              "Start timestamp of the current week if 7 days have passed since the start of the week"
+            ],
+            "type": "i64"
+          },
+          {
+            "name": "current_question",
+            "docs": ["The question or prediction topic for the current week"],
+            "type": {
+              "array": ["u8", 120]
+            }
           },
           {
             "name": "padding",
@@ -1583,6 +1593,10 @@
           {
             "name": "order_id",
             "type": "u64"
+          },
+          {
+            "name": "week_id",
+            "type": "u8"
           },
           {
             "name": "market_id",
@@ -2117,6 +2131,50 @@
             "type": {
               "array": ["u8", 32]
             }
+          }
+        ]
+      }
+    },
+    {
+      "name": "WeeklyResult",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "question",
+            "docs": ["The question or prediction topic for this week"],
+            "type": {
+              "array": ["u8", 120]
+            }
+          },
+          {
+            "name": "start_time",
+            "docs": ["Start timestamp of the week"],
+            "type": "i64"
+          },
+          {
+            "name": "end_time",
+            "docs": ["End timestamp of the week"],
+            "type": "i64"
+          },
+          {
+            "name": "winning_direction",
+            "docs": ["The winning direction (Hype or Flop)"],
+            "type": {
+              "defined": {
+                "name": "OrderDirection"
+              }
+            }
+          },
+          {
+            "name": "final_hype_price",
+            "docs": ["Final price for Hype outcome at the end of the week"],
+            "type": "u64"
+          },
+          {
+            "name": "final_flop_price",
+            "docs": ["Final price for Flop outcome at the end of the week"],
+            "type": "u64"
           }
         ]
       }
