@@ -65,9 +65,9 @@ pub enum OrderStatus {
 
 #[derive(AnchorSerialize, AnchorDeserialize, Clone, Copy, PartialEq, Eq, Default)]
 pub enum OrderType {
-    Limit,
     #[default]
     Market,
+    Limit,
 }
 
 #[derive(AnchorSerialize, AnchorDeserialize)]

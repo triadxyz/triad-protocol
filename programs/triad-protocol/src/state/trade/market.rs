@@ -61,11 +61,19 @@ pub struct WeeklyResult {
     /// End timestamp of the week
     pub end_time: i64,
     /// The winning direction (Hype or Flop)
-    pub winning_direction: OrderDirection,
+    pub winning_direction: WinningDirection,
+    pub market_price: u64,
     /// Final price for Hype outcome at the end of the week
     pub final_hype_price: u64,
     /// Final price for Flop outcome at the end of the week
     pub final_flop_price: u64,
+}
+
+#[derive(AnchorSerialize, AnchorDeserialize, Clone, Copy)]
+pub enum WinningDirection {
+    Hype,
+    Flop,
+    None,
 }
 
 #[derive(AnchorSerialize, AnchorDeserialize)]
@@ -80,7 +88,8 @@ impl Default for WeeklyResult {
             question: [0; 120],
             start_time: 0,
             end_time: 0,
-            winning_direction: OrderDirection::Hype,
+            winning_direction: WinningDirection::Hype,
+            market_price: 0,
             final_hype_price: 500_000,
             final_flop_price: 500_000,
         }
@@ -162,11 +171,13 @@ impl Market {
         match direction {
             OrderDirection::Hype => {
                 let new_hype_price = ((self.hype_price as f64) * (1.0 + price_impact)) as u64;
+
                 self.hype_price = new_hype_price.min(1_000_000);
                 self.flop_price = 1_000_000 - self.hype_price;
             }
             OrderDirection::Flop => {
                 let new_flop_price = ((self.flop_price as f64) * (1.0 + price_impact)) as u64;
+
                 self.flop_price = new_flop_price.min(1_000_000);
                 self.hype_price = 1_000_000 - self.flop_price;
             }
@@ -199,7 +210,7 @@ impl Market {
         } else if self.flop_price > self.hype_price {
             Some(OrderDirection::Flop)
         } else {
-            None // Prices are equal, no clear winner
+            None
         }
     }
 }
