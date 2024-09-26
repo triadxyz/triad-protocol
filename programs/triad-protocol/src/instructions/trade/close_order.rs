@@ -6,6 +6,7 @@ use crate::{
     state::{ Market, UserTrade, OrderStatus, OrderDirection, Order },
     errors::TriadProtocolError,
     events::OrderUpdate,
+    constraints::is_authority_for_user_trade,
 };
 
 // Need check the current status of the Market and of the question to pay the PNL or just close position for the user liquideted
@@ -17,8 +18,7 @@ pub struct CloseOrder<'info> {
 
     #[account(
         mut,
-        seeds = [UserTrade::PREFIX_SEED, signer.key().as_ref()],
-        bump = user_trade.bump,
+        constraint = is_authority_for_user_trade(&user_trade, &signer)?
     )]
     pub user_trade: Box<Account<'info, UserTrade>>,
 
@@ -62,15 +62,9 @@ pub fn close_order(ctx: Context<CloseOrder>, order_id: u64) -> Result<()> {
 
     let order = user_trade.orders[order_index];
 
-    // Extract necessary information from the order
-    let total_amount = order.total_amount;
-    let direction = order.direction;
-    let order_type = order.order_type;
-    let price = order.price;
-    let total_shares = order.total_shares;
-
     // Calculate the amount to refund
-    let refund_amount = total_amount.saturating_sub(order.total_amount);
+    // Based in the shares and the current price of the order
+    let refund_amount = order.total_amount.checked_sub(order.total_amount).unwrap();
 
     if refund_amount > 0 {
         // Transfer net refund to user
@@ -92,23 +86,23 @@ pub fn close_order(ctx: Context<CloseOrder>, order_id: u64) -> Result<()> {
         )?;
 
         // Update market state
-        match direction {
+        match order.direction {
             OrderDirection::Hype => {
-                market.hype_liquidity = market.hype_liquidity.saturating_sub(refund_amount);
-                market.total_hype_shares = market.total_hype_shares.saturating_sub(
-                    total_shares.saturating_sub(order.total_shares)
-                );
+                market.hype_liquidity = market.hype_liquidity.checked_sub(refund_amount).unwrap();
+                market.total_hype_shares = market.total_hype_shares
+                    .checked_sub(order.total_shares)
+                    .unwrap();
             }
             OrderDirection::Flop => {
-                market.flop_liquidity = market.flop_liquidity.saturating_sub(refund_amount);
-                market.total_flop_shares = market.total_flop_shares.saturating_sub(
-                    total_shares.saturating_sub(order.total_shares)
-                );
+                market.flop_liquidity = market.flop_liquidity.checked_sub(refund_amount).unwrap();
+                market.total_flop_shares = market.total_flop_shares
+                    .checked_sub(order.total_shares)
+                    .unwrap();
             }
         }
 
         // Update price
-        market.update_price(refund_amount, direction.opposite(), None)?;
+        market.update_price(refund_amount, order.direction.opposite(), None, false)?;
 
         user_trade.total_withdraws = user_trade.total_withdraws.checked_add(refund_amount).unwrap();
     }
@@ -122,13 +116,13 @@ pub fn close_order(ctx: Context<CloseOrder>, order_id: u64) -> Result<()> {
         user: *ctx.accounts.signer.key,
         market_id: market.market_id,
         order_id,
-        direction,
-        order_type,
+        direction: order.direction,
+        order_type: order.order_type,
         question_id: order.question_id,
         order_status: OrderStatus::Closed,
-        price,
-        total_shares,
-        total_amount,
+        price: order.price,
+        total_shares: order.total_shares,
+        total_amount: order.total_amount,
         comment: None,
         refund_amount: Some(refund_amount),
         timestamp: Clock::get()?.unix_timestamp,

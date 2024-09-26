@@ -159,22 +159,12 @@ impl Market {
         ((amount * 1_000_000) / price) as u64
     }
 
-    pub fn update_shares(&mut self, shares: u64, direction: OrderDirection) {
-        match direction {
-            OrderDirection::Hype => {
-                self.total_hype_shares = self.total_hype_shares.saturating_add(shares);
-            }
-            OrderDirection::Flop => {
-                self.total_flop_shares = self.total_flop_shares.saturating_add(shares);
-            }
-        }
-    }
-
     pub fn update_price(
         &mut self,
         amount: u64,
         direction: OrderDirection,
-        comment: Option<[u8; 64]>
+        comment: Option<[u8; 64]>,
+        _is_open: bool
     ) -> Result<()> {
         let price_impact = ((amount as f64) / 1_000_000.0).min(0.01); // Max 1% impact
 

@@ -123,7 +123,7 @@ pub fn open_order(ctx: Context<OpenOrder>, args: OpenOrderArgs) -> Result<()> {
     market.total_volume = market.total_volume.checked_add(total_amount).unwrap();
     market.update_ts = ts;
 
-    market.update_price(price, args.direction, args.comment)?;
+    market.update_price(price, args.direction, args.comment, true)?;
 
     match args.direction {
         OrderDirection::Hype => {
