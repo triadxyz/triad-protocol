@@ -19,11 +19,14 @@ pub struct InitializeMarket<'info> {
     )]
     pub market: Box<Account<'info, Market>>,
 
+    #[account(mut)]
+    pub mint: Box<InterfaceAccount<'info, Mint>>,
+
     #[account(
         init,
         payer = signer,
         space = FeeVault::SPACE,
-        seeds = [FeeVault::PREFIX_SEED, market.key().as_ref()],
+        seeds = [FeeVault::PREFIX_SEED, &args.market_id.to_le_bytes()],
         bump
     )]
     pub fee_vault: Box<Account<'info, FeeVault>>,
@@ -36,9 +39,6 @@ pub struct InitializeMarket<'info> {
         associated_token::token_program = token_program
     )]
     pub fee_vault_ata: Box<InterfaceAccount<'info, TokenAccount>>,
-
-    #[account(mut)]
-    pub mint: Box<InterfaceAccount<'info, Mint>>,
 
     pub token_program: Program<'info, Token2022>,
     pub associated_token_program: Program<'info, AssociatedToken>,

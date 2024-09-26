@@ -468,6 +468,10 @@ export type TriadProtocol = {
           }
         },
         {
+          name: 'mint'
+          writable: true
+        },
+        {
           name: 'feeVault'
           writable: true
           pda: {
@@ -539,10 +543,6 @@ export type TriadProtocol = {
               ]
             }
           }
-        },
-        {
-          name: 'mint'
-          writable: true
         },
         {
           name: 'tokenProgram'

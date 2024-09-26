@@ -346,6 +346,10 @@
           }
         },
         {
+          "name": "mint",
+          "writable": true
+        },
+        {
           "name": "fee_vault",
           "writable": true,
           "pda": {
@@ -388,10 +392,6 @@
               ]
             }
           }
-        },
-        {
-          "name": "mint",
-          "writable": true
         },
         {
           "name": "token_program",
