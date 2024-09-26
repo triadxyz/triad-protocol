@@ -15,6 +15,7 @@ use crate::{
     },
     errors::TriadProtocolError,
     events::OrderUpdate,
+    constraints::{ is_authority_for_user_trade, is_fee_vault_for_market },
 };
 
 #[derive(Accounts)]
@@ -27,6 +28,7 @@ pub struct OpenOrder<'info> {
         mut,
         seeds = [UserTrade::PREFIX_SEED, signer.key().as_ref()],
         bump = user_trade.bump,
+        constraint = is_authority_for_user_trade(&user_trade, &signer)?
     )]
     pub user_trade: Box<Account<'info, UserTrade>>,
 
@@ -37,6 +39,7 @@ pub struct OpenOrder<'info> {
         mut,
         seeds = [FeeVault::PREFIX_SEED, market.key().as_ref()],
         bump = fee_vault.bump,
+        constraint = is_fee_vault_for_market(&fee_vault, &market)?
     )]
     pub fee_vault: Box<Account<'info, FeeVault>>,
 
@@ -82,10 +85,6 @@ pub fn open_order(ctx: Context<OpenOrder>, args: OpenOrderArgs) -> Result<()> {
         OrderDirection::Hype => market.hype_price,
         OrderDirection::Flop => market.flop_price,
     };
-
-    if price > 1_000_000 {
-        return Err(TriadProtocolError::InvalidPrice.into());
-    }
 
     // Check if order size is less than or equal to 1 share
     let total_shares = market.calculate_shares(args.amount, args.direction);
