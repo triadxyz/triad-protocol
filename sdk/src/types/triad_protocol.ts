@@ -190,18 +190,6 @@ export type TriadProtocol = {
         {
           name: 'userTrade'
           writable: true
-          pda: {
-            seeds: [
-              {
-                kind: 'const'
-                value: [117, 115, 101, 114, 95, 116, 114, 97, 100, 101]
-              },
-              {
-                kind: 'account'
-                path: 'signer'
-              }
-            ]
-          }
         },
         {
           name: 'market'
@@ -488,69 +476,8 @@ export type TriadProtocol = {
           }
         },
         {
-          name: 'feeVaultAta'
-          writable: true
-          pda: {
-            seeds: [
-              {
-                kind: 'account'
-                path: 'feeVault'
-              },
-              {
-                kind: 'account'
-                path: 'tokenProgram'
-              },
-              {
-                kind: 'account'
-                path: 'mint'
-              }
-            ]
-            program: {
-              kind: 'const'
-              value: [
-                140,
-                151,
-                37,
-                143,
-                78,
-                36,
-                137,
-                241,
-                187,
-                61,
-                16,
-                41,
-                20,
-                142,
-                13,
-                131,
-                11,
-                90,
-                19,
-                153,
-                218,
-                255,
-                16,
-                132,
-                4,
-                142,
-                123,
-                216,
-                219,
-                233,
-                248,
-                89
-              ]
-            }
-          }
-        },
-        {
           name: 'tokenProgram'
           address: 'TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb'
-        },
-        {
-          name: 'associatedTokenProgram'
-          address: 'ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL'
         },
         {
           name: 'systemProgram'
@@ -1928,7 +1855,7 @@ export type TriadProtocol = {
           },
           {
             name: 'totalVolume'
-            docs: ['Total trading volume (in TRD)']
+            docs: ['Total trading volume (in TRD) for all resolutions']
             type: 'u64'
           },
           {
@@ -1979,12 +1906,12 @@ export type TriadProtocol = {
             type: 'u64'
           },
           {
-            name: 'weeklyResults'
+            name: 'resolvedQuestions'
             type: {
               array: [
                 {
                   defined: {
-                    name: 'weeklyResult'
+                    name: 'resolvedQuestion'
                   }
                 },
                 4
@@ -1992,17 +1919,21 @@ export type TriadProtocol = {
             }
           },
           {
-            name: 'currentWeekId'
+            name: 'currentQuestionId'
             docs: [
               'Index of the current week in the weekly_results array initialized with default values'
             ]
-            type: 'u8'
+            type: 'u64'
           },
           {
-            name: 'currentWeekStart'
+            name: 'currentQuestionStart'
             docs: [
               'Start timestamp of the current week if 7 days have passed since the start of the week'
             ]
+            type: 'i64'
+          },
+          {
+            name: 'currentQuestionEnd'
             type: 'i64'
           },
           {
@@ -2015,7 +1946,7 @@ export type TriadProtocol = {
           {
             name: 'padding'
             type: {
-              array: ['u8', 224]
+              array: ['u8', 232]
             }
           }
         ]
@@ -2063,8 +1994,8 @@ export type TriadProtocol = {
             type: 'u64'
           },
           {
-            name: 'weekId'
-            type: 'u8'
+            name: 'questionId'
+            type: 'u64'
           },
           {
             name: 'marketId'
@@ -2088,10 +2019,7 @@ export type TriadProtocol = {
           },
           {
             name: 'totalAmount'
-            docs: [
-              'The total amount of TRD committed to this order',
-              'precision: QUOTE_PRECISION'
-            ]
+            docs: ['The total amount of TRD committed to this order']
             type: 'u64'
           },
           {
@@ -2116,10 +2044,9 @@ export type TriadProtocol = {
             }
           },
           {
-            name: 'settledPnl'
+            name: 'pnl'
             docs: [
-              'The amount of pnl settled in this market since opening the position (in TRD)',
-              'precision: QUOTE_PRECISION'
+              'The amount of pnl settled in this market since opening the position (in TRD)'
             ]
             type: 'i64'
           },
@@ -2158,12 +2085,6 @@ export type TriadProtocol = {
             name: 'open'
           },
           {
-            name: 'filled'
-          },
-          {
-            name: 'canceled'
-          },
-          {
             name: 'closed'
           }
         ]
@@ -2175,10 +2096,10 @@ export type TriadProtocol = {
         kind: 'enum'
         variants: [
           {
-            name: 'limit'
+            name: 'market'
           },
           {
-            name: 'market'
+            name: 'limit'
           }
         ]
       }
@@ -2194,6 +2115,10 @@ export type TriadProtocol = {
           },
           {
             name: 'marketId'
+            type: 'u64'
+          },
+          {
+            name: 'questionId'
             type: 'u64'
           },
           {
@@ -2251,8 +2176,18 @@ export type TriadProtocol = {
             }
           },
           {
+            name: 'pnl'
+            type: 'i64'
+          },
+          {
             name: 'timestamp'
             type: 'i64'
+          },
+          {
+            name: 'isQuestionWinner'
+            type: {
+              option: 'bool'
+            }
           }
         ]
       }
@@ -2296,6 +2231,70 @@ export type TriadProtocol = {
               option: {
                 array: ['u8', 64]
               }
+            }
+          }
+        ]
+      }
+    },
+    {
+      name: 'resolvedQuestion'
+      type: {
+        kind: 'struct'
+        fields: [
+          {
+            name: 'question'
+            docs: ['The question or prediction topic for this week']
+            type: {
+              array: ['u8', 120]
+            }
+          },
+          {
+            name: 'startTime'
+            docs: ['Start timestamp of the week']
+            type: 'i64'
+          },
+          {
+            name: 'endTime'
+            docs: ['End timestamp of the week']
+            type: 'i64'
+          },
+          {
+            name: 'hypeLiquidity'
+            docs: ['Total liquidity for Hype (in TRD)']
+            type: 'u64'
+          },
+          {
+            name: 'flopLiquidity'
+            docs: ['Total liquidity for Flop (in TRD)']
+            type: 'u64'
+          },
+          {
+            name: 'winningDirection'
+            docs: ['The winning direction (Hype, Flop or None)']
+            type: {
+              defined: {
+                name: 'winningDirection'
+              }
+            }
+          },
+          {
+            name: 'marketPrice'
+            type: 'u64'
+          },
+          {
+            name: 'finalHypePrice'
+            docs: ['Final price for Hype outcome at the end of the week']
+            type: 'u64'
+          },
+          {
+            name: 'finalFlopPrice'
+            docs: ['Final price for Flop outcome at the end of the week']
+            type: 'u64'
+          },
+          {
+            name: 'padding'
+            type: {
+              array: ['u8', 100]
             }
           }
         ]
@@ -2604,45 +2603,18 @@ export type TriadProtocol = {
       }
     },
     {
-      name: 'weeklyResult'
+      name: 'winningDirection'
       type: {
-        kind: 'struct'
-        fields: [
+        kind: 'enum'
+        variants: [
           {
-            name: 'question'
-            docs: ['The question or prediction topic for this week']
-            type: {
-              array: ['u8', 120]
-            }
+            name: 'hype'
           },
           {
-            name: 'startTime'
-            docs: ['Start timestamp of the week']
-            type: 'i64'
+            name: 'flop'
           },
           {
-            name: 'endTime'
-            docs: ['End timestamp of the week']
-            type: 'i64'
-          },
-          {
-            name: 'winningDirection'
-            docs: ['The winning direction (Hype or Flop)']
-            type: {
-              defined: {
-                name: 'orderDirection'
-              }
-            }
-          },
-          {
-            name: 'finalHypePrice'
-            docs: ['Final price for Hype outcome at the end of the week']
-            type: 'u64'
-          },
-          {
-            name: 'finalFlopPrice'
-            docs: ['Final price for Flop outcome at the end of the week']
-            type: 'u64'
+            name: 'none'
           }
         ]
       }

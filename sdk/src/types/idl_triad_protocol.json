@@ -125,19 +125,7 @@
         },
         {
           "name": "user_trade",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [117, 115, 101, 114, 95, 116, 114, 97, 100, 101]
-              },
-              {
-                "kind": "account",
-                "path": "signer"
-              }
-            ]
-          }
+          "writable": true
         },
         {
           "name": "market",
@@ -366,40 +354,8 @@
           }
         },
         {
-          "name": "fee_vault_ata",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "account",
-                "path": "fee_vault"
-              },
-              {
-                "kind": "account",
-                "path": "token_program"
-              },
-              {
-                "kind": "account",
-                "path": "mint"
-              }
-            ],
-            "program": {
-              "kind": "const",
-              "value": [
-                140, 151, 37, 143, 78, 36, 137, 241, 187, 61, 16, 41, 20, 142,
-                13, 131, 11, 90, 19, 153, 218, 255, 16, 132, 4, 142, 123, 216,
-                219, 233, 248, 89
-              ]
-            }
-          }
-        },
-        {
           "name": "token_program",
           "address": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb"
-        },
-        {
-          "name": "associated_token_program",
-          "address": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"
         },
         {
           "name": "system_program",
@@ -1458,7 +1414,7 @@
           },
           {
             "name": "total_volume",
-            "docs": ["Total trading volume (in TRD)"],
+            "docs": ["Total trading volume (in TRD) for all resolutions"],
             "type": "u64"
           },
           {
@@ -1511,12 +1467,12 @@
             "type": "u64"
           },
           {
-            "name": "weekly_results",
+            "name": "resolved_questions",
             "type": {
               "array": [
                 {
                   "defined": {
-                    "name": "WeeklyResult"
+                    "name": "ResolvedQuestion"
                   }
                 },
                 4
@@ -1524,17 +1480,21 @@
             }
           },
           {
-            "name": "current_week_id",
+            "name": "current_question_id",
             "docs": [
               "Index of the current week in the weekly_results array initialized with default values"
             ],
-            "type": "u8"
+            "type": "u64"
           },
           {
-            "name": "current_week_start",
+            "name": "current_question_start",
             "docs": [
               "Start timestamp of the current week if 7 days have passed since the start of the week"
             ],
+            "type": "i64"
+          },
+          {
+            "name": "current_question_end",
             "type": "i64"
           },
           {
@@ -1547,7 +1507,7 @@
           {
             "name": "padding",
             "type": {
-              "array": ["u8", 224]
+              "array": ["u8", 232]
             }
           }
         ]
@@ -1595,8 +1555,8 @@
             "type": "u64"
           },
           {
-            "name": "week_id",
-            "type": "u8"
+            "name": "question_id",
+            "type": "u64"
           },
           {
             "name": "market_id",
@@ -1620,10 +1580,7 @@
           },
           {
             "name": "total_amount",
-            "docs": [
-              "The total amount of TRD committed to this order",
-              "precision: QUOTE_PRECISION"
-            ],
+            "docs": ["The total amount of TRD committed to this order"],
             "type": "u64"
           },
           {
@@ -1648,10 +1605,9 @@
             }
           },
           {
-            "name": "settled_pnl",
+            "name": "pnl",
             "docs": [
-              "The amount of pnl settled in this market since opening the position (in TRD)",
-              "precision: QUOTE_PRECISION"
+              "The amount of pnl settled in this market since opening the position (in TRD)"
             ],
             "type": "i64"
           },
@@ -1690,12 +1646,6 @@
             "name": "Open"
           },
           {
-            "name": "Filled"
-          },
-          {
-            "name": "Canceled"
-          },
-          {
             "name": "Closed"
           }
         ]
@@ -1707,10 +1657,10 @@
         "kind": "enum",
         "variants": [
           {
-            "name": "Limit"
+            "name": "Market"
           },
           {
-            "name": "Market"
+            "name": "Limit"
           }
         ]
       }
@@ -1726,6 +1676,10 @@
           },
           {
             "name": "market_id",
+            "type": "u64"
+          },
+          {
+            "name": "question_id",
             "type": "u64"
           },
           {
@@ -1783,8 +1737,18 @@
             }
           },
           {
+            "name": "pnl",
+            "type": "i64"
+          },
+          {
             "name": "timestamp",
             "type": "i64"
+          },
+          {
+            "name": "is_question_winner",
+            "type": {
+              "option": "bool"
+            }
           }
         ]
       }
@@ -1828,6 +1792,70 @@
               "option": {
                 "array": ["u8", 64]
               }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "ResolvedQuestion",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "question",
+            "docs": ["The question or prediction topic for this week"],
+            "type": {
+              "array": ["u8", 120]
+            }
+          },
+          {
+            "name": "start_time",
+            "docs": ["Start timestamp of the week"],
+            "type": "i64"
+          },
+          {
+            "name": "end_time",
+            "docs": ["End timestamp of the week"],
+            "type": "i64"
+          },
+          {
+            "name": "hype_liquidity",
+            "docs": ["Total liquidity for Hype (in TRD)"],
+            "type": "u64"
+          },
+          {
+            "name": "flop_liquidity",
+            "docs": ["Total liquidity for Flop (in TRD)"],
+            "type": "u64"
+          },
+          {
+            "name": "winning_direction",
+            "docs": ["The winning direction (Hype, Flop or None)"],
+            "type": {
+              "defined": {
+                "name": "WinningDirection"
+              }
+            }
+          },
+          {
+            "name": "market_price",
+            "type": "u64"
+          },
+          {
+            "name": "final_hype_price",
+            "docs": ["Final price for Hype outcome at the end of the week"],
+            "type": "u64"
+          },
+          {
+            "name": "final_flop_price",
+            "docs": ["Final price for Flop outcome at the end of the week"],
+            "type": "u64"
+          },
+          {
+            "name": "padding",
+            "type": {
+              "array": ["u8", 100]
             }
           }
         ]
@@ -2136,45 +2164,18 @@
       }
     },
     {
-      "name": "WeeklyResult",
+      "name": "WinningDirection",
       "type": {
-        "kind": "struct",
-        "fields": [
+        "kind": "enum",
+        "variants": [
           {
-            "name": "question",
-            "docs": ["The question or prediction topic for this week"],
-            "type": {
-              "array": ["u8", 120]
-            }
+            "name": "Hype"
           },
           {
-            "name": "start_time",
-            "docs": ["Start timestamp of the week"],
-            "type": "i64"
+            "name": "Flop"
           },
           {
-            "name": "end_time",
-            "docs": ["End timestamp of the week"],
-            "type": "i64"
-          },
-          {
-            "name": "winning_direction",
-            "docs": ["The winning direction (Hype or Flop)"],
-            "type": {
-              "defined": {
-                "name": "OrderDirection"
-              }
-            }
-          },
-          {
-            "name": "final_hype_price",
-            "docs": ["Final price for Hype outcome at the end of the week"],
-            "type": "u64"
-          },
-          {
-            "name": "final_flop_price",
-            "docs": ["Final price for Flop outcome at the end of the week"],
-            "type": "u64"
+            "name": "None"
           }
         ]
       }

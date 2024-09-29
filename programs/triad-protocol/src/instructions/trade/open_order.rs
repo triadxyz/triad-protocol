@@ -61,7 +61,8 @@ pub struct OpenOrder<'info> {
     pub market_to_ata: Box<InterfaceAccount<'info, TokenAccount>>,
 
     #[account(
-        mut,
+        init_if_needed,
+        payer = signer,
         associated_token::mint = mint,
         associated_token::authority = fee_vault,
         associated_token::token_program = token_program
