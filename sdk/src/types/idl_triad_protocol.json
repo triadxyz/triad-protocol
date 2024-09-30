@@ -1076,6 +1076,10 @@
     {
       "name": "PriceUpdate",
       "discriminator": [222, 51, 180, 226, 165, 188, 203, 54]
+    },
+    {
+      "name": "QuestionUpdate",
+      "discriminator": [110, 108, 240, 86, 176, 226, 54, 113]
     }
   ],
   "errors": [
@@ -1797,10 +1801,82 @@
       }
     },
     {
+      "name": "QuestionUpdate",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "market_id",
+            "type": "u64"
+          },
+          {
+            "name": "question_id",
+            "type": "u64"
+          },
+          {
+            "name": "question",
+            "type": "string"
+          },
+          {
+            "name": "start_time",
+            "type": "i64"
+          },
+          {
+            "name": "end_time",
+            "type": "i64"
+          },
+          {
+            "name": "hype_liquidity",
+            "type": "u64"
+          },
+          {
+            "name": "flop_liquidity",
+            "type": "u64"
+          },
+          {
+            "name": "winning_direction",
+            "type": {
+              "defined": {
+                "name": "WinningDirection"
+              }
+            }
+          },
+          {
+            "name": "market_price",
+            "type": "u64"
+          },
+          {
+            "name": "final_hype_price",
+            "type": "u64"
+          },
+          {
+            "name": "final_flop_price",
+            "type": "u64"
+          },
+          {
+            "name": "direction",
+            "type": {
+              "defined": {
+                "name": "OrderDirection"
+              }
+            }
+          },
+          {
+            "name": "timestamp",
+            "type": "i64"
+          }
+        ]
+      }
+    },
+    {
       "name": "ResolvedQuestion",
       "type": {
         "kind": "struct",
         "fields": [
+          {
+            "name": "question_id",
+            "type": "u64"
+          },
           {
             "name": "question",
             "docs": ["The question or prediction topic for this week"],
@@ -1854,7 +1930,7 @@
           {
             "name": "padding",
             "type": {
-              "array": ["u8", 64]
+              "array": ["u8", 56]
             }
           }
         ]

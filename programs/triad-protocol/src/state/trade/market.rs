@@ -54,6 +54,7 @@ pub struct Market {
 
 #[derive(AnchorSerialize, AnchorDeserialize, Clone, Copy)]
 pub struct ResolvedQuestion {
+    pub question_id: u64,
     /// The question or prediction topic for this week
     pub question: [u8; 80],
     /// Start timestamp of the week
@@ -71,7 +72,7 @@ pub struct ResolvedQuestion {
     pub final_hype_price: u64,
     /// Final price for Flop outcome at the end of the week
     pub final_flop_price: u64,
-    pub padding: [u8; 64],
+    pub padding: [u8; 56],
 }
 
 #[derive(AnchorSerialize, AnchorDeserialize, Clone, Copy)]
@@ -90,6 +91,7 @@ pub struct InitializeMarketArgs {
 impl Default for ResolvedQuestion {
     fn default() -> Self {
         Self {
+            question_id: 0,
             question: [0; 80],
             start_time: 0,
             end_time: 0,
@@ -99,7 +101,7 @@ impl Default for ResolvedQuestion {
             market_price: 0,
             final_hype_price: 500_000,
             final_flop_price: 500_000,
-            padding: [0; 64],
+            padding: [0; 56],
         }
     }
 }

@@ -1517,6 +1517,10 @@ export type TriadProtocol = {
     {
       name: 'priceUpdate'
       discriminator: [222, 51, 180, 226, 165, 188, 203, 54]
+    },
+    {
+      name: 'questionUpdate'
+      discriminator: [110, 108, 240, 86, 176, 226, 54, 113]
     }
   ]
   errors: [
@@ -2236,10 +2240,82 @@ export type TriadProtocol = {
       }
     },
     {
+      name: 'questionUpdate'
+      type: {
+        kind: 'struct'
+        fields: [
+          {
+            name: 'marketId'
+            type: 'u64'
+          },
+          {
+            name: 'questionId'
+            type: 'u64'
+          },
+          {
+            name: 'question'
+            type: 'string'
+          },
+          {
+            name: 'startTime'
+            type: 'i64'
+          },
+          {
+            name: 'endTime'
+            type: 'i64'
+          },
+          {
+            name: 'hypeLiquidity'
+            type: 'u64'
+          },
+          {
+            name: 'flopLiquidity'
+            type: 'u64'
+          },
+          {
+            name: 'winningDirection'
+            type: {
+              defined: {
+                name: 'winningDirection'
+              }
+            }
+          },
+          {
+            name: 'marketPrice'
+            type: 'u64'
+          },
+          {
+            name: 'finalHypePrice'
+            type: 'u64'
+          },
+          {
+            name: 'finalFlopPrice'
+            type: 'u64'
+          },
+          {
+            name: 'direction'
+            type: {
+              defined: {
+                name: 'orderDirection'
+              }
+            }
+          },
+          {
+            name: 'timestamp'
+            type: 'i64'
+          }
+        ]
+      }
+    },
+    {
       name: 'resolvedQuestion'
       type: {
         kind: 'struct'
         fields: [
+          {
+            name: 'questionId'
+            type: 'u64'
+          },
           {
             name: 'question'
             docs: ['The question or prediction topic for this week']
@@ -2293,7 +2369,7 @@ export type TriadProtocol = {
           {
             name: 'padding'
             type: {
-              array: ['u8', 64]
+              array: ['u8', 56]
             }
           }
         ]
