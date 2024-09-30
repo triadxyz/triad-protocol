@@ -9,7 +9,7 @@ pub struct CreateUser<'info> {
     pub signer: Signer<'info>,
 
     #[account(mut)]
-    pub referral: Account<'info, User>,
+    pub referral: Box<Account<'info, User>>,
 
     #[account(
         init,
@@ -18,7 +18,7 @@ pub struct CreateUser<'info> {
         seeds = [User::PREFIX_SEED, signer.key().as_ref()],
         bump
     )]
-    pub user: Account<'info, User>,
+    pub user: Box<Account<'info, User>>,
 
     #[account(
         init,
@@ -27,7 +27,7 @@ pub struct CreateUser<'info> {
         seeds = [UserTrade::PREFIX_SEED, signer.key().as_ref()],
         bump
     )]
-    pub user_trade: Account<'info, UserTrade>,
+    pub user_trade: Box<Account<'info, UserTrade>>,
 
     pub system_program: Program<'info, System>,
 }
@@ -36,6 +36,8 @@ pub fn create_user(ctx: Context<CreateUser>, args: CreateUserArgs) -> Result<()>
     let user: &mut Account<User> = &mut ctx.accounts.user;
     let referral: &mut Account<User> = &mut ctx.accounts.referral;
     let user_trade = &mut ctx.accounts.user_trade;
+
+    let mut referral_key = Pubkey::default();
 
     user_trade.set_inner(UserTrade {
         bump: ctx.bumps.user_trade,
@@ -47,11 +49,16 @@ pub fn create_user(ctx: Context<CreateUser>, args: CreateUserArgs) -> Result<()>
         padding: [0; 32],
     });
 
+    if referral.key() != user.key() {
+        referral_key = referral.key();
+        referral.referred += 1;
+    }
+
     user.set_inner(User {
         ts: Clock::get()?.unix_timestamp,
         bump: ctx.bumps.user,
         authority: *ctx.accounts.signer.key,
-        referral: referral.key(),
+        referral: referral_key,
         referred: 0,
         name: args.name,
         swaps: 0,
@@ -60,8 +67,6 @@ pub fn create_user(ctx: Context<CreateUser>, args: CreateUserArgs) -> Result<()>
         first_swap: 0,
         user_trade: user_trade.key(),
     });
-
-    referral.referred += 1;
 
     Ok(())
 }

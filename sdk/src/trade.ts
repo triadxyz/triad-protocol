@@ -152,6 +152,20 @@ export default class Trade {
     const ixs: TransactionInstruction[] = []
 
     try {
+      await this.program.account.user.fetch(userPDA)
+    } catch {
+      await this.program.methods
+        .createUser({
+          name: 'dannpl'
+        })
+        .accounts({
+          signer: this.provider.publicKey,
+          referral: this.provider.publicKey
+        })
+        .rpc()
+    }
+
+    try {
       await this.program.account.userTrade.fetch(userTradePDA)
     } catch {
       ixs.push(
