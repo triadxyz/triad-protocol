@@ -37,8 +37,6 @@ pub fn create_user(ctx: Context<CreateUser>, args: CreateUserArgs) -> Result<()>
     let referral: &mut Account<User> = &mut ctx.accounts.referral;
     let user_trade = &mut ctx.accounts.user_trade;
 
-    let mut referral_key = Pubkey::default();
-
     user_trade.set_inner(UserTrade {
         bump: ctx.bumps.user_trade,
         authority: ctx.accounts.signer.key(),
@@ -49,16 +47,11 @@ pub fn create_user(ctx: Context<CreateUser>, args: CreateUserArgs) -> Result<()>
         padding: [0; 32],
     });
 
-    if referral.key() != user.key() {
-        referral_key = referral.key();
-        referral.referred += 1;
-    }
-
     user.set_inner(User {
         ts: Clock::get()?.unix_timestamp,
         bump: ctx.bumps.user,
         authority: *ctx.accounts.signer.key,
-        referral: referral_key,
+        referral: referral.key(),
         referred: 0,
         name: args.name,
         swaps: 0,
@@ -67,6 +60,8 @@ pub fn create_user(ctx: Context<CreateUser>, args: CreateUserArgs) -> Result<()>
         first_swap: 0,
         user_trade: user_trade.key(),
     });
+
+    referral.referred += 1;
 
     Ok(())
 }

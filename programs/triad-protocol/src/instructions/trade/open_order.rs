@@ -39,16 +39,10 @@ pub struct OpenOrder<'info> {
     )]
     pub fee_vault: Box<Account<'info, FeeVault>>,
 
-    #[account(mut, constraint = mint.key() == market.mint)]
+    #[account(mut)]
     pub mint: Box<InterfaceAccount<'info, Mint>>,
 
-    #[account(
-        mut, 
-        constraint = user_from_ata.amount >= args.amount,
-        associated_token::mint = mint,
-        associated_token::authority = signer,
-        associated_token::token_program = token_program
-    )]
+    #[account(mut, constraint = user_from_ata.amount >= args.amount)]
     pub user_from_ata: Box<InterfaceAccount<'info, TokenAccount>>,
 
     #[account(
@@ -61,8 +55,7 @@ pub struct OpenOrder<'info> {
     pub market_to_ata: Box<InterfaceAccount<'info, TokenAccount>>,
 
     #[account(
-        init_if_needed,
-        payer = signer,
+        mut,
         associated_token::mint = mint,
         associated_token::authority = fee_vault,
         associated_token::token_program = token_program
@@ -137,7 +130,7 @@ pub fn open_order(ctx: Context<OpenOrder>, args: OpenOrderArgs) -> Result<()> {
         }
     }
 
-    let fee_amount = (((total_amount as u64) * (market.fee_bps as u64)) / 10000) as u64;
+    let fee_amount = (((total_amount as u64) * (market.fee_bps as u64)) / 100000) as u64;
     let net_amount = total_amount.saturating_sub(fee_amount);
 
     // Update FeeVault state

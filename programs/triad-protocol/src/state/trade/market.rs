@@ -40,23 +40,22 @@ pub struct Market {
     pub fee_vault: Pubkey,
     /// Whether the market is currently active for trading
     pub is_active: bool,
-    pub is_official: bool,
     pub market_price: u64,
-    pub resolved_questions: [ResolvedQuestion; 4],
+    pub previous_resolved_question: ResolvedQuestion,
     /// Index of the current week in the weekly_results array initialized with default values
     pub current_question_id: u64,
     /// Start timestamp of the current week if 7 days have passed since the start of the week
     pub current_question_start: i64,
     pub current_question_end: i64,
     /// The question or prediction topic for the current week
-    pub current_question: [u8; 120],
-    pub padding: [u8; 232],
+    pub current_question: [u8; 80],
+    pub padding: [u8; 180],
 }
 
 #[derive(AnchorSerialize, AnchorDeserialize, Clone, Copy)]
 pub struct ResolvedQuestion {
     /// The question or prediction topic for this week
-    pub question: [u8; 120],
+    pub question: [u8; 80],
     /// Start timestamp of the week
     pub start_time: i64,
     /// End timestamp of the week
@@ -72,7 +71,7 @@ pub struct ResolvedQuestion {
     pub final_hype_price: u64,
     /// Final price for Flop outcome at the end of the week
     pub final_flop_price: u64,
-    pub padding: [u8; 100],
+    pub padding: [u8; 64],
 }
 
 #[derive(AnchorSerialize, AnchorDeserialize, Clone, Copy)]
@@ -91,7 +90,7 @@ pub struct InitializeMarketArgs {
 impl Default for ResolvedQuestion {
     fn default() -> Self {
         Self {
-            question: [0; 120],
+            question: [0; 80],
             start_time: 0,
             end_time: 0,
             hype_liquidity: 0,
@@ -100,7 +99,7 @@ impl Default for ResolvedQuestion {
             market_price: 0,
             final_hype_price: 500_000,
             final_flop_price: 500_000,
-            padding: [0; 100],
+            padding: [0; 64],
         }
     }
 }
@@ -127,14 +126,13 @@ impl Default for Market {
             fee_bps: 1131, // 1.131% fee
             fee_vault: Pubkey::default(),
             is_active: true,
-            is_official: true,
             market_price: 0,
-            resolved_questions: [ResolvedQuestion::default(); 4],
+            previous_resolved_question: ResolvedQuestion::default(),
             current_question_id: 0,
             current_question_start: 0,
             current_question_end: 0,
-            current_question: [0; 120],
-            padding: [0; 232],
+            current_question: [0; 80],
+            padding: [0; 180],
         }
     }
 }
@@ -170,15 +168,22 @@ impl Market {
 
         match direction {
             OrderDirection::Hype => {
+                self.hype_liquidity += amount;
                 let new_hype_price = ((self.hype_price as f64) * (1.0 + price_impact)) as u64;
+                self.hype_price = new_hype_price.min(999_999);
+            }
+            OrderDirection::Flop => {
+                self.flop_liquidity += amount;
+                let new_flop_price = ((self.flop_price as f64) * (1.0 + price_impact)) as u64;
+                self.flop_price = new_flop_price.min(999_999);
+            }
+        }
 
-                self.hype_price = new_hype_price.min(1_000_000);
+        match direction {
+            OrderDirection::Hype => {
                 self.flop_price = 1_000_000 - self.hype_price;
             }
             OrderDirection::Flop => {
-                let new_flop_price = ((self.flop_price as f64) * (1.0 + price_impact)) as u64;
-
-                self.flop_price = new_flop_price.min(1_000_000);
                 self.hype_price = 1_000_000 - self.flop_price;
             }
         }
@@ -195,10 +200,10 @@ impl Market {
             market_id: self.market_id,
             hype_price: self.hype_price,
             flop_price: self.flop_price,
-            direction: direction,
-            market_price: market_price,
+            direction,
+            market_price,
             timestamp: Clock::get()?.unix_timestamp,
-            comment: comment,
+            comment,
         });
 
         Ok(())

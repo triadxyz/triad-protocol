@@ -5,7 +5,7 @@
  * IDL can be found at `target/idl/triad_protocol.json`.
  */
 export type TriadProtocol = {
-  address: 'D6CzYj9FxGa8HeQeF1JYu9hDakEuEeMJkSG2awGPuCXG'
+  address: '4YWv2Ex8WjFGyXmYELD6Xqs1ZsuQujVUzZxbvdvM2tCj'
   metadata: {
     name: 'triadProtocol'
     version: '0.1.4'
@@ -476,58 +476,13 @@ export type TriadProtocol = {
           }
         },
         {
-          name: 'tokenProgram'
-          address: 'TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb'
-        },
-        {
-          name: 'systemProgram'
-          address: '11111111111111111111111111111111'
-        }
-      ]
-      args: [
-        {
-          name: 'args'
-          type: {
-            defined: {
-              name: 'initializeMarketArgs'
-            }
-          }
-        }
-      ]
-    },
-    {
-      name: 'openOrder'
-      discriminator: [206, 88, 88, 143, 38, 136, 50, 224]
-      accounts: [
-        {
-          name: 'signer'
-          writable: true
-          signer: true
-        },
-        {
-          name: 'userTrade'
-          writable: true
-        },
-        {
-          name: 'market'
-          writable: true
-        },
-        {
-          name: 'feeVault'
-          writable: true
-        },
-        {
-          name: 'mint'
-          writable: true
-        },
-        {
-          name: 'userFromAta'
+          name: 'feeAta'
           writable: true
           pda: {
             seeds: [
               {
                 kind: 'account'
-                path: 'signer'
+                path: 'feeVault'
               },
               {
                 kind: 'account'
@@ -576,6 +531,59 @@ export type TriadProtocol = {
               ]
             }
           }
+        },
+        {
+          name: 'tokenProgram'
+          address: 'TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb'
+        },
+        {
+          name: 'associatedTokenProgram'
+          address: 'ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL'
+        },
+        {
+          name: 'systemProgram'
+          address: '11111111111111111111111111111111'
+        }
+      ]
+      args: [
+        {
+          name: 'args'
+          type: {
+            defined: {
+              name: 'initializeMarketArgs'
+            }
+          }
+        }
+      ]
+    },
+    {
+      name: 'openOrder'
+      discriminator: [206, 88, 88, 143, 38, 136, 50, 224]
+      accounts: [
+        {
+          name: 'signer'
+          writable: true
+          signer: true
+        },
+        {
+          name: 'userTrade'
+          writable: true
+        },
+        {
+          name: 'market'
+          writable: true
+        },
+        {
+          name: 'feeVault'
+          writable: true
+        },
+        {
+          name: 'mint'
+          writable: true
+        },
+        {
+          name: 'userFromAta'
+          writable: true
         },
         {
           name: 'marketToAta'
@@ -1898,24 +1906,15 @@ export type TriadProtocol = {
             type: 'bool'
           },
           {
-            name: 'isOfficial'
-            type: 'bool'
-          },
-          {
             name: 'marketPrice'
             type: 'u64'
           },
           {
-            name: 'resolvedQuestions'
+            name: 'previousResolvedQuestion'
             type: {
-              array: [
-                {
-                  defined: {
-                    name: 'resolvedQuestion'
-                  }
-                },
-                4
-              ]
+              defined: {
+                name: 'resolvedQuestion'
+              }
             }
           },
           {
@@ -1940,13 +1939,13 @@ export type TriadProtocol = {
             name: 'currentQuestion'
             docs: ['The question or prediction topic for the current week']
             type: {
-              array: ['u8', 120]
+              array: ['u8', 80]
             }
           },
           {
             name: 'padding'
             type: {
-              array: ['u8', 232]
+              array: ['u8', 180]
             }
           }
         ]
@@ -2245,7 +2244,7 @@ export type TriadProtocol = {
             name: 'question'
             docs: ['The question or prediction topic for this week']
             type: {
-              array: ['u8', 120]
+              array: ['u8', 80]
             }
           },
           {
@@ -2294,7 +2293,7 @@ export type TriadProtocol = {
           {
             name: 'padding'
             type: {
-              array: ['u8', 100]
+              array: ['u8', 64]
             }
           }
         ]

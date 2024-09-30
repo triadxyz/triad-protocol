@@ -21,6 +21,29 @@ export type Market = {
   isActive: boolean
   marketPrice: string
   isOfficial: boolean
+  previousResolvedQuestion: ResolvedQuestion
+  currentQuestionId: string
+  currentQuestionStart: string
+  currentQuestionEnd: string
+  currentQuestion: string
+}
+
+export type ResolvedQuestion = {
+  question: string
+  startTime: string
+  endTime: string
+  hypeLiquidity: string
+  flopLiquidity: string
+  winningDirection: WinningDirection
+  marketPrice: string
+  finalHypePrice: string
+  finalFlopPrice: string
+}
+
+export enum WinningDirection {
+  Hype = 'Hype',
+  Flop = 'Flop',
+  None = 'None'
 }
 
 export type OrderDirection =

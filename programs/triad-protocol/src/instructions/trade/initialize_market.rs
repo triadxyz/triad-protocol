@@ -1,6 +1,6 @@
 use anchor_lang::prelude::*;
 use anchor_spl::token_2022::Token2022;
-use anchor_spl::token_interface::Mint;
+use anchor_spl::{ associated_token::AssociatedToken, token_interface::{ Mint, TokenAccount } };
 
 use crate::{ state::{ Market, InitializeMarketArgs, FeeVault }, constraints::is_admin };
 
@@ -31,7 +31,17 @@ pub struct InitializeMarket<'info> {
     )]
     pub fee_vault: Box<Account<'info, FeeVault>>,
 
+    #[account(
+        init,
+        payer = signer,
+        associated_token::mint = mint,
+        associated_token::authority = fee_vault,
+        associated_token::token_program = token_program
+    )]
+    pub fee_ata: Box<InterfaceAccount<'info, TokenAccount>>,
+
     pub token_program: Program<'info, Token2022>,
+    pub associated_token_program: Program<'info, AssociatedToken>,
     pub system_program: Program<'info, System>,
 }
 

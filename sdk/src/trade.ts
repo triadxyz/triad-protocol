@@ -11,13 +11,13 @@ import { Market, OrderDirection, OrderType } from './types/trade'
 import { RpcOptions } from './types'
 import BN from 'bn.js'
 import { TRD_DECIMALS, TRD_MINT_DEVNET } from './utils/constants'
-import { encodeString } from './utils/helpers'
+import { accountToMarket, encodeString } from './utils/helpers'
 import {
   getFeeVaultPDA,
   getMarketPDA,
   getUserTradePDA
 } from './utils/pda/trade'
-import { getUserPDA } from './utils/pda'
+import { getTokenATA, getUserPDA } from './utils/pda'
 
 export default class Trade {
   program: Program<TriadProtocol>
@@ -33,61 +33,19 @@ export default class Trade {
    * Get all Markets
    */
   async getMarkets(): Promise<Market[]> {
-    return this.program.account.market.all().then((markets) =>
-      markets.map(({ account, publicKey }) => ({
-        bump: account.bump,
-        address: publicKey.toString(),
-        authority: account.authority.toString(),
-        marketId: account.marketId.toString(),
-        name: account.name,
-        hypePrice: account.hypePrice.toString(),
-        flopPrice: account.flopPrice.toString(),
-        hypeLiquidity: account.hypeLiquidity.toString(),
-        flopLiquidity: account.flopLiquidity.toString(),
-        totalHypeShares: account.totalHypeShares.toString(),
-        totalFlopShares: account.totalFlopShares.toString(),
-        totalVolume: account.totalVolume.toString(),
-        mint: account.mint.toString(),
-        ts: account.ts.toString(),
-        updateTs: account.updateTs.toString(),
-        openOrdersCount: account.openOrdersCount.toString(),
-        nextOrderId: account.nextOrderId.toString(),
-        feeBps: account.feeBps,
-        feeVault: account.feeVault.toBase58(),
-        isActive: account.isActive,
-        marketPrice: account.marketPrice.toString(),
-        isOfficial: account.isOfficial
-      }))
-    )
+    return this.program.account.market
+      .all()
+      .then((markets) =>
+        markets.map(({ account, publicKey }) =>
+          accountToMarket(account, publicKey)
+        )
+      )
   }
 
   async getMarketByAddress(address: PublicKey): Promise<Market> {
     const account = await this.program.account.market.fetch(address)
 
-    return {
-      bump: account.bump,
-      address: address.toString(),
-      authority: account.authority.toString(),
-      marketId: account.marketId.toString(),
-      name: account.name,
-      hypePrice: account.hypePrice.toString(),
-      flopPrice: account.flopPrice.toString(),
-      hypeLiquidity: account.hypeLiquidity.toString(),
-      flopLiquidity: account.flopLiquidity.toString(),
-      totalHypeShares: account.totalHypeShares.toString(),
-      totalFlopShares: account.totalFlopShares.toString(),
-      totalVolume: account.totalVolume.toString(),
-      mint: account.mint.toString(),
-      ts: account.ts.toString(),
-      updateTs: account.updateTs.toString(),
-      openOrdersCount: account.openOrdersCount.toString(),
-      nextOrderId: account.nextOrderId.toString(),
-      feeBps: account.feeBps,
-      feeVault: account.feeVault.toBase58(),
-      isActive: account.isActive,
-      marketPrice: account.marketPrice.toString(),
-      isOfficial: account.isOfficial
-    }
+    return accountToMarket(account, address)
   }
 
   /**
@@ -100,6 +58,9 @@ export default class Trade {
     { marketId, name }: { marketId: number; name: string },
     options?: RpcOptions
   ): Promise<string> {
+    const marketPDA = getMarketPDA(this.program.programId, marketId)
+    const feeVaultPDA = getFeeVaultPDA(this.program.programId, marketId)
+
     const method = this.program.methods
       .initializeMarket({
         marketId: new BN(marketId),
@@ -148,22 +109,9 @@ export default class Trade {
       this.provider.publicKey
     )
     const userPDA = getUserPDA(this.program.programId, this.provider.publicKey)
+    const userFromATA = getTokenATA(this.provider.publicKey, this.mint)
 
     const ixs: TransactionInstruction[] = []
-
-    try {
-      await this.program.account.user.fetch(userPDA)
-    } catch {
-      await this.program.methods
-        .createUser({
-          name: 'dannpl'
-        })
-        .accounts({
-          signer: this.provider.publicKey,
-          referral: this.provider.publicKey
-        })
-        .rpc()
-    }
 
     try {
       await this.program.account.userTrade.fetch(userTradePDA)
@@ -191,7 +139,8 @@ export default class Trade {
           market: marketPDA,
           feeVault: feeVualtPDA,
           userTrade: userTradePDA,
-          mint: this.mint
+          mint: this.mint,
+          userFromAta: userFromATA
         })
         .instruction()
     )
@@ -227,11 +176,16 @@ export default class Trade {
     options?: RpcOptions
   ): Promise<string> {
     const marketPDA = getMarketPDA(this.program.programId, marketId)
+    const userTradePDA = getUserTradePDA(
+      this.program.programId,
+      this.provider.publicKey
+    )
 
     const method = this.program.methods.closeOrder(new BN(orderId)).accounts({
       signer: this.provider.publicKey,
       market: marketPDA,
-      mint: this.mint
+      mint: this.mint,
+      userTrade: userTradePDA
     })
 
     if (options?.microLamports) {

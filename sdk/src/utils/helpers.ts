@@ -1,5 +1,7 @@
 import { Stake, StakeVault } from './../types/stake'
 import { User } from './../types'
+import { ResolvedQuestion, Market, WinningDirection } from '../types/trade'
+import { PublicKey } from '@solana/web3.js'
 
 export const encodeString = (value: string, alloc = 32): number[] => {
   const buffer = Buffer.alloc(alloc)
@@ -61,5 +63,55 @@ export const formatUser = (user: any): User => {
     swaps: user.swaps,
     staked: user.staked.toNumber(),
     name: user.name
+  }
+}
+
+export const accountToMarket = (account: any, address: PublicKey): Market => {
+  return {
+    bump: account.bump,
+    address: address.toString(),
+    authority: account.authority.toString(),
+    marketId: account.marketId.toString(),
+    name: account.name,
+    hypePrice: account.hypePrice.toString(),
+    flopPrice: account.flopPrice.toString(),
+    hypeLiquidity: account.hypeLiquidity.toString(),
+    flopLiquidity: account.flopLiquidity.toString(),
+    totalHypeShares: account.totalHypeShares.toString(),
+    totalFlopShares: account.totalFlopShares.toString(),
+    totalVolume: account.totalVolume.toString(),
+    mint: account.mint.toString(),
+    ts: account.ts.toString(),
+    updateTs: account.updateTs.toString(),
+    openOrdersCount: account.openOrdersCount.toString(),
+    nextOrderId: account.nextOrderId.toString(),
+    feeBps: account.feeBps,
+    feeVault: account.feeVault.toBase58(),
+    isActive: account.isActive,
+    marketPrice: account.marketPrice.toString(),
+    isOfficial: account.isOfficial,
+    previousResolvedQuestion: accountToResolvedQuestion(
+      account.previousResolvedQuestion
+    ),
+    currentQuestionId: account.currentQuestionId.toString(),
+    currentQuestionStart: account.currentQuestionStart.toString(),
+    currentQuestionEnd: account.currentQuestionEnd.toString(),
+    currentQuestion: Buffer.from(account.currentQuestion)
+      .toString()
+      .replace(/\0+$/, '')
+  }
+}
+
+const accountToResolvedQuestion = (question: any): ResolvedQuestion => {
+  return {
+    question: Buffer.from(question.question).toString().replace(/\0+$/, ''),
+    startTime: question.startTime.toString(),
+    endTime: question.endTime.toString(),
+    hypeLiquidity: question.hypeLiquidity.toString(),
+    flopLiquidity: question.flopLiquidity.toString(),
+    winningDirection: WinningDirection[question.winningDirection],
+    marketPrice: question.marketPrice.toString(),
+    finalHypePrice: question.finalHypePrice.toString(),
+    finalFlopPrice: question.finalFlopPrice.toString()
   }
 }

@@ -1,5 +1,5 @@
 {
-  "address": "D6CzYj9FxGa8HeQeF1JYu9hDakEuEeMJkSG2awGPuCXG",
+  "address": "4YWv2Ex8WjFGyXmYELD6Xqs1ZsuQujVUzZxbvdvM2tCj",
   "metadata": {
     "name": "triad_protocol",
     "version": "0.1.4",
@@ -354,8 +354,40 @@
           }
         },
         {
+          "name": "fee_ata",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "account",
+                "path": "fee_vault"
+              },
+              {
+                "kind": "account",
+                "path": "token_program"
+              },
+              {
+                "kind": "account",
+                "path": "mint"
+              }
+            ],
+            "program": {
+              "kind": "const",
+              "value": [
+                140, 151, 37, 143, 78, 36, 137, 241, 187, 61, 16, 41, 20, 142,
+                13, 131, 11, 90, 19, 153, 218, 255, 16, 132, 4, 142, 123, 216,
+                219, 233, 248, 89
+              ]
+            }
+          }
+        },
+        {
           "name": "token_program",
           "address": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb"
+        },
+        {
+          "name": "associated_token_program",
+          "address": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"
         },
         {
           "name": "system_program",
@@ -400,31 +432,7 @@
         },
         {
           "name": "user_from_ata",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "account",
-                "path": "signer"
-              },
-              {
-                "kind": "account",
-                "path": "token_program"
-              },
-              {
-                "kind": "account",
-                "path": "mint"
-              }
-            ],
-            "program": {
-              "kind": "const",
-              "value": [
-                140, 151, 37, 143, 78, 36, 137, 241, 187, 61, 16, 41, 20, 142,
-                13, 131, 11, 90, 19, 153, 218, 255, 16, 132, 4, 142, 123, 216,
-                219, 233, 248, 89
-              ]
-            }
-          }
+          "writable": true
         },
         {
           "name": "market_to_ata",
@@ -1459,24 +1467,15 @@
             "type": "bool"
           },
           {
-            "name": "is_official",
-            "type": "bool"
-          },
-          {
             "name": "market_price",
             "type": "u64"
           },
           {
-            "name": "resolved_questions",
+            "name": "previous_resolved_question",
             "type": {
-              "array": [
-                {
-                  "defined": {
-                    "name": "ResolvedQuestion"
-                  }
-                },
-                4
-              ]
+              "defined": {
+                "name": "ResolvedQuestion"
+              }
             }
           },
           {
@@ -1501,13 +1500,13 @@
             "name": "current_question",
             "docs": ["The question or prediction topic for the current week"],
             "type": {
-              "array": ["u8", 120]
+              "array": ["u8", 80]
             }
           },
           {
             "name": "padding",
             "type": {
-              "array": ["u8", 232]
+              "array": ["u8", 180]
             }
           }
         ]
@@ -1806,7 +1805,7 @@
             "name": "question",
             "docs": ["The question or prediction topic for this week"],
             "type": {
-              "array": ["u8", 120]
+              "array": ["u8", 80]
             }
           },
           {
@@ -1855,7 +1854,7 @@
           {
             "name": "padding",
             "type": {
-              "array": ["u8", 100]
+              "array": ["u8", 64]
             }
           }
         ]
