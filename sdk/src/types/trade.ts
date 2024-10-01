@@ -78,3 +78,17 @@ export type OrderType =
   | {
       market: {}
     }
+
+export type InitializeQuestionArgs = {
+  marketId: number
+  question: string
+  startTime: number
+  endTime: number
+}
+
+export type OpenOrderArgs = {
+  marketId: number
+  amount: number
+  direction: OrderDirection
+  comment?: string
+}

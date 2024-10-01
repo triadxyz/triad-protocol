@@ -1,6 +1,4 @@
 use anchor_lang::prelude::*;
-use anchor_spl::token_2022::Token2022;
-use anchor_spl::{ associated_token::AssociatedToken, token_interface::{ Mint, TokenAccount } };
 
 use crate::{
     state::{ Market, InitializeQuestionArgs },
@@ -18,19 +16,6 @@ pub struct InitializeQuestion<'info> {
     #[account(mut)]
     pub market: Box<Account<'info, Market>>,
 
-    #[account(mut, constraint = mint.key() == market.mint)]
-    pub mint: Box<InterfaceAccount<'info, Mint>>,
-
-    #[account(
-        mut,
-        associated_token::mint = mint,
-        associated_token::authority = market,
-        associated_token::token_program = token_program
-    )]
-    pub market_vault: Box<InterfaceAccount<'info, TokenAccount>>,
-
-    pub token_program: Program<'info, Token2022>,
-    pub associated_token_program: Program<'info, AssociatedToken>,
     pub system_program: Program<'info, System>,
 }
 

@@ -30,6 +30,8 @@ import {
 } from './utils/constants'
 import { toByteArray } from 'base64-js'
 import getRarityRank from './utils/getRarityRank'
+import sendVersionedTransaction from './utils/sendVersionedTransaction'
+import sendTransactionWithOptions from './utils/sendTransactionWithOptions'
 
 export default class Stake {
   program: Program<TriadProtocol>
@@ -179,30 +181,7 @@ export default class Stake {
       )
     }
 
-    if (options?.microLamports) {
-      ixs.push(
-        ComputeBudgetProgram.setComputeUnitPrice({
-          microLamports: options.microLamports
-        })
-      )
-    }
-
-    const { blockhash } = await this.provider.connection.getLatestBlockhash()
-
-    return this.provider.sendAndConfirm(
-      new VersionedTransaction(
-        new TransactionMessage({
-          instructions: ixs,
-          recentBlockhash: blockhash,
-          payerKey: wallet
-        }).compileToV0Message()
-      ),
-      [],
-      {
-        skipPreflight: options?.skipPreflight,
-        commitment: 'confirmed'
-      }
-    )
+    return sendVersionedTransaction(this.provider, ixs, options)
   }
 
   /**
@@ -218,27 +197,20 @@ export default class Stake {
   ) {
     const userPDA = getUserPDA(this.program.programId, wallet)
 
-    const method = this.program.methods
-      .stakeToken({
-        name,
-        amount: new BN(amount * 10 ** 6),
-        stakeVault: this.stakeVaultName
-      })
-      .accounts({
-        signer: wallet,
-        mint: TRD_MINT,
-        user: userPDA
-      })
-
-    if (options?.microLamports) {
-      method.postInstructions([
-        ComputeBudgetProgram.setComputeUnitPrice({
-          microLamports: options.microLamports
+    return sendTransactionWithOptions(
+      this.program.methods
+        .stakeToken({
+          name,
+          amount: new BN(amount * 10 ** 6),
+          stakeVault: this.stakeVaultName
         })
-      ])
-    }
-
-    return method.rpc({ skipPreflight: options?.skipPreflight })
+        .accounts({
+          signer: wallet,
+          mint: TRD_MINT,
+          user: userPDA
+        }),
+      options
+    )
   }
 
   /**
@@ -252,26 +224,19 @@ export default class Stake {
     { wallet, amount, status }: UpdateStakeVaultArgs,
     options?: RpcOptions
   ) {
-    const method = this.program.methods
-      .updateStakeVault({
-        amount,
-        status,
-        stakeVault: this.stakeVaultName
-      })
-      .accounts({
-        signer: wallet,
-        mint: TRD_MINT
-      })
-
-    if (options?.microLamports) {
-      method.postInstructions([
-        ComputeBudgetProgram.setComputeUnitPrice({
-          microLamports: options.microLamports
+    return sendTransactionWithOptions(
+      this.program.methods
+        .updateStakeVault({
+          amount,
+          status,
+          stakeVault: this.stakeVaultName
         })
-      ])
-    }
-
-    return method.rpc({ skipPreflight: options?.skipPreflight })
+        .accounts({
+          signer: wallet,
+          mint: TRD_MINT
+        }),
+      options
+    )
   }
 
   /**
@@ -291,23 +256,16 @@ export default class Stake {
     const stakePDA = getStakePDA(this.program.programId, wallet, name)
     const userPDA = getUserPDA(this.program.programId, wallet)
 
-    const method = this.program.methods.requestWithdrawStake().accounts({
-      signer: wallet,
-      mint: mint,
-      user: userPDA,
-      stake: stakePDA,
-      stakeVault: stakeVaultPDA
-    })
-
-    if (options?.microLamports) {
-      method.postInstructions([
-        ComputeBudgetProgram.setComputeUnitPrice({
-          microLamports: options.microLamports
-        })
-      ])
-    }
-
-    return method.rpc({ skipPreflight: options?.skipPreflight })
+    return sendTransactionWithOptions(
+      this.program.methods.requestWithdrawStake().accounts({
+        signer: wallet,
+        mint: mint,
+        user: userPDA,
+        stake: stakePDA,
+        stakeVault: stakeVaultPDA
+      }),
+      options
+    )
   }
 
   /**
@@ -328,24 +286,17 @@ export default class Stake {
     const userPDA = getUserPDA(this.program.programId, wallet)
     const stakePDA = getStakePDA(this.program.programId, wallet, name)
 
-    const method = this.program.methods.withdrawStake().accounts({
-      signer: wallet,
-      stake: stakePDA,
-      stakeVault: stakeVaultPDA,
-      admin: TRIAD_ADMIN,
-      mint: mint,
-      user: userPDA
-    })
-
-    if (options?.microLamports) {
-      method.postInstructions([
-        ComputeBudgetProgram.setComputeUnitPrice({
-          microLamports: options.microLamports
-        })
-      ])
-    }
-
-    return method.rpc({ skipPreflight: options?.skipPreflight })
+    return sendTransactionWithOptions(
+      this.program.methods.withdrawStake().accounts({
+        signer: wallet,
+        stake: stakePDA,
+        stakeVault: stakeVaultPDA,
+        admin: TRIAD_ADMIN,
+        mint: mint,
+        user: userPDA
+      }),
+      options
+    )
   }
 
   /**
@@ -416,29 +367,6 @@ export default class Stake {
       )
     }
 
-    if (options?.microLamports) {
-      ixs.push(
-        ComputeBudgetProgram.setComputeUnitPrice({
-          microLamports: options.microLamports
-        })
-      )
-    }
-
-    const { blockhash } = await this.provider.connection.getLatestBlockhash()
-
-    return this.provider.sendAndConfirm(
-      new VersionedTransaction(
-        new TransactionMessage({
-          instructions: ixs,
-          recentBlockhash: blockhash,
-          payerKey: wallet
-        }).compileToV0Message()
-      ),
-      [],
-      {
-        skipPreflight: options?.skipPreflight,
-        commitment: 'confirmed'
-      }
-    )
+    return sendVersionedTransaction(this.provider, ixs, options)
   }
 }

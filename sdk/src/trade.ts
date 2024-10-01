@@ -1,13 +1,7 @@
 import { AnchorProvider, Program } from '@coral-xyz/anchor'
 import { TriadProtocol } from './types/triad_protocol'
-import {
-  ComputeBudgetProgram,
-  PublicKey,
-  TransactionInstruction,
-  VersionedTransaction,
-  TransactionMessage
-} from '@solana/web3.js'
-import { Market, OrderDirection, OrderType } from './types/trade'
+import { PublicKey, TransactionInstruction } from '@solana/web3.js'
+import { InitializeQuestionArgs, Market, OpenOrderArgs } from './types/trade'
 import { RpcOptions } from './types'
 import BN from 'bn.js'
 import { TRD_DECIMALS, TRD_MINT_DEVNET } from './utils/constants'
@@ -18,6 +12,8 @@ import {
   getUserTradePDA
 } from './utils/pda/trade'
 import { getTokenATA, getUserPDA } from './utils/pda'
+import sendVersionedTransaction from './utils/sendVersionedTransaction'
+import sendTransactionWithOptions from './utils/sendTransactionWithOptions'
 
 export default class Trade {
   program: Program<TriadProtocol>
@@ -42,6 +38,11 @@ export default class Trade {
       )
   }
 
+  /**
+   * Get Market by Address
+   * @param address - The address of the market
+   *
+   */
   async getMarketByAddress(address: PublicKey): Promise<Market> {
     const account = await this.program.account.market.fetch(address)
 
@@ -49,56 +50,54 @@ export default class Trade {
   }
 
   /**
+   * Get User Trade
+   * @param user - The user's public key
+   *
+   */
+  async getUserTrade(user: PublicKey) {
+    const userTradePDA = getUserTradePDA(this.program.programId, user)
+
+    return this.program.account.userTrade.fetch(userTradePDA)
+  }
+
+  /**
    * Initialize Market
    * @param market id - new markert id - length + 1
    * @param name - PYTH/TRD JUP/TRD DRIFT/TRD
+   *
+   * @param options - RPC options
    *
    */
   async initializeMarket(
     { marketId, name }: { marketId: number; name: string },
     options?: RpcOptions
-  ): Promise<string> {
-    const marketPDA = getMarketPDA(this.program.programId, marketId)
-    const feeVaultPDA = getFeeVaultPDA(this.program.programId, marketId)
-
-    const method = this.program.methods
-      .initializeMarket({
-        marketId: new BN(marketId),
-        name: name
-      })
-      .accounts({
-        signer: this.provider.publicKey,
-        mint: this.mint
-      })
-
-    if (options?.microLamports) {
-      method.postInstructions([
-        ComputeBudgetProgram.setComputeUnitPrice({
-          microLamports: options.microLamports
+  ) {
+    return sendTransactionWithOptions(
+      this.program.methods
+        .initializeMarket({
+          marketId: new BN(marketId),
+          name: name
         })
-      ])
-    }
-
-    return method.rpc({ skipPreflight: options?.skipPreflight })
-  }
-
-  async getUserTrade() {
-    const userTradePDA = getUserTradePDA(
-      this.program.programId,
-      this.provider.publicKey
+        .accounts({
+          signer: this.provider.publicKey,
+          mint: this.mint
+        }),
+      options
     )
-
-    return this.program.account.userTrade.fetch(userTradePDA)
   }
 
+  /**
+   * Open Order
+   * @param marketId - The ID of the market
+   * @param amount - The amount of the order
+   * @param direction - The direction of the order
+   * @param comment - The comment of the order
+   *
+   * @param options - RPC options
+   *
+   */
   async openOrder(
-    marketId: number,
-    args: {
-      amount: number
-      direction: OrderDirection
-      orderType: OrderType
-      comment?: string
-    },
+    { marketId, amount, direction, comment }: OpenOrderArgs,
     options?: RpcOptions
   ): Promise<string> {
     const marketPDA = getMarketPDA(this.program.programId, marketId)
@@ -129,9 +128,9 @@ export default class Trade {
     ixs.push(
       await this.program.methods
         .openOrder({
-          amount: new BN(args.amount * 10 ** TRD_DECIMALS),
-          direction: args.direction,
-          comment: encodeString(args.comment, 64)
+          amount: new BN(amount * 10 ** TRD_DECIMALS),
+          direction: direction,
+          comment: encodeString(comment, 64)
         })
         .accounts({
           signer: this.provider.publicKey,
@@ -144,32 +143,17 @@ export default class Trade {
         .instruction()
     )
 
-    if (options?.microLamports) {
-      ixs.push(
-        ComputeBudgetProgram.setComputeUnitPrice({
-          microLamports: options.microLamports
-        })
-      )
-    }
-
-    const { blockhash } = await this.provider.connection.getLatestBlockhash()
-
-    return this.provider.sendAndConfirm(
-      new VersionedTransaction(
-        new TransactionMessage({
-          instructions: ixs,
-          recentBlockhash: blockhash,
-          payerKey: this.provider.publicKey
-        }).compileToV0Message()
-      ),
-      [],
-      {
-        skipPreflight: options?.skipPreflight,
-        commitment: 'confirmed'
-      }
-    )
+    return sendVersionedTransaction(this.provider, ixs, options)
   }
 
+  /**
+   * Close Order
+   * @param marketId - The ID of the market
+   * @param orderId - The ID of the order
+   *
+   * @param options - RPC options
+   *
+   */
   async closeOrder(
     { marketId, orderId }: { marketId: number; orderId: number },
     options?: RpcOptions
@@ -180,21 +164,66 @@ export default class Trade {
       this.provider.publicKey
     )
 
-    const method = this.program.methods.closeOrder(new BN(orderId)).accounts({
+    return sendTransactionWithOptions(
+      this.program.methods.closeOrder(new BN(orderId)).accounts({
+        signer: this.provider.publicKey,
+        market: marketPDA,
+        mint: this.mint,
+        userTrade: userTradePDA
+      }),
+      options
+    )
+  }
+
+  /**
+   * Initialize a new question for a market
+   * @param marketId - The ID of the market
+   * @param question - The question to initialize
+   * @param startTime - The start time of the question
+   * @param endTime - The end time of the question
+   *
+   * @param options - RPC options
+   *
+   */
+  async initializeQuestion(
+    { marketId, question, startTime, endTime }: InitializeQuestionArgs,
+    options?: RpcOptions
+  ): Promise<string> {
+    const marketPDA = getMarketPDA(this.program.programId, marketId)
+
+    return sendTransactionWithOptions(
+      this.program.methods
+        .initializeQuestion({
+          question: encodeString(question, 80),
+          startTime: new BN(startTime),
+          endTime: new BN(endTime)
+        })
+        .accounts({
+          signer: this.provider.publicKey,
+          market: marketPDA
+        }),
+      options
+    )
+  }
+
+  /**
+   * Resolve the current question for a market
+   * @param marketId - The ID of the market
+   *
+   * @param options - RPC options
+   *
+   */
+  async resolveQuestion(
+    marketId: number,
+    options?: RpcOptions
+  ): Promise<string> {
+    const marketPDA = getMarketPDA(this.program.programId, marketId)
+
+    const method = this.program.methods.resolveQuestion().accounts({
       signer: this.provider.publicKey,
-      market: marketPDA,
-      mint: this.mint,
-      userTrade: userTradePDA
+      market: marketPDA
     })
 
-    if (options?.microLamports) {
-      method.postInstructions([
-        ComputeBudgetProgram.setComputeUnitPrice({
-          microLamports: options.microLamports
-        })
-      ])
-    }
-
-    return method.rpc({ skipPreflight: options?.skipPreflight })
+    return sendTransactionWithOptions(method, options)
   }
 }

@@ -1,5 +1,5 @@
 import { AnchorProvider, Program, Wallet } from '@coral-xyz/anchor'
-import { ComputeBudgetProgram, Connection, PublicKey } from '@solana/web3.js'
+import { Connection, PublicKey } from '@solana/web3.js'
 import { TriadProtocol } from './types/triad_protocol'
 import IDL from './types/idl_triad_protocol.json'
 import Trade from './trade'
@@ -7,6 +7,7 @@ import { formatUser } from './utils/helpers'
 import { getUserPDA } from './utils/pda'
 import Stake from './stake'
 import { CreateUserArgs, RpcOptions } from './types'
+import sendTransactionWithOptions from './utils/sendTransactionWithOptions'
 
 export default class TriadProtocolClient {
   program: Program<TriadProtocol>
@@ -20,8 +21,8 @@ export default class TriadProtocolClient {
       wallet,
       AnchorProvider.defaultOptions()
     )
-
     this.program = new Program(IDL as TriadProtocol, this.provider)
+
     this.trade = new Trade(this.program, this.provider)
     this.stake = new Stake(this.program, this.provider)
   }
@@ -29,6 +30,7 @@ export default class TriadProtocolClient {
   /**
    * Get User by wallet
    * @param wallet - User wallet
+   *
    */
   async getUser(wallet: PublicKey) {
     const userPDA = getUserPDA(this.program.programId, wallet)
@@ -39,6 +41,7 @@ export default class TriadProtocolClient {
   /**
    * Get User by wallet
    * @param wallet - User wallet
+   *
    */
   async getUsers() {
     const response = await this.program.account.user.all()
@@ -51,6 +54,7 @@ export default class TriadProtocolClient {
   /**
    * Check if user exists
    * @param username - User name
+   *
    */
   async hasUser(wallet: PublicKey) {
     try {
@@ -67,6 +71,7 @@ export default class TriadProtocolClient {
   /**
    * Get Refferal
    * @param name - User name
+   *
    */
   async getReferral(name: string) {
     try {
@@ -96,28 +101,23 @@ export default class TriadProtocolClient {
    *  @param name - user name
    *  @param referral - user referral
    *
+   *  @param options - RPC options
+   *
    */
   async createUser(
     { wallet, name, referral }: CreateUserArgs,
     options?: RpcOptions
   ) {
-    const method = this.program.methods
-      .createUser({
-        name
-      })
-      .accounts({
-        signer: wallet,
-        referral
-      })
-
-    if (options?.microLamports) {
-      method.postInstructions([
-        ComputeBudgetProgram.setComputeUnitPrice({
-          microLamports: options.microLamports
+    return sendTransactionWithOptions(
+      this.program.methods
+        .createUser({
+          name
         })
-      ])
-    }
-
-    return method.rpc({ skipPreflight: options?.skipPreflight })
+        .accounts({
+          signer: wallet,
+          referral
+        }),
+      options
+    )
   }
 }
