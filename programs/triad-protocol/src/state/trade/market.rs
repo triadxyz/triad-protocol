@@ -72,20 +72,38 @@ pub struct ResolvedQuestion {
     pub final_hype_price: u64,
     /// Final price for Flop outcome at the end of the week
     pub final_flop_price: u64,
-    pub padding: [u8; 56],
+    /// Total number of Hype shares issued
+    pub total_hype_shares: u64,
+    /// Total number of Flop shares issued
+    pub total_flop_shares: u64,
+    pub padding: [u8; 40],
 }
 
 #[derive(AnchorSerialize, AnchorDeserialize, Clone, Copy)]
 pub enum WinningDirection {
+    None,
     Hype,
     Flop,
-    None,
+    Draw,
+}
+
+#[derive(AnchorSerialize, AnchorDeserialize, Clone, Copy)]
+pub enum QuestionStatus {
+    Resolved,
+    Unresolved,
 }
 
 #[derive(AnchorSerialize, AnchorDeserialize)]
 pub struct InitializeMarketArgs {
     pub name: String,
     pub market_id: u64,
+}
+
+#[derive(AnchorSerialize, AnchorDeserialize)]
+pub struct InitializeQuestionArgs {
+    pub question: [u8; 80],
+    pub start_time: i64,
+    pub end_time: i64,
 }
 
 impl Default for ResolvedQuestion {
@@ -97,11 +115,13 @@ impl Default for ResolvedQuestion {
             end_time: 0,
             hype_liquidity: 0,
             flop_liquidity: 0,
-            winning_direction: WinningDirection::Hype,
+            winning_direction: WinningDirection::None,
             market_price: 0,
             final_hype_price: 500_000,
             final_flop_price: 500_000,
-            padding: [0; 56],
+            total_hype_shares: 0,
+            total_flop_shares: 0,
+            padding: [0; 40],
         }
     }
 }
@@ -211,11 +231,11 @@ impl Market {
         Ok(())
     }
 
-    pub fn get_winning_direction(&self) -> Option<OrderDirection> {
+    pub fn get_winning_direction(&self) -> Option<WinningDirection> {
         if self.hype_price > self.flop_price {
-            Some(OrderDirection::Hype)
+            Some(WinningDirection::Hype)
         } else if self.flop_price > self.hype_price {
-            Some(OrderDirection::Flop)
+            Some(WinningDirection::Flop)
         } else {
             None
         }

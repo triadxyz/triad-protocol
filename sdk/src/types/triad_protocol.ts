@@ -557,6 +557,104 @@ export type TriadProtocol = {
       ]
     },
     {
+      name: 'initializeQuestion'
+      discriminator: [245, 151, 106, 188, 88, 44, 65, 212]
+      accounts: [
+        {
+          name: 'signer'
+          writable: true
+          signer: true
+        },
+        {
+          name: 'market'
+          writable: true
+        },
+        {
+          name: 'mint'
+          writable: true
+        },
+        {
+          name: 'marketVault'
+          writable: true
+          pda: {
+            seeds: [
+              {
+                kind: 'account'
+                path: 'market'
+              },
+              {
+                kind: 'account'
+                path: 'tokenProgram'
+              },
+              {
+                kind: 'account'
+                path: 'mint'
+              }
+            ]
+            program: {
+              kind: 'const'
+              value: [
+                140,
+                151,
+                37,
+                143,
+                78,
+                36,
+                137,
+                241,
+                187,
+                61,
+                16,
+                41,
+                20,
+                142,
+                13,
+                131,
+                11,
+                90,
+                19,
+                153,
+                218,
+                255,
+                16,
+                132,
+                4,
+                142,
+                123,
+                216,
+                219,
+                233,
+                248,
+                89
+              ]
+            }
+          }
+        },
+        {
+          name: 'tokenProgram'
+          address: 'TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb'
+        },
+        {
+          name: 'associatedTokenProgram'
+          address: 'ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL'
+        },
+        {
+          name: 'systemProgram'
+          address: '11111111111111111111111111111111'
+        }
+      ]
+      args: [
+        {
+          name: 'args'
+          type: {
+            defined: {
+              name: 'initializeQuestionArgs'
+            }
+          }
+        }
+      ]
+    },
+    {
       name: 'openOrder'
       discriminator: [206, 88, 88, 143, 38, 136, 50, 224]
       accounts: [
@@ -751,6 +849,26 @@ export type TriadProtocol = {
         {
           name: 'tokenProgram'
           address: 'TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb'
+        },
+        {
+          name: 'systemProgram'
+          address: '11111111111111111111111111111111'
+        }
+      ]
+      args: []
+    },
+    {
+      name: 'resolveQuestion'
+      discriminator: [52, 32, 224, 179, 180, 8, 0, 246]
+      accounts: [
+        {
+          name: 'signer'
+          writable: true
+          signer: true
+        },
+        {
+          name: 'market'
+          writable: true
         },
         {
           name: 'systemProgram'
@@ -1698,6 +1816,21 @@ export type TriadProtocol = {
       code: 6034
       name: 'orderSizeTooLarge'
       msg: 'Order size too large'
+    },
+    {
+      code: 6035
+      name: 'questionPeriodNotEnded'
+      msg: 'Question period not ended'
+    },
+    {
+      code: 6036
+      name: 'invalidStartTime'
+      msg: 'Invalid start time'
+    },
+    {
+      code: 6037
+      name: 'invalidEndTime'
+      msg: 'Invalid end time'
     }
   ]
   types: [
@@ -1803,6 +1936,28 @@ export type TriadProtocol = {
           {
             name: 'marketId'
             type: 'u64'
+          }
+        ]
+      }
+    },
+    {
+      name: 'initializeQuestionArgs'
+      type: {
+        kind: 'struct'
+        fields: [
+          {
+            name: 'question'
+            type: {
+              array: ['u8', 80]
+            }
+          },
+          {
+            name: 'startTime'
+            type: 'i64'
+          },
+          {
+            name: 'endTime'
+            type: 'i64'
           }
         ]
       }
@@ -2240,6 +2395,20 @@ export type TriadProtocol = {
       }
     },
     {
+      name: 'questionStatus'
+      type: {
+        kind: 'enum'
+        variants: [
+          {
+            name: 'resolved'
+          },
+          {
+            name: 'unresolved'
+          }
+        ]
+      }
+    },
+    {
       name: 'questionUpdate'
       type: {
         kind: 'struct'
@@ -2293,16 +2462,24 @@ export type TriadProtocol = {
             type: 'u64'
           },
           {
-            name: 'direction'
-            type: {
-              defined: {
-                name: 'orderDirection'
-              }
-            }
-          },
-          {
             name: 'timestamp'
             type: 'i64'
+          },
+          {
+            name: 'totalHypeShares'
+            type: 'u64'
+          },
+          {
+            name: 'totalFlopShares'
+            type: 'u64'
+          },
+          {
+            name: 'status'
+            type: {
+              defined: {
+                name: 'questionStatus'
+              }
+            }
           }
         ]
       }
@@ -2367,9 +2544,19 @@ export type TriadProtocol = {
             type: 'u64'
           },
           {
+            name: 'totalHypeShares'
+            docs: ['Total number of Hype shares issued']
+            type: 'u64'
+          },
+          {
+            name: 'totalFlopShares'
+            docs: ['Total number of Flop shares issued']
+            type: 'u64'
+          },
+          {
             name: 'padding'
             type: {
-              array: ['u8', 56]
+              array: ['u8', 40]
             }
           }
         ]
@@ -2683,13 +2870,16 @@ export type TriadProtocol = {
         kind: 'enum'
         variants: [
           {
+            name: 'none'
+          },
+          {
             name: 'hype'
           },
           {
             name: 'flop'
           },
           {
-            name: 'none'
+            name: 'draw'
           }
         ]
       }

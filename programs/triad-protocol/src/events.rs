@@ -1,6 +1,6 @@
 use anchor_lang::prelude::*;
 
-use crate::state::{ OrderDirection, OrderStatus, OrderType, WinningDirection };
+use crate::state::{ OrderDirection, OrderStatus, OrderType, WinningDirection, QuestionStatus };
 
 #[event]
 pub struct PriceUpdate {
@@ -45,6 +45,8 @@ pub struct QuestionUpdate {
     pub market_price: u64,
     pub final_hype_price: u64,
     pub final_flop_price: u64,
-    pub direction: OrderDirection,
     pub timestamp: i64,
+    pub total_hype_shares: u64,
+    pub total_flop_shares: u64,
+    pub status: QuestionStatus,
 }

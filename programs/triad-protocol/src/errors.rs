@@ -106,4 +106,13 @@ pub enum TriadProtocolError {
 
     #[msg("Order size too large")]
     OrderSizeTooLarge,
+
+    #[msg("Question period not ended")]
+    QuestionPeriodNotEnded,
+
+    #[msg("Invalid start time")]
+    InvalidStartTime,
+
+    #[msg("Invalid end time")]
+    InvalidEndTime,
 }

@@ -22,6 +22,17 @@ pub mod triad_protocol {
         instructions::initialize_market(ctx, args)
     }
 
+    pub fn initialize_question(
+        ctx: Context<InitializeQuestion>,
+        args: InitializeQuestionArgs
+    ) -> Result<()> {
+        instructions::initialize_question(ctx, args)
+    }
+
+    pub fn resolve_question(ctx: Context<ResolveQuestion>) -> Result<()> {
+        instructions::resolve_question(ctx)
+    }
+
     pub fn create_user(ctx: Context<CreateUser>, args: CreateUserArgs) -> Result<()> {
         instructions::create_user(ctx, args)
     }

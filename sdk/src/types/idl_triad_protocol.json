@@ -406,6 +406,75 @@
       ]
     },
     {
+      "name": "initialize_question",
+      "discriminator": [245, 151, 106, 188, 88, 44, 65, 212],
+      "accounts": [
+        {
+          "name": "signer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "market",
+          "writable": true
+        },
+        {
+          "name": "mint",
+          "writable": true
+        },
+        {
+          "name": "market_vault",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "account",
+                "path": "market"
+              },
+              {
+                "kind": "account",
+                "path": "token_program"
+              },
+              {
+                "kind": "account",
+                "path": "mint"
+              }
+            ],
+            "program": {
+              "kind": "const",
+              "value": [
+                140, 151, 37, 143, 78, 36, 137, 241, 187, 61, 16, 41, 20, 142,
+                13, 131, 11, 90, 19, 153, 218, 255, 16, 132, 4, 142, 123, 216,
+                219, 233, 248, 89
+              ]
+            }
+          }
+        },
+        {
+          "name": "token_program",
+          "address": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb"
+        },
+        {
+          "name": "associated_token_program",
+          "address": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "args",
+          "type": {
+            "defined": {
+              "name": "InitializeQuestionArgs"
+            }
+          }
+        }
+      ]
+    },
+    {
       "name": "open_order",
       "discriminator": [206, 88, 88, 143, 38, 136, 50, 224],
       "accounts": [
@@ -542,6 +611,26 @@
         {
           "name": "token_program",
           "address": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb"
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "resolve_question",
+      "discriminator": [52, 32, 224, 179, 180, 8, 0, 246],
+      "accounts": [
+        {
+          "name": "signer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "market",
+          "writable": true
         },
         {
           "name": "system_program",
@@ -1257,6 +1346,21 @@
       "code": 6034,
       "name": "OrderSizeTooLarge",
       "msg": "Order size too large"
+    },
+    {
+      "code": 6035,
+      "name": "QuestionPeriodNotEnded",
+      "msg": "Question period not ended"
+    },
+    {
+      "code": 6036,
+      "name": "InvalidStartTime",
+      "msg": "Invalid start time"
+    },
+    {
+      "code": 6037,
+      "name": "InvalidEndTime",
+      "msg": "Invalid end time"
     }
   ],
   "types": [
@@ -1362,6 +1466,28 @@
           {
             "name": "market_id",
             "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "InitializeQuestionArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "question",
+            "type": {
+              "array": ["u8", 80]
+            }
+          },
+          {
+            "name": "start_time",
+            "type": "i64"
+          },
+          {
+            "name": "end_time",
+            "type": "i64"
           }
         ]
       }
@@ -1801,6 +1927,20 @@
       }
     },
     {
+      "name": "QuestionStatus",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Resolved"
+          },
+          {
+            "name": "Unresolved"
+          }
+        ]
+      }
+    },
+    {
       "name": "QuestionUpdate",
       "type": {
         "kind": "struct",
@@ -1854,16 +1994,24 @@
             "type": "u64"
           },
           {
-            "name": "direction",
-            "type": {
-              "defined": {
-                "name": "OrderDirection"
-              }
-            }
-          },
-          {
             "name": "timestamp",
             "type": "i64"
+          },
+          {
+            "name": "total_hype_shares",
+            "type": "u64"
+          },
+          {
+            "name": "total_flop_shares",
+            "type": "u64"
+          },
+          {
+            "name": "status",
+            "type": {
+              "defined": {
+                "name": "QuestionStatus"
+              }
+            }
           }
         ]
       }
@@ -1928,9 +2076,19 @@
             "type": "u64"
           },
           {
+            "name": "total_hype_shares",
+            "docs": ["Total number of Hype shares issued"],
+            "type": "u64"
+          },
+          {
+            "name": "total_flop_shares",
+            "docs": ["Total number of Flop shares issued"],
+            "type": "u64"
+          },
+          {
             "name": "padding",
             "type": {
-              "array": ["u8", 56]
+              "array": ["u8", 40]
             }
           }
         ]
@@ -2244,13 +2402,16 @@
         "kind": "enum",
         "variants": [
           {
+            "name": "None"
+          },
+          {
             "name": "Hype"
           },
           {
             "name": "Flop"
           },
           {
-            "name": "None"
+            "name": "Draw"
           }
         ]
       }
