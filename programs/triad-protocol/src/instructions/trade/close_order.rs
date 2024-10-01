@@ -73,7 +73,11 @@ pub fn close_order(ctx: Context<CloseOrder>, order_id: u64) -> Result<()> {
 
     // Calculate the amount to refund
     // Based in the shares and the current price of the order
-    let refund_amount = order.total_amount;
+
+    let fee_amount = (((order.total_amount as u64) * (market.fee_bps as u64)) / 100000) as u64;
+    let net_amount = order.total_amount.saturating_sub(fee_amount);
+
+    let refund_amount = net_amount;
 
     if refund_amount > 0 {
         // Transfer net refund to user
