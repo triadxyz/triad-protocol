@@ -54,6 +54,15 @@ pub fn close_order(ctx: Context<CloseOrder>, order_id: u64) -> Result<()> {
     let market = &mut ctx.accounts.market;
     let user_trade = &mut ctx.accounts.user_trade;
 
+    let ts = Clock::get()?.unix_timestamp;
+
+    // Check if the current question period is active
+    require!(ts >= market.current_question_start, TriadProtocolError::QuestionPeriodNotStarted);
+    require!(ts < market.current_question_end, TriadProtocolError::QuestionPeriodEnded);
+
+    // Check if the market is active
+    require!(market.is_active, TriadProtocolError::MarketInactive);
+
     // Find the order
     let order_index = user_trade.orders
         .iter()
@@ -122,7 +131,7 @@ pub fn close_order(ctx: Context<CloseOrder>, order_id: u64) -> Result<()> {
         total_amount: order.total_amount,
         comment: None,
         refund_amount: Some(refund_amount),
-        timestamp: Clock::get()?.unix_timestamp,
+        timestamp: ts,
         is_question_winner: None,
         pnl: order.pnl,
     });

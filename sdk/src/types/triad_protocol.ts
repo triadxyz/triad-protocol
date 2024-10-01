@@ -1831,6 +1831,16 @@ export type TriadProtocol = {
       code: 6037
       name: 'invalidEndTime'
       msg: 'Invalid end time'
+    },
+    {
+      code: 6038
+      name: 'questionPeriodNotStarted'
+      msg: 'Question period not started'
+    },
+    {
+      code: 6039
+      name: 'questionPeriodEnded'
+      msg: 'Question period ended'
     }
   ]
   types: [

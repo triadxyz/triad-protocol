@@ -54,6 +54,7 @@ pub fn initialize_question(
     market.current_question_start = args.start_time;
     market.current_question_end = args.end_time;
     market.current_question = args.question;
+    market.is_active = true;
 
     market.hype_price = 500_000; // Reset to 0.5 TRD
     market.flop_price = 500_000; // Reset to 0.5 TRD

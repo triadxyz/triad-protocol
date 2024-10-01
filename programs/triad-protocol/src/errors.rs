@@ -115,4 +115,10 @@ pub enum TriadProtocolError {
 
     #[msg("Invalid end time")]
     InvalidEndTime,
+
+    #[msg("Question period not started")]
+    QuestionPeriodNotStarted,
+
+    #[msg("Question period ended")]
+    QuestionPeriodEnded,
 }

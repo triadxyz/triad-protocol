@@ -29,6 +29,8 @@ pub fn resolve_question(ctx: Context<ResolveQuestion>) -> Result<()> {
 
     let winning_direction = market.get_winning_direction().unwrap();
 
+    market.is_active = false;
+
     market.previous_resolved_question = ResolvedQuestion {
         question_id: market.current_question_id,
         question: market.current_question,

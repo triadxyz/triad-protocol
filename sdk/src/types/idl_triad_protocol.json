@@ -1361,6 +1361,16 @@
       "code": 6037,
       "name": "InvalidEndTime",
       "msg": "Invalid end time"
+    },
+    {
+      "code": 6038,
+      "name": "QuestionPeriodNotStarted",
+      "msg": "Question period not started"
+    },
+    {
+      "code": 6039,
+      "name": "QuestionPeriodEnded",
+      "msg": "Question period ended"
     }
   ],
   "types": [
