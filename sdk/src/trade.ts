@@ -97,7 +97,6 @@ export default class Trade {
       amount: number
       direction: OrderDirection
       orderType: OrderType
-      limitPrice?: number
       comment?: string
     },
     options?: RpcOptions
