@@ -50,3 +50,12 @@ pub struct QuestionUpdate {
     pub total_flop_shares: u64,
     pub status: QuestionStatus,
 }
+
+#[event]
+pub struct StakeRewards {
+    pub user: Pubkey,
+    pub mint: Pubkey,
+    pub amount: u64,
+    pub timestamp: i64,
+    pub rank: u16,
+}

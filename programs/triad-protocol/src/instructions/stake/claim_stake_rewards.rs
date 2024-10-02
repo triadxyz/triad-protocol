@@ -4,6 +4,7 @@ use anchor_spl::{ associated_token::AssociatedToken, token_interface::{ Mint, To
 
 use crate::{
     state::{ ClaimStakeRewardsArgs, StakeV2, StakeVault },
+    events::StakeRewards,
     constraints::{ is_authority_for_stake, is_mint_for_stake_vault, is_verifier },
     errors::TriadProtocolError,
 };
@@ -145,6 +146,14 @@ pub fn claim_stake_rewards(
         msg!("Stake vault is locked: Rewards {:12}", checked_rewards);
         return Err(TriadProtocolError::StakeVaultLocked.into());
     }
+
+    emit!(StakeRewards {
+        user: ctx.accounts.signer.key(),
+        mint: stake.mint,
+        amount: checked_rewards,
+        timestamp: current_time,
+        rank: args.rank,
+    });
 
     Ok(checked_rewards)
 }

@@ -9,7 +9,7 @@ triad_protocol = "TRDwq3BN4mP3m9KsuNUWSN6QDff93VKGSwE95Jbr9Ss"
 
 
 [provider]
-cluster = "https://devnet.helius-rpc.com/?api-key=0beef971-e049-42f3-9688-4af84d7cdea4"
+cluster = "devnet"
 wallet = "~/.config/solana/triad.json"
 
 [scripts]

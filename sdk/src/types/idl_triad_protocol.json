@@ -1129,6 +1129,10 @@
     {
       "name": "QuestionUpdate",
       "discriminator": [110, 108, 240, 86, 176, 226, 54, 113]
+    },
+    {
+      "name": "StakeRewards",
+      "discriminator": [236, 217, 227, 239, 6, 129, 188, 218]
     }
   ],
   "errors": [
@@ -1204,133 +1208,133 @@
     },
     {
       "code": 6014,
-      "name": "StakeVaultLocked",
-      "msg": "Stake vault locked"
-    },
-    {
-      "code": 6015,
       "name": "StakeLocked",
       "msg": "Stake is locked"
     },
     {
-      "code": 6016,
+      "code": 6015,
       "name": "StakeVaultFull",
       "msg": "Stake vault full"
     },
     {
-      "code": 6017,
+      "code": 6016,
       "name": "InvalidMint",
       "msg": "Invalid mint"
     },
     {
-      "code": 6018,
+      "code": 6017,
       "name": "InvalidStakeVaultWeek",
       "msg": "Invalid stake vault week"
     },
     {
-      "code": 6019,
+      "code": 6018,
       "name": "RewardsAlreadyClaimed",
       "msg": "Rewards already claimed"
     },
     {
-      "code": 6020,
+      "code": 6019,
       "name": "StakeOverflow",
       "msg": "Stake overflow"
     },
     {
-      "code": 6021,
+      "code": 6020,
       "name": "SwapsReachedLimit",
       "msg": "Swaps reached limit"
     },
     {
-      "code": 6022,
+      "code": 6021,
       "name": "InsufficientFunds",
       "msg": "Insufficient funds"
     },
     {
-      "code": 6023,
+      "code": 6022,
       "name": "NoRewardsAvailable",
       "msg": "No rewards available"
     },
     {
-      "code": 6024,
+      "code": 6023,
       "name": "InvalidPrice",
       "msg": "Invalid price"
     },
     {
-      "code": 6025,
+      "code": 6024,
       "name": "InvalidOrderSize",
       "msg": "Invalid order size"
     },
     {
-      "code": 6026,
+      "code": 6025,
       "name": "MaxOpenOrdersReached",
       "msg": "Maximum number of open orders reached"
     },
     {
-      "code": 6027,
+      "code": 6026,
       "name": "NoAvailableOrderSlot",
       "msg": "No available order slot"
     },
     {
-      "code": 6028,
+      "code": 6027,
       "name": "MarketInactive",
       "msg": "Market is inactive"
     },
     {
-      "code": 6029,
+      "code": 6028,
       "name": "InvalidOrderType",
       "msg": "Invalid order type"
     },
     {
-      "code": 6030,
+      "code": 6029,
       "name": "InvalidOrderDirection",
       "msg": "Invalid order direction"
     },
     {
-      "code": 6031,
+      "code": 6030,
       "name": "OrderNotFound",
       "msg": "Order not found"
     },
     {
-      "code": 6032,
+      "code": 6031,
       "name": "InvalidOrderStatus",
       "msg": "Invalid order status"
     },
     {
-      "code": 6033,
+      "code": 6032,
       "name": "ArithmeticOverflow",
       "msg": "Arithmetic overflow"
     },
     {
-      "code": 6034,
+      "code": 6033,
       "name": "OrderSizeTooLarge",
       "msg": "Order size too large"
     },
     {
-      "code": 6035,
+      "code": 6034,
       "name": "QuestionPeriodNotEnded",
       "msg": "Question period not ended"
     },
     {
-      "code": 6036,
+      "code": 6035,
       "name": "InvalidStartTime",
       "msg": "Invalid start time"
     },
     {
-      "code": 6037,
+      "code": 6036,
       "name": "InvalidEndTime",
       "msg": "Invalid end time"
     },
     {
-      "code": 6038,
+      "code": 6037,
       "name": "QuestionPeriodNotStarted",
       "msg": "Question period not started"
     },
     {
-      "code": 6039,
+      "code": 6038,
       "name": "QuestionPeriodEnded",
       "msg": "Question period ended"
+    },
+    {
+      "code": 6039,
+      "name": "StakeVaultLocked",
+      "msg": "Stake vault is locked"
     }
   ],
   "types": [
@@ -2073,6 +2077,34 @@
           {
             "name": "stake_vault",
             "type": "string"
+          }
+        ]
+      }
+    },
+    {
+      "name": "StakeRewards",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "user",
+            "type": "pubkey"
+          },
+          {
+            "name": "mint",
+            "type": "pubkey"
+          },
+          {
+            "name": "amount",
+            "type": "u64"
+          },
+          {
+            "name": "timestamp",
+            "type": "i64"
+          },
+          {
+            "name": "rank",
+            "type": "u16"
           }
         ]
       }

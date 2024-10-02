@@ -1570,6 +1570,10 @@ export type TriadProtocol = {
     {
       name: 'questionUpdate'
       discriminator: [110, 108, 240, 86, 176, 226, 54, 113]
+    },
+    {
+      name: 'stakeRewards'
+      discriminator: [236, 217, 227, 239, 6, 129, 188, 218]
     }
   ]
   errors: [
@@ -1645,133 +1649,133 @@ export type TriadProtocol = {
     },
     {
       code: 6014
-      name: 'stakeVaultLocked'
-      msg: 'Stake vault locked'
-    },
-    {
-      code: 6015
       name: 'stakeLocked'
       msg: 'Stake is locked'
     },
     {
-      code: 6016
+      code: 6015
       name: 'stakeVaultFull'
       msg: 'Stake vault full'
     },
     {
-      code: 6017
+      code: 6016
       name: 'invalidMint'
       msg: 'Invalid mint'
     },
     {
-      code: 6018
+      code: 6017
       name: 'invalidStakeVaultWeek'
       msg: 'Invalid stake vault week'
     },
     {
-      code: 6019
+      code: 6018
       name: 'rewardsAlreadyClaimed'
       msg: 'Rewards already claimed'
     },
     {
-      code: 6020
+      code: 6019
       name: 'stakeOverflow'
       msg: 'Stake overflow'
     },
     {
-      code: 6021
+      code: 6020
       name: 'swapsReachedLimit'
       msg: 'Swaps reached limit'
     },
     {
-      code: 6022
+      code: 6021
       name: 'insufficientFunds'
       msg: 'Insufficient funds'
     },
     {
-      code: 6023
+      code: 6022
       name: 'noRewardsAvailable'
       msg: 'No rewards available'
     },
     {
-      code: 6024
+      code: 6023
       name: 'invalidPrice'
       msg: 'Invalid price'
     },
     {
-      code: 6025
+      code: 6024
       name: 'invalidOrderSize'
       msg: 'Invalid order size'
     },
     {
-      code: 6026
+      code: 6025
       name: 'maxOpenOrdersReached'
       msg: 'Maximum number of open orders reached'
     },
     {
-      code: 6027
+      code: 6026
       name: 'noAvailableOrderSlot'
       msg: 'No available order slot'
     },
     {
-      code: 6028
+      code: 6027
       name: 'marketInactive'
       msg: 'Market is inactive'
     },
     {
-      code: 6029
+      code: 6028
       name: 'invalidOrderType'
       msg: 'Invalid order type'
     },
     {
-      code: 6030
+      code: 6029
       name: 'invalidOrderDirection'
       msg: 'Invalid order direction'
     },
     {
-      code: 6031
+      code: 6030
       name: 'orderNotFound'
       msg: 'Order not found'
     },
     {
-      code: 6032
+      code: 6031
       name: 'invalidOrderStatus'
       msg: 'Invalid order status'
     },
     {
-      code: 6033
+      code: 6032
       name: 'arithmeticOverflow'
       msg: 'Arithmetic overflow'
     },
     {
-      code: 6034
+      code: 6033
       name: 'orderSizeTooLarge'
       msg: 'Order size too large'
     },
     {
-      code: 6035
+      code: 6034
       name: 'questionPeriodNotEnded'
       msg: 'Question period not ended'
     },
     {
-      code: 6036
+      code: 6035
       name: 'invalidStartTime'
       msg: 'Invalid start time'
     },
     {
-      code: 6037
+      code: 6036
       name: 'invalidEndTime'
       msg: 'Invalid end time'
     },
     {
-      code: 6038
+      code: 6037
       name: 'questionPeriodNotStarted'
       msg: 'Question period not started'
     },
     {
-      code: 6039
+      code: 6038
       name: 'questionPeriodEnded'
       msg: 'Question period ended'
+    },
+    {
+      code: 6039
+      name: 'stakeVaultLocked'
+      msg: 'Stake vault is locked'
     }
   ]
   types: [
@@ -2512,6 +2516,34 @@ export type TriadProtocol = {
           {
             name: 'stakeVault'
             type: 'string'
+          }
+        ]
+      }
+    },
+    {
+      name: 'stakeRewards'
+      type: {
+        kind: 'struct'
+        fields: [
+          {
+            name: 'user'
+            type: 'pubkey'
+          },
+          {
+            name: 'mint'
+            type: 'pubkey'
+          },
+          {
+            name: 'amount'
+            type: 'u64'
+          },
+          {
+            name: 'timestamp'
+            type: 'i64'
+          },
+          {
+            name: 'rank'
+            type: 'u16'
           }
         ]
       }
