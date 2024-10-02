@@ -34,9 +34,7 @@ pub fn request_withdraw_stake(ctx: Context<RequestWithdrawStake>) -> Result<()> 
     let user: &mut Box<Account<User>> = &mut ctx.accounts.user;
     let stake_vault: &mut Box<Account<StakeVault>> = &mut ctx.accounts.stake_vault;
 
-    if stake.withdraw_ts != 0 {
-        return Err(TriadProtocolError::Unauthorized.into());
-    }
+    require!(stake.withdraw_ts == 0, TriadProtocolError::Unauthorized);
 
     let mut days = 3;
 

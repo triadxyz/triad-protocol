@@ -56,13 +56,9 @@ pub fn claim_stake_rewards(
     let stake_vault: &mut Box<Account<StakeVault>> = &mut ctx.accounts.stake_vault;
     let stake: &mut Box<Account<StakeV2>> = &mut ctx.accounts.stake;
 
-    if stake.withdraw_ts != 0 {
-        return Err(TriadProtocolError::NoRewardsAvailable.into());
-    }
+    require!(stake.withdraw_ts == 0, TriadProtocolError::NoRewardsAvailable);
 
-    if args.collections > 5 {
-        return Err(TriadProtocolError::Unauthorized.into());
-    }
+    require!(args.collections <= 5, TriadProtocolError::Unauthorized);
 
     let mut rank = args.rank;
     let collections = args.collections;
