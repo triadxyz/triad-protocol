@@ -15,6 +15,10 @@ declare_id!("4YWv2Ex8WjFGyXmYELD6Xqs1ZsuQujVUzZxbvdvM2tCj");
 pub mod triad_protocol {
     use super::*;
 
+    pub fn withdraw_v1(ctx: Context<WithdrawV1>, position_index: u8) -> Result<()> {
+        instructions::withdraw_v1(ctx, position_index)
+    }
+
     pub fn initialize_market(
         ctx: Context<InitializeMarket>,
         args: InitializeMarketArgs

@@ -22,3 +22,9 @@ pub struct Position {
     pub is_open: bool,
     pub pnl: i64,
 }
+
+impl UserPosition {
+    pub const PREFIX_SEED: &'static [u8] = b"user_position";
+
+    pub const SPACE: usize = 8 + std::mem::size_of::<Self>();
+}
