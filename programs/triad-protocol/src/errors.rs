@@ -44,9 +44,6 @@ pub enum TriadProtocolError {
     #[msg("Invalid stake vault amount")]
     InvalidStakeVaultAmount,
 
-    #[msg("Stake vault locked")]
-    StakeVaultLocked,
-
     #[msg("Stake is locked")]
     StakeLocked,
 
@@ -121,4 +118,7 @@ pub enum TriadProtocolError {
 
     #[msg("Question period ended")]
     QuestionPeriodEnded,
+
+    #[msg("Stake vault is locked")]
+    StakeVaultLocked,
 }

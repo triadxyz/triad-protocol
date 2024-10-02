@@ -28,7 +28,7 @@ export default class Trade {
   /**
    * Get all Markets
    */
-  async getMarkets(): Promise<Market[]> {
+  async getAllMarkets(): Promise<Market[]> {
     return this.program.account.market
       .all()
       .then((markets) =>
@@ -36,6 +36,19 @@ export default class Trade {
           accountToMarket(account, publicKey)
         )
       )
+  }
+
+  /**
+   * Get Market by ID
+   * @param marketId - The ID of the market
+   *
+   */
+  async getMarketById(marketId: number): Promise<Market> {
+    const marketPDA = getMarketPDA(this.program.programId, marketId)
+
+    const response = await this.program.account.market.fetch(marketPDA)
+
+    return accountToMarket(response, marketPDA)
   }
 
   /**

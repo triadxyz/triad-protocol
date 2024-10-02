@@ -2026,9 +2026,6 @@ export type TriadProtocol = {
           },
           {
             name: 'currentQuestionStart'
-            docs: [
-              'Start timestamp of the current week if 7 days have passed since the start of the week'
-            ]
             type: 'i64'
           },
           {

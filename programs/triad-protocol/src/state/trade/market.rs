@@ -44,7 +44,6 @@ pub struct Market {
     pub previous_resolved_question: ResolvedQuestion,
     /// Index of the current week in the weekly_results array initialized with default values
     pub current_question_id: u64,
-    /// Start timestamp of the current week if 7 days have passed since the start of the week
     pub current_question_start: i64,
     pub current_question_end: i64,
     /// The question or prediction topic for the current week

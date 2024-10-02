@@ -143,7 +143,7 @@ pub fn claim_stake_rewards(
 
     if stake_vault.is_locked {
         msg!("Stake vault is locked: Rewards {:12}", checked_rewards);
-        return Err(TriadProtocolError::Unauthorized.into());
+        return Err(TriadProtocolError::StakeVaultLocked.into());
     }
 
     Ok(checked_rewards)
