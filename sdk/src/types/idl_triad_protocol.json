@@ -35,7 +35,31 @@
         },
         {
           "name": "from_ata",
-          "writable": true
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "account",
+                "path": "stake_vault"
+              },
+              {
+                "kind": "account",
+                "path": "token_program"
+              },
+              {
+                "kind": "account",
+                "path": "mint"
+              }
+            ],
+            "program": {
+              "kind": "const",
+              "value": [
+                140, 151, 37, 143, 78, 36, 137, 241, 187, 61, 16, 41, 20, 142,
+                13, 131, 11, 90, 19, 153, 218, 255, 16, 132, 4, 142, 123, 216,
+                219, 233, 248, 89
+              ]
+            }
+          }
         },
         {
           "name": "to_ata",
@@ -47,12 +71,8 @@
                 "path": "signer"
               },
               {
-                "kind": "const",
-                "value": [
-                  6, 221, 246, 225, 215, 101, 161, 147, 217, 203, 225, 70, 206,
-                  235, 121, 172, 28, 180, 133, 237, 95, 91, 55, 145, 58, 140,
-                  245, 133, 126, 255, 0, 169
-                ]
+                "kind": "account",
+                "path": "token_program"
               },
               {
                 "kind": "account",
@@ -95,8 +115,8 @@
       "returns": "u64"
     },
     {
-      "name": "close_position",
-      "discriminator": [123, 134, 81, 0, 49, 68, 98, 98],
+      "name": "close_order",
+      "discriminator": [90, 103, 209, 28, 7, 63, 168, 4],
       "accounts": [
         {
           "name": "signer",
@@ -104,125 +124,90 @@
           "signer": true
         },
         {
-          "name": "ticker",
+          "name": "user_trade",
           "writable": true
         },
         {
-          "name": "vault",
+          "name": "market",
           "writable": true
         },
         {
-          "name": "user_position",
+          "name": "mint",
           "writable": true
         },
         {
-          "name": "vault_token_account",
-          "writable": true
+          "name": "user_ata",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "account",
+                "path": "signer"
+              },
+              {
+                "kind": "account",
+                "path": "token_program"
+              },
+              {
+                "kind": "account",
+                "path": "mint"
+              }
+            ],
+            "program": {
+              "kind": "const",
+              "value": [
+                140, 151, 37, 143, 78, 36, 137, 241, 187, 61, 16, 41, 20, 142,
+                13, 131, 11, 90, 19, 153, 218, 255, 16, 132, 4, 142, 123, 216,
+                219, 233, 248, 89
+              ]
+            }
+          }
         },
         {
-          "name": "user_token_account",
-          "writable": true
+          "name": "market_vault",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "account",
+                "path": "market"
+              },
+              {
+                "kind": "account",
+                "path": "token_program"
+              },
+              {
+                "kind": "account",
+                "path": "mint"
+              }
+            ],
+            "program": {
+              "kind": "const",
+              "value": [
+                140, 151, 37, 143, 78, 36, 137, 241, 187, 61, 16, 41, 20, 142,
+                13, 131, 11, 90, 19, 153, 218, 255, 16, 132, 4, 142, 123, 216,
+                219, 233, 248, 89
+              ]
+            }
+          }
+        },
+        {
+          "name": "token_program",
+          "address": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb"
+        },
+        {
+          "name": "associated_token_program",
+          "address": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"
         },
         {
           "name": "system_program",
           "address": "11111111111111111111111111111111"
-        },
-        {
-          "name": "token_program",
-          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
         }
       ],
       "args": [
         {
-          "name": "args",
-          "type": {
-            "defined": {
-              "name": "ClosePositionArgs"
-            }
-          }
-        }
-      ]
-    },
-    {
-      "name": "create_ticker",
-      "discriminator": [32, 213, 147, 234, 14, 160, 57, 17],
-      "accounts": [
-        {
-          "name": "signer",
-          "writable": true,
-          "signer": true
-        },
-        {
-          "name": "ticker",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [116, 105, 99, 107, 101, 114]
-              },
-              {
-                "kind": "arg",
-                "path": "args.name"
-              }
-            ]
-          }
-        },
-        {
-          "name": "vault",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [118, 97, 117, 108, 116]
-              },
-              {
-                "kind": "account",
-                "path": "ticker"
-              }
-            ]
-          }
-        },
-        {
-          "name": "payer_token_mint"
-        },
-        {
-          "name": "token_account",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  118, 97, 117, 108, 116, 95, 116, 111, 107, 101, 110, 95, 97,
-                  99, 99, 111, 117, 110, 116
-                ]
-              },
-              {
-                "kind": "account",
-                "path": "vault"
-              }
-            ]
-          }
-        },
-        {
-          "name": "system_program",
-          "address": "11111111111111111111111111111111"
-        },
-        {
-          "name": "token_program",
-          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
-        }
-      ],
-      "args": [
-        {
-          "name": "args",
-          "type": {
-            "defined": {
-              "name": "CreateTickerArgs"
-            }
-          }
+          "name": "order_id",
+          "type": "u64"
         }
       ]
     },
@@ -232,11 +217,6 @@
       "accounts": [
         {
           "name": "signer",
-          "writable": true,
-          "signer": true
-        },
-        {
-          "name": "payer",
           "writable": true,
           "signer": true
         },
@@ -252,6 +232,22 @@
               {
                 "kind": "const",
                 "value": [117, 115, 101, 114]
+              },
+              {
+                "kind": "account",
+                "path": "signer"
+              }
+            ]
+          }
+        },
+        {
+          "name": "user_trade",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [117, 115, 101, 114, 95, 116, 114, 97, 100, 101]
               },
               {
                 "kind": "account",
@@ -277,8 +273,8 @@
       ]
     },
     {
-      "name": "create_user_position",
-      "discriminator": [6, 137, 127, 227, 135, 241, 14, 109],
+      "name": "create_user_trade",
+      "discriminator": [232, 235, 58, 194, 135, 248, 153, 1],
       "accounts": [
         {
           "name": "signer",
@@ -286,27 +282,21 @@
           "signer": true
         },
         {
-          "name": "ticker",
+          "name": "user",
           "writable": true
         },
         {
-          "name": "user_position",
+          "name": "user_trade",
           "writable": true,
           "pda": {
             "seeds": [
               {
                 "kind": "const",
-                "value": [
-                  117, 115, 101, 114, 95, 112, 111, 115, 105, 116, 105, 111, 110
-                ]
+                "value": [117, 115, 101, 114, 95, 116, 114, 97, 100, 101]
               },
               {
                 "kind": "account",
                 "path": "signer"
-              },
-              {
-                "kind": "account",
-                "path": "ticker"
               }
             ]
           }
@@ -319,8 +309,8 @@
       "args": []
     },
     {
-      "name": "deposit_stake_rewards",
-      "discriminator": [59, 201, 204, 3, 44, 75, 231, 129],
+      "name": "initialize_market",
+      "discriminator": [35, 35, 189, 193, 155, 48, 170, 203],
       "accounts": [
         {
           "name": "signer",
@@ -328,17 +318,17 @@
           "signer": true
         },
         {
-          "name": "stake_vault",
+          "name": "market",
           "writable": true,
           "pda": {
             "seeds": [
               {
                 "kind": "const",
-                "value": [115, 116, 97, 107, 101, 95, 118, 97, 117, 108, 116]
+                "value": [109, 97, 114, 107, 101, 116]
               },
               {
                 "kind": "arg",
-                "path": "args.stake_vault"
+                "path": "args.market_id"
               }
             ]
           }
@@ -348,25 +338,33 @@
           "writable": true
         },
         {
-          "name": "from_ata",
-          "writable": true
+          "name": "fee_vault",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [102, 101, 101, 95, 118, 97, 117, 108, 116]
+              },
+              {
+                "kind": "arg",
+                "path": "args.market_id"
+              }
+            ]
+          }
         },
         {
-          "name": "to_ata",
+          "name": "fee_ata",
           "writable": true,
           "pda": {
             "seeds": [
               {
                 "kind": "account",
-                "path": "stake_vault"
+                "path": "fee_vault"
               },
               {
-                "kind": "const",
-                "value": [
-                  6, 221, 246, 225, 215, 101, 161, 147, 217, 203, 225, 70, 206,
-                  235, 121, 172, 28, 180, 133, 237, 95, 91, 55, 145, 58, 140,
-                  245, 133, 126, 255, 0, 169
-                ]
+                "kind": "account",
+                "path": "token_program"
               },
               {
                 "kind": "account",
@@ -401,15 +399,15 @@
           "name": "args",
           "type": {
             "defined": {
-              "name": "DepositStakeRewardsArgs"
+              "name": "InitializeMarketArgs"
             }
           }
         }
       ]
     },
     {
-      "name": "mine_ore",
-      "discriminator": [170, 66, 140, 123, 15, 20, 224, 194],
+      "name": "initialize_question",
+      "discriminator": [245, 151, 106, 188, 88, 44, 65, 212],
       "accounts": [
         {
           "name": "signer",
@@ -417,40 +415,8 @@
           "signer": true
         },
         {
-          "name": "user",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [117, 115, 101, 114]
-              },
-              {
-                "kind": "account",
-                "path": "signer"
-              }
-            ]
-          }
-        },
-        {
-          "name": "proof_info",
+          "name": "market",
           "writable": true
-        },
-        {
-          "name": "bus",
-          "writable": true
-        },
-        {
-          "name": "ore_program"
-        },
-        {
-          "name": "config_program"
-        },
-        {
-          "name": "sysvar_hashes_info"
-        },
-        {
-          "name": "sysvar_instructions_info"
         },
         {
           "name": "system_program",
@@ -462,15 +428,15 @@
           "name": "args",
           "type": {
             "defined": {
-              "name": "MineArgs"
+              "name": "InitializeQuestionArgs"
             }
           }
         }
       ]
     },
     {
-      "name": "open_ore",
-      "discriminator": [120, 233, 125, 197, 12, 153, 25, 229],
+      "name": "open_order",
+      "discriminator": [206, 88, 88, 143, 38, 136, 50, 224],
       "accounts": [
         {
           "name": "signer",
@@ -478,98 +444,92 @@
           "signer": true
         },
         {
-          "name": "payer",
-          "writable": true,
-          "signer": true
-        },
-        {
-          "name": "user",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [117, 115, 101, 114]
-              },
-              {
-                "kind": "account",
-                "path": "signer"
-              }
-            ]
-          }
-        },
-        {
-          "name": "miner_info",
+          "name": "user_trade",
           "writable": true
         },
         {
-          "name": "proof_info",
+          "name": "market",
           "writable": true
         },
         {
-          "name": "ore_program"
-        },
-        {
-          "name": "sysvar_hashes_info"
-        },
-        {
-          "name": "system_program",
-          "address": "11111111111111111111111111111111"
-        }
-      ],
-      "args": []
-    },
-    {
-      "name": "open_position",
-      "discriminator": [135, 128, 47, 77, 15, 152, 240, 49],
-      "accounts": [
-        {
-          "name": "signer",
-          "writable": true,
-          "signer": true
-        },
-        {
-          "name": "ticker",
+          "name": "fee_vault",
           "writable": true
         },
         {
-          "name": "vault",
+          "name": "mint",
           "writable": true
         },
         {
-          "name": "user_position",
+          "name": "user_from_ata",
           "writable": true
         },
         {
-          "name": "vault_token_account",
+          "name": "market_to_ata",
           "writable": true,
           "pda": {
             "seeds": [
               {
-                "kind": "const",
-                "value": [
-                  118, 97, 117, 108, 116, 95, 116, 111, 107, 101, 110, 95, 97,
-                  99, 99, 111, 117, 110, 116
-                ]
+                "kind": "account",
+                "path": "market"
               },
               {
                 "kind": "account",
-                "path": "vault"
+                "path": "token_program"
+              },
+              {
+                "kind": "account",
+                "path": "mint"
               }
-            ]
+            ],
+            "program": {
+              "kind": "const",
+              "value": [
+                140, 151, 37, 143, 78, 36, 137, 241, 187, 61, 16, 41, 20, 142,
+                13, 131, 11, 90, 19, 153, 218, 255, 16, 132, 4, 142, 123, 216,
+                219, 233, 248, 89
+              ]
+            }
           }
         },
         {
-          "name": "user_token_account",
-          "writable": true
-        },
-        {
-          "name": "system_program",
-          "address": "11111111111111111111111111111111"
+          "name": "fee_ata",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "account",
+                "path": "fee_vault"
+              },
+              {
+                "kind": "account",
+                "path": "token_program"
+              },
+              {
+                "kind": "account",
+                "path": "mint"
+              }
+            ],
+            "program": {
+              "kind": "const",
+              "value": [
+                140, 151, 37, 143, 78, 36, 137, 241, 187, 61, 16, 41, 20, 142,
+                13, 131, 11, 90, 19, 153, 218, 255, 16, 132, 4, 142, 123, 216,
+                219, 233, 248, 89
+              ]
+            }
+          }
         },
         {
           "name": "token_program",
-          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+          "address": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb"
+        },
+        {
+          "name": "associated_token_program",
+          "address": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
         }
       ],
       "args": [
@@ -577,7 +537,7 @@
           "name": "args",
           "type": {
             "defined": {
-              "name": "OpenPositionArgs"
+              "name": "OpenOrderArgs"
             }
           }
         }
@@ -611,6 +571,26 @@
         {
           "name": "token_program",
           "address": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb"
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "resolve_question",
+      "discriminator": [52, 32, 224, 179, 180, 8, 0, 246],
+      "accounts": [
+        {
+          "name": "signer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "market",
+          "writable": true
         },
         {
           "name": "system_program",
@@ -670,7 +650,31 @@
         },
         {
           "name": "from_ata",
-          "writable": true
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "account",
+                "path": "signer"
+              },
+              {
+                "kind": "account",
+                "path": "token_program"
+              },
+              {
+                "kind": "account",
+                "path": "mint"
+              }
+            ],
+            "program": {
+              "kind": "const",
+              "value": [
+                140, 151, 37, 143, 78, 36, 137, 241, 187, 61, 16, 41, 20, 142,
+                13, 131, 11, 90, 19, 153, 218, 255, 16, 132, 4, 142, 123, 216,
+                219, 233, 248, 89
+              ]
+            }
+          }
         },
         {
           "name": "to_ata",
@@ -682,12 +686,8 @@
                 "path": "stake_vault"
               },
               {
-                "kind": "const",
-                "value": [
-                  6, 221, 246, 225, 215, 101, 161, 147, 217, 203, 225, 70, 206,
-                  235, 121, 172, 28, 180, 133, 237, 95, 91, 55, 145, 58, 140,
-                  245, 133, 126, 255, 0, 169
-                ]
+                "kind": "account",
+                "path": "token_program"
               },
               {
                 "kind": "account",
@@ -783,7 +783,31 @@
         },
         {
           "name": "from_ata",
-          "writable": true
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "account",
+                "path": "signer"
+              },
+              {
+                "kind": "account",
+                "path": "token_program"
+              },
+              {
+                "kind": "account",
+                "path": "mint"
+              }
+            ],
+            "program": {
+              "kind": "const",
+              "value": [
+                140, 151, 37, 143, 78, 36, 137, 241, 187, 61, 16, 41, 20, 142,
+                13, 131, 11, 90, 19, 153, 218, 255, 16, 132, 4, 142, 123, 216,
+                219, 233, 248, 89
+              ]
+            }
+          }
         },
         {
           "name": "to_ata",
@@ -795,12 +819,8 @@
                 "path": "stake_vault"
               },
               {
-                "kind": "const",
-                "value": [
-                  6, 221, 246, 225, 215, 101, 161, 147, 217, 203, 225, 70, 206,
-                  235, 121, 172, 28, 180, 133, 237, 95, 91, 55, 145, 58, 140,
-                  245, 133, 126, 255, 0, 169
-                ]
+                "kind": "account",
+                "path": "token_program"
               },
               {
                 "kind": "account",
@@ -859,16 +879,11 @@
           "address": "11111111111111111111111111111111"
         }
       ],
-      "args": [
-        {
-          "name": "boost",
-          "type": "bool"
-        }
-      ]
+      "args": []
     },
     {
-      "name": "update_stake_vault_status",
-      "discriminator": [71, 64, 188, 150, 86, 254, 221, 65],
+      "name": "update_stake_vault",
+      "discriminator": [84, 171, 100, 153, 126, 215, 229, 68],
       "accounts": [
         {
           "name": "signer",
@@ -877,32 +892,87 @@
         },
         {
           "name": "stake_vault",
-          "writable": true
-        },
-        {
-          "name": "system_program",
-          "address": "11111111111111111111111111111111"
-        }
-      ],
-      "args": [
-        {
-          "name": "is_locked",
-          "type": "bool"
-        }
-      ]
-    },
-    {
-      "name": "update_ticker_price",
-      "discriminator": [203, 166, 139, 83, 76, 144, 250, 29],
-      "accounts": [
-        {
-          "name": "signer",
           "writable": true,
-          "signer": true
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [115, 116, 97, 107, 101, 95, 118, 97, 117, 108, 116]
+              },
+              {
+                "kind": "arg",
+                "path": "args.stake_vault"
+              }
+            ]
+          }
         },
         {
-          "name": "ticker",
+          "name": "mint",
           "writable": true
+        },
+        {
+          "name": "from_ata",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "account",
+                "path": "signer"
+              },
+              {
+                "kind": "account",
+                "path": "token_program"
+              },
+              {
+                "kind": "account",
+                "path": "mint"
+              }
+            ],
+            "program": {
+              "kind": "const",
+              "value": [
+                140, 151, 37, 143, 78, 36, 137, 241, 187, 61, 16, 41, 20, 142,
+                13, 131, 11, 90, 19, 153, 218, 255, 16, 132, 4, 142, 123, 216,
+                219, 233, 248, 89
+              ]
+            }
+          }
+        },
+        {
+          "name": "to_ata",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "account",
+                "path": "stake_vault"
+              },
+              {
+                "kind": "account",
+                "path": "token_program"
+              },
+              {
+                "kind": "account",
+                "path": "mint"
+              }
+            ],
+            "program": {
+              "kind": "const",
+              "value": [
+                140, 151, 37, 143, 78, 36, 137, 241, 187, 61, 16, 41, 20, 142,
+                13, 131, 11, 90, 19, 153, 218, 255, 16, 132, 4, 142, 123, 216,
+                219, 233, 248, 89
+              ]
+            }
+          }
+        },
+        {
+          "name": "token_program",
+          "address": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb"
+        },
+        {
+          "name": "associated_token_program",
+          "address": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"
         },
         {
           "name": "system_program",
@@ -914,7 +984,7 @@
           "name": "args",
           "type": {
             "defined": {
-              "name": "UpdateTickerPriceArgs"
+              "name": "UpdateStakeVaultArgs"
             }
           }
         }
@@ -951,7 +1021,31 @@
         },
         {
           "name": "from_ata",
-          "writable": true
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "account",
+                "path": "stake_vault"
+              },
+              {
+                "kind": "account",
+                "path": "token_program"
+              },
+              {
+                "kind": "account",
+                "path": "mint"
+              }
+            ],
+            "program": {
+              "kind": "const",
+              "value": [
+                140, 151, 37, 143, 78, 36, 137, 241, 187, 61, 16, 41, 20, 142,
+                13, 131, 11, 90, 19, 153, 218, 255, 16, 132, 4, 142, 123, 216,
+                219, 233, 248, 89
+              ]
+            }
+          }
         },
         {
           "name": "to_ata",
@@ -963,12 +1057,8 @@
                 "path": "signer"
               },
               {
-                "kind": "const",
-                "value": [
-                  6, 221, 246, 225, 215, 101, 161, 147, 217, 203, 225, 70, 206,
-                  235, 121, 172, 28, 180, 133, 237, 95, 91, 55, 145, 58, 140,
-                  245, 133, 126, 255, 0, 169
-                ]
+                "kind": "account",
+                "path": "token_program"
               },
               {
                 "kind": "account",
@@ -999,9 +1089,62 @@
         }
       ],
       "args": []
+    },
+    {
+      "name": "withdraw_v1",
+      "discriminator": [212, 118, 210, 5, 187, 1, 117, 222],
+      "accounts": [
+        {
+          "name": "signer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "ticker",
+          "writable": true
+        },
+        {
+          "name": "vault",
+          "writable": true
+        },
+        {
+          "name": "user_position",
+          "writable": true
+        },
+        {
+          "name": "vault_token_account",
+          "writable": true
+        },
+        {
+          "name": "user_token_account",
+          "writable": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        },
+        {
+          "name": "token_program",
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+        }
+      ],
+      "args": [
+        {
+          "name": "position_index",
+          "type": "u8"
+        }
+      ]
     }
   ],
   "accounts": [
+    {
+      "name": "FeeVault",
+      "discriminator": [192, 178, 69, 232, 58, 149, 157, 132]
+    },
+    {
+      "name": "Market",
+      "discriminator": [219, 190, 213, 55, 0, 227, 198, 154]
+    },
     {
       "name": "StakeV2",
       "discriminator": [207, 98, 130, 13, 118, 181, 238, 47]
@@ -1023,22 +1166,30 @@
       "discriminator": [251, 248, 209, 245, 83, 234, 17, 27]
     },
     {
+      "name": "UserTrade",
+      "discriminator": [149, 190, 47, 218, 136, 9, 222, 222]
+    },
+    {
       "name": "Vault",
       "discriminator": [211, 8, 232, 43, 2, 152, 117, 119]
     }
   ],
   "events": [
     {
-      "name": "ClosePositionRecord",
-      "discriminator": [202, 208, 157, 166, 193, 229, 76, 5]
+      "name": "OrderUpdate",
+      "discriminator": [97, 239, 148, 96, 83, 234, 245, 14]
     },
     {
-      "name": "OpenPositionRecord",
-      "discriminator": [118, 71, 105, 89, 222, 111, 56, 63]
+      "name": "PriceUpdate",
+      "discriminator": [222, 51, 180, 226, 165, 188, 203, 54]
     },
     {
-      "name": "TickerPriceUpdateRecord",
-      "discriminator": [11, 38, 250, 234, 149, 218, 144, 15]
+      "name": "QuestionUpdate",
+      "discriminator": [110, 108, 240, 86, 176, 226, 54, 113]
+    },
+    {
+      "name": "StakeRewards",
+      "discriminator": [236, 217, 227, 239, 6, 129, 188, 218]
     }
   ],
   "errors": [
@@ -1114,53 +1265,133 @@
     },
     {
       "code": 6014,
-      "name": "StakeVaultLocked",
-      "msg": "Stake vault locked"
-    },
-    {
-      "code": 6015,
       "name": "StakeLocked",
       "msg": "Stake is locked"
     },
     {
-      "code": 6016,
+      "code": 6015,
       "name": "StakeVaultFull",
       "msg": "Stake vault full"
     },
     {
-      "code": 6017,
+      "code": 6016,
       "name": "InvalidMint",
       "msg": "Invalid mint"
     },
     {
-      "code": 6018,
+      "code": 6017,
       "name": "InvalidStakeVaultWeek",
       "msg": "Invalid stake vault week"
     },
     {
-      "code": 6019,
+      "code": 6018,
       "name": "RewardsAlreadyClaimed",
       "msg": "Rewards already claimed"
     },
     {
-      "code": 6020,
+      "code": 6019,
       "name": "StakeOverflow",
       "msg": "Stake overflow"
     },
     {
-      "code": 6021,
+      "code": 6020,
       "name": "SwapsReachedLimit",
       "msg": "Swaps reached limit"
     },
     {
-      "code": 6022,
+      "code": 6021,
       "name": "InsufficientFunds",
       "msg": "Insufficient funds"
     },
     {
-      "code": 6023,
+      "code": 6022,
       "name": "NoRewardsAvailable",
       "msg": "No rewards available"
+    },
+    {
+      "code": 6023,
+      "name": "InvalidPrice",
+      "msg": "Invalid price"
+    },
+    {
+      "code": 6024,
+      "name": "InvalidOrderSize",
+      "msg": "Invalid order size"
+    },
+    {
+      "code": 6025,
+      "name": "MaxOpenOrdersReached",
+      "msg": "Maximum number of open orders reached"
+    },
+    {
+      "code": 6026,
+      "name": "NoAvailableOrderSlot",
+      "msg": "No available order slot"
+    },
+    {
+      "code": 6027,
+      "name": "MarketInactive",
+      "msg": "Market is inactive"
+    },
+    {
+      "code": 6028,
+      "name": "InvalidOrderType",
+      "msg": "Invalid order type"
+    },
+    {
+      "code": 6029,
+      "name": "InvalidOrderDirection",
+      "msg": "Invalid order direction"
+    },
+    {
+      "code": 6030,
+      "name": "OrderNotFound",
+      "msg": "Order not found"
+    },
+    {
+      "code": 6031,
+      "name": "InvalidOrderStatus",
+      "msg": "Invalid order status"
+    },
+    {
+      "code": 6032,
+      "name": "ArithmeticOverflow",
+      "msg": "Arithmetic overflow"
+    },
+    {
+      "code": 6033,
+      "name": "OrderSizeTooLarge",
+      "msg": "Order size too large"
+    },
+    {
+      "code": 6034,
+      "name": "QuestionPeriodNotEnded",
+      "msg": "Question period not ended"
+    },
+    {
+      "code": 6035,
+      "name": "InvalidStartTime",
+      "msg": "Invalid start time"
+    },
+    {
+      "code": 6036,
+      "name": "InvalidEndTime",
+      "msg": "Invalid end time"
+    },
+    {
+      "code": 6037,
+      "name": "QuestionPeriodNotStarted",
+      "msg": "Question period not started"
+    },
+    {
+      "code": 6038,
+      "name": "QuestionPeriodEnded",
+      "msg": "Question period ended"
+    },
+    {
+      "code": 6039,
+      "name": "StakeVaultLocked",
+      "msg": "Stake vault is locked"
     }
   ],
   "types": [
@@ -1181,70 +1412,6 @@
       }
     },
     {
-      "name": "ClosePositionArgs",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "position_index",
-            "type": "u8"
-          }
-        ]
-      }
-    },
-    {
-      "name": "ClosePositionRecord",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "amount",
-            "type": "u64"
-          },
-          {
-            "name": "ticker",
-            "type": "pubkey"
-          },
-          {
-            "name": "close_price",
-            "type": "u64"
-          },
-          {
-            "name": "ts",
-            "type": "i64"
-          },
-          {
-            "name": "is_long",
-            "type": "bool"
-          },
-          {
-            "name": "pnl",
-            "type": "i64"
-          },
-          {
-            "name": "user",
-            "type": "pubkey"
-          }
-        ]
-      }
-    },
-    {
-      "name": "CreateTickerArgs",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "name",
-            "type": "string"
-          },
-          {
-            "name": "protocol_program_id",
-            "type": "pubkey"
-          }
-        ]
-      }
-    },
-    {
       "name": "CreateUserArgs",
       "type": {
         "kind": "struct",
@@ -1257,85 +1424,478 @@
       }
     },
     {
-      "name": "DepositStakeRewardsArgs",
+      "name": "FeeVault",
       "type": {
         "kind": "struct",
         "fields": [
           {
-            "name": "amount",
-            "type": "u64"
+            "name": "bump",
+            "type": "u8"
           },
           {
-            "name": "stake_vault",
-            "type": "string"
-          }
-        ]
-      }
-    },
-    {
-      "name": "MineArgs",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "digest",
-            "type": {
-              "array": ["u8", 16]
-            }
-          },
-          {
-            "name": "nonce",
-            "type": {
-              "array": ["u8", 8]
-            }
-          }
-        ]
-      }
-    },
-    {
-      "name": "OpenPositionArgs",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "amount",
-            "type": "u64"
-          },
-          {
-            "name": "is_long",
-            "type": "bool"
-          }
-        ]
-      }
-    },
-    {
-      "name": "OpenPositionRecord",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "amount",
-            "type": "u64"
-          },
-          {
-            "name": "ticker",
+            "name": "authority",
             "type": "pubkey"
           },
           {
-            "name": "entry_price",
+            "name": "market",
+            "type": "pubkey"
+          },
+          {
+            "name": "deposited",
             "type": "u64"
           },
+          {
+            "name": "withdrawn",
+            "type": "u64"
+          },
+          {
+            "name": "net_balance",
+            "type": "u64"
+          },
+          {
+            "name": "project_available",
+            "type": "u64"
+          },
+          {
+            "name": "project_claimed",
+            "type": "u64"
+          },
+          {
+            "name": "nft_holders_available",
+            "type": "u64"
+          },
+          {
+            "name": "nft_holders_claimed",
+            "type": "u64"
+          },
+          {
+            "name": "market_available",
+            "type": "u64"
+          },
+          {
+            "name": "market_claimed",
+            "type": "u64"
+          },
+          {
+            "name": "padding",
+            "type": {
+              "array": ["u8", 60]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "InitializeMarketArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "name": "market_id",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "InitializeQuestionArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "question",
+            "type": {
+              "array": ["u8", 80]
+            }
+          },
+          {
+            "name": "start_time",
+            "type": "i64"
+          },
+          {
+            "name": "end_time",
+            "type": "i64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Market",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "bump",
+            "type": "u8"
+          },
+          {
+            "name": "authority",
+            "type": "pubkey"
+          },
+          {
+            "name": "market_id",
+            "docs": ["Unique identifier for the market"],
+            "type": "u64"
+          },
+          {
+            "name": "name",
+            "docs": ["The event being predicted (e.g., \"tJUP/TRD\")"],
+            "type": "string"
+          },
+          {
+            "name": "hype_price",
+            "docs": [
+              "Current price for Hype outcome (0-1000000, representing 0 to 1 TRD)",
+              "1000000 = 1 TRD, 500000 = 0.5 TRD, etc."
+            ],
+            "type": "u64"
+          },
+          {
+            "name": "flop_price",
+            "docs": [
+              "Current price for Flop outcome (0-1000000, representing 0 to 1 TRD)"
+            ],
+            "type": "u64"
+          },
+          {
+            "name": "hype_liquidity",
+            "docs": ["Total liquidity for Hype (in TRD)"],
+            "type": "u64"
+          },
+          {
+            "name": "flop_liquidity",
+            "docs": ["Total liquidity for Flop (in TRD)"],
+            "type": "u64"
+          },
+          {
+            "name": "total_hype_shares",
+            "docs": ["Total number of Hype shares issued"],
+            "type": "u64"
+          },
+          {
+            "name": "total_flop_shares",
+            "docs": ["Total number of Flop shares issued"],
+            "type": "u64"
+          },
+          {
+            "name": "total_volume",
+            "docs": ["Total trading volume (in TRD) for all resolutions"],
+            "type": "u64"
+          },
+          {
+            "name": "mint",
+            "docs": ["Mint $TRD token"],
+            "type": "pubkey"
+          },
+          {
+            "name": "ts",
+            "docs": ["Timestamp of the init"],
+            "type": "i64"
+          },
+          {
+            "name": "update_ts",
+            "type": "i64"
+          },
+          {
+            "name": "open_orders_count",
+            "docs": ["Total number of open orders in this market"],
+            "type": "u64"
+          },
+          {
+            "name": "next_order_id",
+            "docs": ["Next available order ID"],
+            "type": "u64"
+          },
+          {
+            "name": "fee_bps",
+            "docs": [
+              "Fees applied to trades (in basis points, e.g., 1.131% fee)"
+            ],
+            "type": "u16"
+          },
+          {
+            "name": "fee_vault",
+            "docs": ["Vault to Receive fees"],
+            "type": "pubkey"
+          },
+          {
+            "name": "is_active",
+            "docs": ["Whether the market is currently active for trading"],
+            "type": "bool"
+          },
+          {
+            "name": "market_price",
+            "type": "u64"
+          },
+          {
+            "name": "previous_resolved_question",
+            "type": {
+              "defined": {
+                "name": "ResolvedQuestion"
+              }
+            }
+          },
+          {
+            "name": "current_question_id",
+            "docs": [
+              "Index of the current week in the weekly_results array initialized with default values"
+            ],
+            "type": "u64"
+          },
+          {
+            "name": "current_question_start",
+            "type": "i64"
+          },
+          {
+            "name": "current_question_end",
+            "type": "i64"
+          },
+          {
+            "name": "current_question",
+            "docs": ["The question or prediction topic for the current week"],
+            "type": {
+              "array": ["u8", 80]
+            }
+          },
+          {
+            "name": "padding",
+            "type": {
+              "array": ["u8", 200]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "OpenOrderArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "amount",
+            "type": "u64"
+          },
+          {
+            "name": "direction",
+            "type": {
+              "defined": {
+                "name": "OrderDirection"
+              }
+            }
+          },
+          {
+            "name": "comment",
+            "type": {
+              "option": {
+                "array": ["u8", 64]
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "Order",
+      "type": {
+        "kind": "struct",
+        "fields": [
           {
             "name": "ts",
             "type": "i64"
           },
           {
-            "name": "is_long",
-            "type": "bool"
+            "name": "order_id",
+            "type": "u64"
           },
+          {
+            "name": "question_id",
+            "type": "u64"
+          },
+          {
+            "name": "market_id",
+            "type": "u64"
+          },
+          {
+            "name": "status",
+            "type": {
+              "defined": {
+                "name": "OrderStatus"
+              }
+            }
+          },
+          {
+            "name": "price",
+            "docs": ["The price of the order (in TRD)"],
+            "type": "u64"
+          },
+          {
+            "name": "total_amount",
+            "docs": ["The total amount of TRD committed to this order"],
+            "type": "u64"
+          },
+          {
+            "name": "total_shares",
+            "docs": ["The total number of shares to be purchased"],
+            "type": "u64"
+          },
+          {
+            "name": "order_type",
+            "type": {
+              "defined": {
+                "name": "OrderType"
+              }
+            }
+          },
+          {
+            "name": "direction",
+            "type": {
+              "defined": {
+                "name": "OrderDirection"
+              }
+            }
+          },
+          {
+            "name": "padding",
+            "type": {
+              "array": ["u8", 32]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "OrderDirection",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Hype"
+          },
+          {
+            "name": "Flop"
+          }
+        ]
+      }
+    },
+    {
+      "name": "OrderStatus",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Init"
+          },
+          {
+            "name": "Open"
+          },
+          {
+            "name": "Closed"
+          }
+        ]
+      }
+    },
+    {
+      "name": "OrderType",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Market"
+          },
+          {
+            "name": "Limit"
+          }
+        ]
+      }
+    },
+    {
+      "name": "OrderUpdate",
+      "type": {
+        "kind": "struct",
+        "fields": [
           {
             "name": "user",
             "type": "pubkey"
+          },
+          {
+            "name": "market_id",
+            "type": "u64"
+          },
+          {
+            "name": "question_id",
+            "type": "u64"
+          },
+          {
+            "name": "order_id",
+            "type": "u64"
+          },
+          {
+            "name": "direction",
+            "type": {
+              "defined": {
+                "name": "OrderDirection"
+              }
+            }
+          },
+          {
+            "name": "order_type",
+            "type": {
+              "defined": {
+                "name": "OrderType"
+              }
+            }
+          },
+          {
+            "name": "order_status",
+            "type": {
+              "defined": {
+                "name": "OrderStatus"
+              }
+            }
+          },
+          {
+            "name": "price",
+            "type": "u64"
+          },
+          {
+            "name": "total_shares",
+            "type": "u64"
+          },
+          {
+            "name": "total_amount",
+            "type": "u64"
+          },
+          {
+            "name": "comment",
+            "type": {
+              "option": {
+                "array": ["u8", 64]
+              }
+            }
+          },
+          {
+            "name": "refund_amount",
+            "type": {
+              "option": "u64"
+            }
+          },
+          {
+            "name": "pnl",
+            "type": "i64"
+          },
+          {
+            "name": "timestamp",
+            "type": "i64"
+          },
+          {
+            "name": "is_question_winner",
+            "type": {
+              "option": "bool"
+            }
           }
         ]
       }
@@ -1373,6 +1933,218 @@
       }
     },
     {
+      "name": "PriceUpdate",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "market_id",
+            "type": "u64"
+          },
+          {
+            "name": "hype_price",
+            "type": "u64"
+          },
+          {
+            "name": "flop_price",
+            "type": "u64"
+          },
+          {
+            "name": "market_price",
+            "type": "u64"
+          },
+          {
+            "name": "direction",
+            "type": {
+              "defined": {
+                "name": "OrderDirection"
+              }
+            }
+          },
+          {
+            "name": "timestamp",
+            "type": "i64"
+          },
+          {
+            "name": "comment",
+            "type": {
+              "option": {
+                "array": ["u8", 64]
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "QuestionStatus",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Resolved"
+          },
+          {
+            "name": "Unresolved"
+          }
+        ]
+      }
+    },
+    {
+      "name": "QuestionUpdate",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "market_id",
+            "type": "u64"
+          },
+          {
+            "name": "question_id",
+            "type": "u64"
+          },
+          {
+            "name": "question",
+            "type": "string"
+          },
+          {
+            "name": "start_time",
+            "type": "i64"
+          },
+          {
+            "name": "end_time",
+            "type": "i64"
+          },
+          {
+            "name": "hype_liquidity",
+            "type": "u64"
+          },
+          {
+            "name": "flop_liquidity",
+            "type": "u64"
+          },
+          {
+            "name": "winning_direction",
+            "type": {
+              "defined": {
+                "name": "WinningDirection"
+              }
+            }
+          },
+          {
+            "name": "market_price",
+            "type": "u64"
+          },
+          {
+            "name": "final_hype_price",
+            "type": "u64"
+          },
+          {
+            "name": "final_flop_price",
+            "type": "u64"
+          },
+          {
+            "name": "timestamp",
+            "type": "i64"
+          },
+          {
+            "name": "total_hype_shares",
+            "type": "u64"
+          },
+          {
+            "name": "total_flop_shares",
+            "type": "u64"
+          },
+          {
+            "name": "status",
+            "type": {
+              "defined": {
+                "name": "QuestionStatus"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "ResolvedQuestion",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "question_id",
+            "type": "u64"
+          },
+          {
+            "name": "question",
+            "docs": ["The question or prediction topic for this week"],
+            "type": {
+              "array": ["u8", 80]
+            }
+          },
+          {
+            "name": "start_time",
+            "docs": ["Start timestamp of the week"],
+            "type": "i64"
+          },
+          {
+            "name": "end_time",
+            "docs": ["End timestamp of the week"],
+            "type": "i64"
+          },
+          {
+            "name": "hype_liquidity",
+            "docs": ["Total liquidity for Hype (in TRD)"],
+            "type": "u64"
+          },
+          {
+            "name": "flop_liquidity",
+            "docs": ["Total liquidity for Flop (in TRD)"],
+            "type": "u64"
+          },
+          {
+            "name": "winning_direction",
+            "docs": ["The winning direction (Hype, Flop or None)"],
+            "type": {
+              "defined": {
+                "name": "WinningDirection"
+              }
+            }
+          },
+          {
+            "name": "market_price",
+            "type": "u64"
+          },
+          {
+            "name": "final_hype_price",
+            "docs": ["Final price for Hype outcome at the end of the week"],
+            "type": "u64"
+          },
+          {
+            "name": "final_flop_price",
+            "docs": ["Final price for Flop outcome at the end of the week"],
+            "type": "u64"
+          },
+          {
+            "name": "total_hype_shares",
+            "docs": ["Total number of Hype shares issued"],
+            "type": "u64"
+          },
+          {
+            "name": "total_flop_shares",
+            "docs": ["Total number of Flop shares issued"],
+            "type": "u64"
+          },
+          {
+            "name": "padding",
+            "type": {
+              "array": ["u8", 40]
+            }
+          }
+        ]
+      }
+    },
+    {
       "name": "StakeNFTArgs",
       "type": {
         "kind": "struct",
@@ -1384,6 +2156,34 @@
           {
             "name": "stake_vault",
             "type": "string"
+          }
+        ]
+      }
+    },
+    {
+      "name": "StakeRewards",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "user",
+            "type": "pubkey"
+          },
+          {
+            "name": "mint",
+            "type": "pubkey"
+          },
+          {
+            "name": "amount",
+            "type": "u64"
+          },
+          {
+            "name": "timestamp",
+            "type": "i64"
+          },
+          {
+            "name": "rank",
+            "type": "u16"
           }
         ]
       }
@@ -1583,33 +2383,25 @@
       }
     },
     {
-      "name": "TickerPriceUpdateRecord",
+      "name": "UpdateStakeVaultArgs",
       "type": {
         "kind": "struct",
         "fields": [
           {
-            "name": "price",
-            "type": "u64"
+            "name": "amount",
+            "type": {
+              "option": "u64"
+            }
           },
           {
-            "name": "ts",
-            "type": "i64"
+            "name": "status",
+            "type": {
+              "option": "bool"
+            }
           },
           {
-            "name": "ticker",
-            "type": "pubkey"
-          }
-        ]
-      }
-    },
-    {
-      "name": "UpdateTickerPriceArgs",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "price",
-            "type": "u64"
+            "name": "stake_vault",
+            "type": "string"
           }
         ]
       }
@@ -1660,10 +2452,8 @@
             "type": "i64"
           },
           {
-            "name": "padding",
-            "type": {
-              "array": ["u8", 32]
-            }
+            "name": "user_trade",
+            "type": "pubkey"
           }
         ]
       }
@@ -1716,6 +2506,62 @@
                 },
                 3
               ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "UserTrade",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "bump",
+            "type": "u8"
+          },
+          {
+            "name": "authority",
+            "type": "pubkey"
+          },
+          {
+            "name": "total_deposits",
+            "docs": [
+              "The total value of deposits the user has made (in TRD)",
+              "precision: QUOTE_PRECISION"
+            ],
+            "type": "u64"
+          },
+          {
+            "name": "total_withdraws",
+            "docs": [
+              "The total value of withdrawals the user has made (in TRD)",
+              "precision: QUOTE_PRECISION"
+            ],
+            "type": "u64"
+          },
+          {
+            "name": "opened_orders",
+            "docs": ["The number of orders the user has opened"],
+            "type": "u64"
+          },
+          {
+            "name": "orders",
+            "type": {
+              "array": [
+                {
+                  "defined": {
+                    "name": "Order"
+                  }
+                },
+                10
+              ]
+            }
+          },
+          {
+            "name": "padding",
+            "type": {
+              "array": ["u8", 32]
             }
           }
         ]
@@ -1781,6 +2627,26 @@
           {
             "name": "short_positions_opened",
             "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "WinningDirection",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "None"
+          },
+          {
+            "name": "Hype"
+          },
+          {
+            "name": "Flop"
+          },
+          {
+            "name": "Draw"
           }
         ]
       }

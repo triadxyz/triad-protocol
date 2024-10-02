@@ -1,12 +1,12 @@
 [features]
 skip-lint = false
 
-[programs.localnet]
+[programs.mainnet]
 triad_protocol = "TRDwq3BN4mP3m9KsuNUWSN6QDff93VKGSwE95Jbr9Ss"
 
 [provider]
-cluster = "localnet"
-wallet = "/Users/dannpl/.config/solana/id.json"
+cluster = "mainnet"
+wallet = "~/.config/solana/triad.json"
 
 [scripts]
 test = "yarn run ts-mocha -p ./tsconfig.json -t 1000000 tests/**/*.ts"

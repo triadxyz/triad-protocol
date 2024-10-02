@@ -15,27 +15,42 @@ declare_id!("TRDwq3BN4mP3m9KsuNUWSN6QDff93VKGSwE95Jbr9Ss");
 pub mod triad_protocol {
     use super::*;
 
-    pub fn create_user_position(ctx: Context<CreateUserPosition>) -> Result<()> {
-        instructions::create_user_position(ctx)
+    pub fn withdraw_v1(ctx: Context<WithdrawV1>, position_index: u8) -> Result<()> {
+        instructions::withdraw_v1(ctx, position_index)
     }
 
-    pub fn create_ticker(ctx: Context<CreateTicker>, args: CreateTickerArgs) -> Result<()> {
-        instructions::create_ticker(ctx, args)
-    }
-
-    pub fn update_ticker_price(
-        ctx: Context<UpdateTickerPrice>,
-        args: UpdateTickerPriceArgs
+    pub fn initialize_market(
+        ctx: Context<InitializeMarket>,
+        args: InitializeMarketArgs
     ) -> Result<()> {
-        instructions::update_ticker_price(ctx, args)
+        instructions::initialize_market(ctx, args)
     }
 
-    pub fn open_position(ctx: Context<OpenPosition>, args: OpenPositionArgs) -> Result<()> {
-        instructions::open_position(ctx, args)
+    pub fn initialize_question(
+        ctx: Context<InitializeQuestion>,
+        args: InitializeQuestionArgs
+    ) -> Result<()> {
+        instructions::initialize_question(ctx, args)
     }
 
-    pub fn close_position(ctx: Context<ClosePosition>, args: ClosePositionArgs) -> Result<()> {
-        instructions::close_position(ctx, args)
+    pub fn resolve_question(ctx: Context<ResolveQuestion>) -> Result<()> {
+        instructions::resolve_question(ctx)
+    }
+
+    pub fn create_user(ctx: Context<CreateUser>, args: CreateUserArgs) -> Result<()> {
+        instructions::create_user(ctx, args)
+    }
+
+    pub fn create_user_trade(ctx: Context<CreateUserTrade>) -> Result<()> {
+        instructions::create_user_trade(ctx)
+    }
+
+    pub fn open_order(ctx: Context<OpenOrder>, args: OpenOrderArgs) -> Result<()> {
+        instructions::open_order(ctx, args)
+    }
+
+    pub fn close_order(ctx: Context<CloseOrder>, order_id: u64) -> Result<()> {
+        instructions::close_order(ctx, order_id)
     }
 
     pub fn stake_nft(ctx: Context<StakeNFT>, args: StakeNFTArgs) -> Result<()> {
@@ -54,18 +69,11 @@ pub mod triad_protocol {
         instructions::withdraw_stake(ctx)
     }
 
-    pub fn deposit_stake_rewards(
-        ctx: Context<DepositStakeRewards>,
-        args: DepositStakeRewardsArgs
+    pub fn update_stake_vault(
+        ctx: Context<UpdateStakeVault>,
+        args: UpdateStakeVaultArgs
     ) -> Result<()> {
-        instructions::deposit_stake_rewards(ctx, args)
-    }
-
-    pub fn update_stake_vault_status(
-        ctx: Context<UpdateStakeVaultStatus>,
-        is_locked: bool
-    ) -> Result<()> {
-        instructions::update_stake_vault_status(ctx, is_locked)
+        instructions::update_stake_vault(ctx, args)
     }
 
     pub fn claim_stake_rewards(
@@ -75,19 +83,7 @@ pub mod triad_protocol {
         instructions::claim_stake_rewards(ctx, args)
     }
 
-    pub fn create_user(ctx: Context<CreateUser>, args: CreateUserArgs) -> Result<()> {
-        instructions::create_user(ctx, args)
-    }
-
-    pub fn update_stake_boost(ctx: Context<UpdateStakeBoost>, boost: bool) -> Result<()> {
-        instructions::update_stake_boost(ctx, boost)
-    }
-
-    pub fn open_ore(ctx: Context<OpenOre>) -> Result<()> {
-        instructions::open_ore(ctx)
-    }
-
-    pub fn mine_ore(ctx: Context<MineOre>, args: MineArgs) -> Result<()> {
-        instructions::mine_ore(ctx, args)
+    pub fn update_stake_boost(ctx: Context<UpdateStakeBoost>) -> Result<()> {
+        instructions::update_stake_boost(ctx)
     }
 }

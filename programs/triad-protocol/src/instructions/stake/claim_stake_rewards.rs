@@ -1,10 +1,13 @@
-use crate::constraints::{ is_mint_for_stake_vault, is_verifier };
-use crate::errors::TriadProtocolError;
-use crate::{ constraints::is_authority_for_stake, state::StakeVault };
-use crate::{ ClaimStakeRewardsArgs, StakeV2 };
 use anchor_lang::prelude::*;
 use anchor_spl::token_2022::{ transfer_checked, Token2022, TransferChecked };
 use anchor_spl::{ associated_token::AssociatedToken, token_interface::{ Mint, TokenAccount } };
+
+use crate::{
+    state::{ ClaimStakeRewardsArgs, StakeV2, StakeVault },
+    events::StakeRewards,
+    constraints::{ is_authority_for_stake, is_mint_for_stake_vault, is_verifier },
+    errors::TriadProtocolError,
+};
 
 #[derive(Accounts)]
 #[instruction(args: ClaimStakeRewardsArgs)]
@@ -24,15 +27,20 @@ pub struct ClaimStakeRewards<'info> {
     #[account(mut, constraint = is_mint_for_stake_vault(&stake_vault, &mint.key())?)]
     pub mint: Box<InterfaceAccount<'info, Mint>>,
 
-    #[account(mut)]
+    #[account(
+        mut,
+        associated_token::mint = mint,
+        associated_token::authority = stake_vault,
+        associated_token::token_program = token_program
+    )]
     pub from_ata: Box<InterfaceAccount<'info, TokenAccount>>,
 
     #[account(
         init_if_needed,
         payer = signer,
-        constraint = to_ata.owner == *signer.key && to_ata.mint == mint.key(),
         associated_token::mint = mint,
-        associated_token::authority = signer
+        associated_token::authority = signer,
+        associated_token::token_program = token_program
     )]
     pub to_ata: Box<InterfaceAccount<'info, TokenAccount>>,
 
@@ -48,15 +56,11 @@ pub fn claim_stake_rewards(
     let stake_vault: &mut Box<Account<StakeVault>> = &mut ctx.accounts.stake_vault;
     let stake: &mut Box<Account<StakeV2>> = &mut ctx.accounts.stake;
 
-    if stake.withdraw_ts != 0 {
-        return Err(TriadProtocolError::NoRewardsAvailable.into());
-    }
+    require!(stake.withdraw_ts == 0, TriadProtocolError::NoRewardsAvailable);
 
-    if args.collections > 5 {
-        return Err(TriadProtocolError::Unauthorized.into());
-    }
+    require!(args.collections <= 5, TriadProtocolError::Unauthorized);
 
-    let rank = args.rank;
+    let mut rank = args.rank;
     let collections = args.collections;
 
     let boost_rewards = if stake.boost { 3.69 * 369.0 } else { 0.0 };
@@ -67,6 +71,10 @@ pub fn claim_stake_rewards(
     } else {
         stake.amount * 10000 * (10u64).pow(ctx.accounts.mint.decimals as u32)
     };
+
+    if stake.mint.eq(&stake_vault.token_mint) {
+        rank = 963;
+    }
 
     let max_rank = 1823 as f64;
     let rank = rank as f64;
@@ -81,13 +89,16 @@ pub fn claim_stake_rewards(
 
     let last_claim = if stake.claimed_ts == 0 { stake.init_ts } else { stake.claimed_ts };
     let current_time = Clock::get()?.unix_timestamp;
-    let seconds_staked = current_time - last_claim;
+    let seconds_staked = current_time.checked_sub(last_claim).unwrap();
 
     let mut amount_base = 6.0;
 
-    // Thu Sep 19 2024 14:32:02
-    if stake.claimed_ts > 1726756310 || stake.init_ts > 1726756310 {
-        amount_base = 3.0;
+    if stake.claimed_ts > 1726876394 || stake.init_ts > 1726876394 {
+        amount_base = 2.0;
+    }
+
+    if stake.boost {
+        amount_base = 3.69;
     }
 
     let user_base_rewards =
@@ -129,8 +140,16 @@ pub fn claim_stake_rewards(
 
     if stake_vault.is_locked {
         msg!("Stake vault is locked: Rewards {:12}", checked_rewards);
-        return Err(TriadProtocolError::Unauthorized.into());
+        return Err(TriadProtocolError::StakeVaultLocked.into());
     }
+
+    emit!(StakeRewards {
+        user: ctx.accounts.signer.key(),
+        mint: stake.mint,
+        amount: checked_rewards,
+        timestamp: current_time,
+        rank: args.rank,
+    });
 
     Ok(checked_rewards)
 }

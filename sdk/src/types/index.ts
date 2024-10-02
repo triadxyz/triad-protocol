@@ -1,4 +1,4 @@
-import { Keypair, PublicKey } from '@solana/web3.js'
+import { PublicKey } from '@solana/web3.js'
 
 export type RpcOptions = {
   skipPreflight?: boolean
@@ -11,17 +11,13 @@ export type CreateUserArgs = {
   referral?: PublicKey
 }
 
-export type OpenOreArgs = {
-  user: PublicKey
-  payer: Keypair
+export type User = {
+  ts: number
+  authority: string
+  referral: string
+  referred: number
   name: string
-  referralName: string
-}
-
-export type MineOreArgs = {
-  user: PublicKey
-  payer: PublicKey
-  bus: PublicKey
-  digest: number[]
-  nonce: number[]
+  swapsMade: number
+  swaps: number
+  staked: number
 }

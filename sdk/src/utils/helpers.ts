@@ -1,29 +1,11 @@
-import {
-  COLLECTION_MUlTIPLIER,
-  StakeResponse,
-  StakeVaultResponse,
-  UserResponse
-} from './../types/stake'
+import { Stake, StakeVault } from './../types/stake'
+import { User } from './../types'
+import { ResolvedQuestion, Market, WinningDirection } from '../types/trade'
 import { PublicKey } from '@solana/web3.js'
-import * as anchor from '@coral-xyz/anchor'
-import BN from 'bn.js'
-import { TOKEN_2022_PROGRAM_ID } from '@solana/spl-token'
-import { ATA_PROGRAM_ID, ORE_PROGRAM_ID } from './constants'
 
-export const getTickerAddressSync = (
-  programId: PublicKey,
-  tickerName: string
-) => {
-  const [TickerPDA] = PublicKey.findProgramAddressSync(
-    [Buffer.from('ticker'), Buffer.from(tickerName)],
-    programId
-  )
+export const encodeString = (value: string, alloc = 32): number[] => {
+  const buffer = Buffer.alloc(alloc)
 
-  return TickerPDA
-}
-
-export const encodeString = (value: string): number[] => {
-  const buffer = Buffer.alloc(32)
   buffer.fill(value)
   buffer.fill(' ', value.length)
 
@@ -35,131 +17,7 @@ export const decodeString = (bytes: number[]): string => {
   return buffer.toString('utf8').trim()
 }
 
-export const getVaultAddressSync = (
-  programId: PublicKey,
-  tickerAddress: PublicKey
-): PublicKey => {
-  const [VaultPDA] = PublicKey.findProgramAddressSync(
-    [
-      Buffer.from(anchor.utils.bytes.utf8.encode('vault')),
-      tickerAddress.toBuffer()
-    ],
-    programId
-  )
-
-  return VaultPDA
-}
-
-export const getTokenVaultAddressSync = (
-  programId: PublicKey,
-  vault: PublicKey
-) => {
-  const [VaultTokenPDA] = PublicKey.findProgramAddressSync(
-    [
-      Buffer.from(anchor.utils.bytes.utf8.encode('vault_token_account')),
-      vault.toBuffer()
-    ],
-    programId
-  )
-
-  return VaultTokenPDA
-}
-
-export function getUserPositionAddressSync(
-  programId: PublicKey,
-  authority: PublicKey,
-  ticker: PublicKey
-): PublicKey {
-  const [UserPositionPDA] = PublicKey.findProgramAddressSync(
-    [
-      Buffer.from(anchor.utils.bytes.utf8.encode('user_position')),
-      authority.toBuffer(),
-      ticker.toBuffer()
-    ],
-    programId
-  )
-
-  return UserPositionPDA
-}
-
-export const getStakeVaultAddressSync = (
-  programId: PublicKey,
-  vaultName: string
-) => {
-  const [StakeVaultPDA] = PublicKey.findProgramAddressSync(
-    [Buffer.from('stake_vault'), Buffer.from(vaultName)],
-    programId
-  )
-
-  return StakeVaultPDA
-}
-
-export const getStakeAddressSync = (
-  programId: PublicKey,
-  wallet: PublicKey,
-  name: string
-) => {
-  const [StakePDA] = PublicKey.findProgramAddressSync(
-    [Buffer.from('stake'), wallet.toBuffer(), Buffer.from(name)],
-    programId
-  )
-
-  return StakePDA
-}
-
-export const getNFTRewardsAddressSync = (
-  programId: PublicKey,
-  stake: PublicKey
-) => {
-  const [NFTRewardsPDA] = PublicKey.findProgramAddressSync(
-    [Buffer.from('nft_rewards'), stake.toBuffer()],
-    programId
-  )
-
-  return NFTRewardsPDA
-}
-
-export const getATASync = (address: PublicKey, Mint: PublicKey) => {
-  const [ATA] = PublicKey.findProgramAddressSync(
-    [address.toBytes(), TOKEN_2022_PROGRAM_ID.toBytes(), Mint.toBytes()],
-    new PublicKey(ATA_PROGRAM_ID)
-  )
-
-  return ATA
-}
-
-export const getUserAddressSync = (programId: PublicKey, wallet: PublicKey) => {
-  const [StakePDA] = PublicKey.findProgramAddressSync(
-    [Buffer.from('user'), wallet.toBuffer()],
-    programId
-  )
-
-  return StakePDA
-}
-
-export const getProofOreAddressSync = (wallet: PublicKey) => {
-  const [ProofPDA] = PublicKey.findProgramAddressSync(
-    [Buffer.from('proof'), wallet.toBuffer()],
-    new PublicKey(ORE_PROGRAM_ID)
-  )
-
-  return ProofPDA
-}
-
-export const configOreProgramAddressSync = () => {
-  const [ProofPDA] = PublicKey.findProgramAddressSync(
-    [Buffer.from('config')],
-    new PublicKey(ORE_PROGRAM_ID)
-  )
-
-  return ProofPDA
-}
-
-export const formatNumber = (number: bigint | BN, decimals = 6) => {
-  return Number(number.toString()) / 10 ** decimals
-}
-
-export const formatStakeVault = (stakeVault: any): StakeVaultResponse => {
+export const formatStakeVault = (stakeVault: any): StakeVault => {
   return {
     name: stakeVault.name,
     collection: stakeVault.collection,
@@ -179,7 +37,7 @@ export const formatStakeVault = (stakeVault: any): StakeVaultResponse => {
   }
 }
 
-export const formatStake = (stake: any): StakeResponse => {
+export const formatStake = (stake: any): Stake => {
   return {
     name: stake.name,
     stakeVault: stake.stakeVault.toBase58(),
@@ -195,7 +53,7 @@ export const formatStake = (stake: any): StakeResponse => {
   }
 }
 
-export const formatUser = (user: any): UserResponse => {
+export const formatUser = (user: any): User => {
   return {
     ts: user.ts.toNumber(),
     authority: user.authority.toBase58(),
@@ -208,33 +66,52 @@ export const formatUser = (user: any): UserResponse => {
   }
 }
 
-export const calculateTotalMultiplier = (
-  collections: COLLECTION_MUlTIPLIER[],
-  rank: { max: number; currentPosition: number }
-) => {
-  let multiplier = 1
-
-  collections.forEach((collection) => {
-    if (COLLECTION_MUlTIPLIER[collection]) {
-      multiplier *= Number(COLLECTION_MUlTIPLIER[collection])
-    }
-  })
-
-  let rankMultiplier = (rank.max + 1 - rank.currentPosition) / rank.max
-
-  return multiplier * rankMultiplier
+export const accountToMarket = (account: any, address: PublicKey): Market => {
+  return {
+    bump: account.bump,
+    address: address.toString(),
+    authority: account.authority.toString(),
+    marketId: account.marketId.toString(),
+    name: account.name,
+    hypePrice: account.hypePrice.toString(),
+    flopPrice: account.flopPrice.toString(),
+    hypeLiquidity: account.hypeLiquidity.toString(),
+    flopLiquidity: account.flopLiquidity.toString(),
+    totalHypeShares: account.totalHypeShares.toString(),
+    totalFlopShares: account.totalFlopShares.toString(),
+    totalVolume: account.totalVolume.toString(),
+    mint: account.mint.toString(),
+    ts: account.ts.toString(),
+    updateTs: account.updateTs.toString(),
+    openOrdersCount: account.openOrdersCount.toString(),
+    nextOrderId: account.nextOrderId.toString(),
+    feeBps: account.feeBps,
+    feeVault: account.feeVault.toBase58(),
+    isActive: account.isActive,
+    marketPrice: account.marketPrice.toString(),
+    isOfficial: account.isOfficial,
+    previousResolvedQuestion: accountToResolvedQuestion(
+      account.previousResolvedQuestion
+    ),
+    currentQuestionId: account.currentQuestionId.toString(),
+    currentQuestionStart: account.currentQuestionStart.toString(),
+    currentQuestionEnd: account.currentQuestionEnd.toString(),
+    currentQuestion: Buffer.from(account.currentQuestion)
+      .toString()
+      .replace(/\0+$/, '')
+  }
 }
 
-export const calculateAPR = ({
-  rewards,
-  rate,
-  amount,
-  baseRewards
-}: {
-  rewards: number
-  rate: number
-  amount: number
-  baseRewards: number
-}) => {
-  return ((rewards * rate) / (amount * baseRewards)) * 100
+const accountToResolvedQuestion = (question: any): ResolvedQuestion => {
+  return {
+    question: Buffer.from(question.question).toString().replace(/\0+$/, ''),
+    startTime: question.startTime.toString(),
+    endTime: question.endTime.toString(),
+    hypeLiquidity: question.hypeLiquidity.toString(),
+    flopLiquidity: question.flopLiquidity.toString(),
+    winningDirection: WinningDirection[question.winningDirection],
+    marketPrice: question.marketPrice.toString(),
+    finalHypePrice: question.finalHypePrice.toString(),
+    finalFlopPrice: question.finalFlopPrice.toString()
+  }
 }

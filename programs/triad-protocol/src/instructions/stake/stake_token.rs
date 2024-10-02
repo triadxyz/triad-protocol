@@ -1,13 +1,12 @@
-use crate::{
-    constraints::is_mint_for_stake_vault,
-    errors::TriadProtocolError,
-    state::{ StakeTokenArgs, StakeVault },
-    StakeV2,
-    User,
-};
 use anchor_lang::prelude::*;
 use anchor_spl::token_2022::{ Token2022, transfer_checked, TransferChecked };
 use anchor_spl::{ associated_token::AssociatedToken, token_interface::{ Mint, TokenAccount } };
+
+use crate::{
+    constraints::is_mint_for_stake_vault,
+    errors::TriadProtocolError,
+    state::{ StakeTokenArgs, StakeVault, StakeV2, User },
+};
 
 #[derive(Accounts)]
 #[instruction(args: StakeTokenArgs)]
@@ -25,11 +24,7 @@ pub struct StakeToken<'info> {
         init,
         payer = signer,
         space = StakeV2::SPACE,
-        seeds = [
-            StakeV2::PREFIX_SEED,
-            signer.to_account_info().key().as_ref(),
-            args.name.as_bytes(),
-        ],
+        seeds = [StakeV2::PREFIX_SEED, signer.key().as_ref(), args.name.as_bytes()],
         bump
     )]
     pub stake: Box<Account<'info, StakeV2>>,
@@ -39,7 +34,10 @@ pub struct StakeToken<'info> {
 
     #[account(
         mut, 
-        constraint = from_ata.amount >= args.amount && signer.key() == from_ata.owner && from_ata.mint == mint.key(),
+        constraint = from_ata.amount >= args.amount,
+        associated_token::mint = mint,
+        associated_token::authority = signer,
+        associated_token::token_program = token_program
     )]
     pub from_ata: Box<InterfaceAccount<'info, TokenAccount>>,
 
@@ -47,7 +45,8 @@ pub struct StakeToken<'info> {
         init_if_needed,
         payer = signer,
         associated_token::mint = mint,
-        associated_token::authority = stake_vault
+        associated_token::authority = stake_vault,
+        associated_token::token_program = token_program
     )]
     pub to_ata: Box<InterfaceAccount<'info, TokenAccount>>,
 
@@ -82,14 +81,6 @@ pub fn stake_token(ctx: Context<StakeToken>, args: StakeTokenArgs) -> Result<()>
     stake_vault.token_staked = stake_vault.token_staked.checked_add(args.amount).unwrap();
 
     user.staked = user.staked.checked_add(args.amount).unwrap();
-
-    let result = user.staked
-        .checked_div((10u64).pow(stake_vault.token_decimals as u32))
-        .unwrap()
-        .checked_div(10000)
-        .unwrap();
-
-    user.swaps = result as i16;
 
     transfer_checked(
         CpiContext::new(ctx.accounts.token_program.to_account_info(), TransferChecked {

@@ -5,16 +5,6 @@ export type Collection = 'alligators' | 'coleta' | 'undead' | 'pyth'
 
 export type StakeNftArgs = {
   wallet: PublicKey
-  stakeVault: string
-  items: {
-    mint: PublicKey
-    name: string
-  }[]
-}
-
-export type MigrateStakeArgs = {
-  wallet: PublicKey
-  stakeVault: string
   items: {
     mint: PublicKey
     name: string
@@ -24,7 +14,6 @@ export type MigrateStakeArgs = {
 export type StakeTokenArgs = {
   name: string
   wallet: PublicKey
-  stakeVault: string
   amount: number
 }
 
@@ -35,36 +24,26 @@ export type InitializeStakeArgs = {
   collection: string
 }
 
-export type DepositStakeRewardsArgs = {
+export type UpdateStakeVaultArgs = {
   wallet: PublicKey
-  amount: BN
-  mint: PublicKey
-  stakeVault: string
+  amount?: BN
+  status?: boolean
 }
 
 export type RequestWithdrawArgs = {
   wallet: PublicKey
   name: string
   mint: PublicKey
-  stakeVault: string
 }
 
 export type WithdrawArgs = {
   wallet: PublicKey
   name: string
   mint: PublicKey
-  stakeVault: string
-}
-
-export type UpdateStakeVaultStatusArgs = {
-  wallet: PublicKey
-  isLocked: boolean
-  stakeVault: string
 }
 
 export type ClaimStakeRewardsArgs = {
   wallet: PublicKey
-  stakeVault: string
   nftName: string
   collections: number
   rank: number
@@ -72,9 +51,7 @@ export type ClaimStakeRewardsArgs = {
 
 export type UpdateBoostArgs = {
   wallet: PublicKey
-  stakeVault: string
   nfts: { name: string; wallet: string }[]
-  boost: boolean
 }
 
 export type UpdateStakeRewardsArgs = {
@@ -96,15 +73,7 @@ export enum RARITY_WEIGHT {
   MYTHIC = 6
 }
 
-export enum COLLECTION_MUlTIPLIER {
-  ALLIGATORS = 1.5,
-  COLETA = 1.5,
-  UNDEAD = 1.5,
-  UNDEAD_TRIADFI = 2.5,
-  PYTH = 1.5
-}
-
-export type StakeVaultResponse = {
+export type StakeVault = {
   name: string
   collection: string
   authority: string
@@ -121,7 +90,7 @@ export type StakeVaultResponse = {
   endTs: number
 }
 
-export type StakeResponse = {
+export type Stake = {
   name: string
   stakeVault: string
   authority: string
@@ -133,15 +102,4 @@ export type StakeResponse = {
   claimed: number
   available: number
   amount: number
-}
-
-export type UserResponse = {
-  ts: number
-  authority: string
-  referral: string
-  referred: number
-  name: string
-  swapsMade: number
-  swaps: number
-  staked: number
 }

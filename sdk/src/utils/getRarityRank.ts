@@ -1,4 +1,4 @@
-export const getRarityRank = (
+const getRarityRank = (
   ranks: {
     onchainId: string
     name: string
@@ -13,3 +13,5 @@ export const getRarityRank = (
 
   return item ? item.rarityRankHrtt : 963
 }
+
+export default getRarityRank

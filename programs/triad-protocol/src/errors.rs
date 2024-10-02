@@ -44,9 +44,6 @@ pub enum TriadProtocolError {
     #[msg("Invalid stake vault amount")]
     InvalidStakeVaultAmount,
 
-    #[msg("Stake vault locked")]
-    StakeVaultLocked,
-
     #[msg("Stake is locked")]
     StakeLocked,
 
@@ -73,4 +70,55 @@ pub enum TriadProtocolError {
 
     #[msg("No rewards available")]
     NoRewardsAvailable,
+
+    #[msg("Invalid price")]
+    InvalidPrice,
+
+    #[msg("Invalid order size")]
+    InvalidOrderSize,
+
+    #[msg("Maximum number of open orders reached")]
+    MaxOpenOrdersReached,
+
+    #[msg("No available order slot")]
+    NoAvailableOrderSlot,
+
+    #[msg("Market is inactive")]
+    MarketInactive,
+
+    #[msg("Invalid order type")]
+    InvalidOrderType,
+
+    #[msg("Invalid order direction")]
+    InvalidOrderDirection,
+
+    #[msg("Order not found")]
+    OrderNotFound,
+
+    #[msg("Invalid order status")]
+    InvalidOrderStatus,
+
+    #[msg("Arithmetic overflow")]
+    ArithmeticOverflow,
+
+    #[msg("Order size too large")]
+    OrderSizeTooLarge,
+
+    #[msg("Question period not ended")]
+    QuestionPeriodNotEnded,
+
+    #[msg("Invalid start time")]
+    InvalidStartTime,
+
+    #[msg("Invalid end time")]
+    InvalidEndTime,
+
+    #[msg("Question period not started")]
+    QuestionPeriodNotStarted,
+
+    #[msg("Question period ended")]
+    QuestionPeriodEnded,
+
+    #[msg("Stake vault is locked")]
+    StakeVaultLocked,
 }

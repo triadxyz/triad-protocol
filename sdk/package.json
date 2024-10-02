@@ -1,6 +1,6 @@
 {
   "name": "@triadxyz/triad-protocol",
-  "version": "0.5.2-beta",
+  "version": "1.0.0-beta",
   "main": "./dist/index.js",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -8,8 +8,7 @@
     "clean": "rimraf dist",
     "build": "yarn run clean && tsc",
     "prepublishOnly": "yarn build",
-    "start": "yarn build && node ./dist/test.js",
-    "test": "rimraf dist && tsc && node ./dist/test.js"
+    "test": "rimraf dist && tsc && node ./dist/local-test.js"
   },
   "publishConfig": {
     "access": "public"
@@ -32,8 +31,8 @@
   "author": "Triad Labs",
   "license": "ISC",
   "dependencies": {
-    "@coral-xyz/anchor": "0.30.0",
-    "@solana/spl-token": "0.4.1",
+    "@coral-xyz/anchor": "0.30.1",
+    "@solana/spl-token": "0.4.8",
     "@solana/web3.js": "^1.95.3",
     "axios": "^1.5.1",
     "base64-js": "^1.5.1",

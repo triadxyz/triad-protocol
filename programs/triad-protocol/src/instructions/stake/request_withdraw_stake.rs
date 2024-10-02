@@ -1,9 +1,12 @@
-use crate::constraints::{ is_authority_for_stake, is_mint_for_stake };
-use crate::{ StakeV2, User };
-use crate::{ errors::TriadProtocolError, StakeVault };
 use anchor_lang::prelude::*;
 use anchor_spl::token_2022::Token2022;
 use anchor_spl::token_interface::Mint;
+
+use crate::{
+    errors::TriadProtocolError,
+    state::{ StakeV2, User, StakeVault },
+    constraints::{ is_authority_for_stake, is_mint_for_stake },
+};
 
 #[derive(Accounts)]
 pub struct RequestWithdrawStake<'info> {
@@ -13,7 +16,7 @@ pub struct RequestWithdrawStake<'info> {
     #[account(mut)]
     pub stake_vault: Box<Account<'info, StakeVault>>,
 
-    #[account(mut, constraint = user.authority == *signer.key)]
+    #[account(mut, constraint = user.authority == stake.authority)]
     pub user: Box<Account<'info, User>>,
 
     #[account(mut, constraint = is_authority_for_stake(&stake, &signer)?)]
@@ -31,24 +34,14 @@ pub fn request_withdraw_stake(ctx: Context<RequestWithdrawStake>) -> Result<()> 
     let user: &mut Box<Account<User>> = &mut ctx.accounts.user;
     let stake_vault: &mut Box<Account<StakeVault>> = &mut ctx.accounts.stake_vault;
 
-    if stake.withdraw_ts != 0 {
-        return Err(TriadProtocolError::Unauthorized.into());
-    }
+    require!(stake.withdraw_ts == 0, TriadProtocolError::Unauthorized);
 
     let mut days = 3;
 
     if stake.mint.eq(&stake_vault.token_mint) {
         days = 7;
 
-        user.staked -= stake.amount;
-
-        let result = user.staked
-            .checked_div((10u64).pow(stake_vault.token_decimals as u32))
-            .unwrap()
-            .checked_div(10000)
-            .unwrap();
-
-        user.swaps = result as i16;
+        user.staked = user.staked.checked_sub(stake.amount).unwrap();
     }
 
     stake.withdraw_ts = Clock::get()?.unix_timestamp + days * 24 * 60 * 60;

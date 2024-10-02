@@ -1,10 +1,3 @@
-use std::str::FromStr;
-use crate::{
-    constants::{ MYSTERY_BOX_PROGRAM, TRIAD_MYSTERY_BOX },
-    errors::TriadProtocolError,
-    state::{ StakeNFTArgs, StakeVault },
-    StakeV2,
-};
 use anchor_lang::prelude::*;
 use anchor_spl::token_2022::spl_token_2022::extension::BaseStateWithExtensions;
 use anchor_spl::token_2022::{
@@ -16,6 +9,13 @@ use anchor_spl::{
     token_interface::{ transfer_checked, Mint, TokenAccount, TransferChecked },
 };
 use spl_token_metadata_interface::state::TokenMetadata;
+use std::str::FromStr;
+
+use crate::{
+    constants::{ MYSTERY_BOX_PROGRAM, TRIAD_MYSTERY_BOX },
+    errors::TriadProtocolError,
+    state::{ StakeNFTArgs, StakeVault, StakeV2 },
+};
 
 #[derive(Accounts)]
 #[instruction(args: StakeNFTArgs)]
@@ -30,11 +30,7 @@ pub struct StakeNFT<'info> {
         init_if_needed,
         payer = signer,
         space = StakeV2::SPACE,
-        seeds = [
-            StakeV2::PREFIX_SEED,
-            signer.to_account_info().key().as_ref(),
-            args.name.as_bytes(),
-        ],
+        seeds = [StakeV2::PREFIX_SEED, signer.key().as_ref(), args.name.as_bytes()],
         bump
     )]
     pub stake: Box<Account<'info, StakeV2>>,
@@ -47,7 +43,10 @@ pub struct StakeNFT<'info> {
 
     #[account(
         mut, 
-        constraint = from_ata.amount >= 1 && signer.key() == from_ata.owner && from_ata.mint == mint.key(),
+        constraint = from_ata.amount >= 1,
+        associated_token::mint = mint,
+        associated_token::authority = signer,
+        associated_token::token_program = token_program
     )]
     pub from_ata: Box<InterfaceAccount<'info, TokenAccount>>,
 
@@ -55,7 +54,8 @@ pub struct StakeNFT<'info> {
         init_if_needed,
         payer = signer,
         associated_token::mint = mint,
-        associated_token::authority = stake_vault
+        associated_token::authority = stake_vault,
+        associated_token::token_program = token_program
     )]
     pub to_ata: Box<InterfaceAccount<'info, TokenAccount>>,
 
