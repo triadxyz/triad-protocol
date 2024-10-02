@@ -4,7 +4,7 @@ import { PublicKey, TransactionInstruction } from '@solana/web3.js'
 import { InitializeQuestionArgs, Market, OpenOrderArgs } from './types/trade'
 import { RpcOptions } from './types'
 import BN from 'bn.js'
-import { TRD_DECIMALS, TRD_MINT_DEVNET } from './utils/constants'
+import { TRD_DECIMALS, TRD_MINT } from './utils/constants'
 import { accountToMarket, encodeString } from './utils/helpers'
 import {
   getFeeVaultPDA,
@@ -18,7 +18,7 @@ import sendTransactionWithOptions from './utils/sendTransactionWithOptions'
 export default class Trade {
   program: Program<TriadProtocol>
   provider: AnchorProvider
-  mint: PublicKey = TRD_MINT_DEVNET
+  mint: PublicKey = TRD_MINT
 
   constructor(program: Program<TriadProtocol>, provider: AnchorProvider) {
     this.provider = provider

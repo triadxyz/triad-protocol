@@ -14,7 +14,7 @@ pub struct FeeVault {
     pub nft_holders_claimed: u64,
     pub market_available: u64,
     pub market_claimed: u64,
-    pub padding: [u8; 56],
+    pub padding: [u8; 60],
 }
 
 impl FeeVault {

@@ -137,7 +137,7 @@ pub fn close_order(ctx: Context<CloseOrder>, order_id: u64) -> Result<()> {
         refund_amount: Some(refund_amount),
         timestamp: ts,
         is_question_winner: None,
-        pnl: order.pnl,
+        pnl: 0,
     });
 
     Ok(())

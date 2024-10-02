@@ -12,7 +12,3 @@ export const TRD_MINT = new PublicKey(
 export const TRIAD_ADMIN = new PublicKey(
   '82ppCojm3yrEKgdpH8B5AmBJTU1r1uAWXFWhxvPs9UCR'
 )
-
-export const TRD_MINT_DEVNET = new PublicKey(
-  '9ti9L1a4ynpTj4gbGQLkYmZh7495nvLEgWtw5mtUkGQj'
-)

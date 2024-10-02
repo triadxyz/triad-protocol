@@ -62,7 +62,7 @@ pub fn initialize_market(ctx: Context<InitializeMarket>, args: InitializeMarketA
         nft_holders_claimed: 0,
         market_available: 0,
         market_claimed: 0,
-        padding: [0; 56],
+        padding: [0; 60],
     });
 
     let ts = Clock::get()?.unix_timestamp;

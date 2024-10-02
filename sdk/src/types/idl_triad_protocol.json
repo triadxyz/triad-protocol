@@ -1,5 +1,5 @@
 {
-  "address": "4YWv2Ex8WjFGyXmYELD6Xqs1ZsuQujVUzZxbvdvM2tCj",
+  "address": "TRDwq3BN4mP3m9KsuNUWSN6QDff93VKGSwE95Jbr9Ss",
   "metadata": {
     "name": "triad_protocol",
     "version": "0.1.4",
@@ -1089,6 +1089,51 @@
         }
       ],
       "args": []
+    },
+    {
+      "name": "withdraw_v1",
+      "discriminator": [212, 118, 210, 5, 187, 1, 117, 222],
+      "accounts": [
+        {
+          "name": "signer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "ticker",
+          "writable": true
+        },
+        {
+          "name": "vault",
+          "writable": true
+        },
+        {
+          "name": "user_position",
+          "writable": true
+        },
+        {
+          "name": "vault_token_account",
+          "writable": true
+        },
+        {
+          "name": "user_token_account",
+          "writable": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        },
+        {
+          "name": "token_program",
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+        }
+      ],
+      "args": [
+        {
+          "name": "position_index",
+          "type": "u8"
+        }
+      ]
     }
   ],
   "accounts": [
@@ -1109,12 +1154,24 @@
       "discriminator": [192, 112, 65, 125, 129, 151, 173, 226]
     },
     {
+      "name": "Ticker",
+      "discriminator": [214, 74, 184, 188, 214, 64, 251, 53]
+    },
+    {
       "name": "User",
       "discriminator": [159, 117, 95, 227, 239, 151, 58, 236]
     },
     {
+      "name": "UserPosition",
+      "discriminator": [251, 248, 209, 245, 83, 234, 17, 27]
+    },
+    {
       "name": "UserTrade",
       "discriminator": [149, 190, 47, 218, 136, 9, 222, 222]
+    },
+    {
+      "name": "Vault",
+      "discriminator": [211, 8, 232, 43, 2, 152, 117, 119]
     }
   ],
   "events": [
@@ -1422,7 +1479,7 @@
           {
             "name": "padding",
             "type": {
-              "array": ["u8", 56]
+              "array": ["u8", 60]
             }
           }
         ]
@@ -1607,7 +1664,7 @@
           {
             "name": "padding",
             "type": {
-              "array": ["u8", 180]
+              "array": ["u8", 200]
             }
           }
         ]
@@ -1672,10 +1729,7 @@
           },
           {
             "name": "price",
-            "docs": [
-              "The price of the order (in TRD)",
-              "precision: PRICE_PRECISION (e.g., 1_000_000 = 1 TRD)"
-            ],
+            "docs": ["The price of the order (in TRD)"],
             "type": "u64"
           },
           {
@@ -1703,13 +1757,6 @@
                 "name": "OrderDirection"
               }
             }
-          },
-          {
-            "name": "pnl",
-            "docs": [
-              "The amount of pnl settled in this market since opening the position (in TRD)"
-            ],
-            "type": "i64"
           },
           {
             "name": "padding",
@@ -1849,6 +1896,38 @@
             "type": {
               "option": "bool"
             }
+          }
+        ]
+      }
+    },
+    {
+      "name": "Position",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "amount",
+            "type": "u64"
+          },
+          {
+            "name": "entry_price",
+            "type": "u64"
+          },
+          {
+            "name": "ts",
+            "type": "i64"
+          },
+          {
+            "name": "is_long",
+            "type": "bool"
+          },
+          {
+            "name": "is_open",
+            "type": "bool"
+          },
+          {
+            "name": "pnl",
+            "type": "i64"
           }
         ]
       }
@@ -2264,6 +2343,46 @@
       }
     },
     {
+      "name": "Ticker",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "init_ts",
+            "type": "i64"
+          },
+          {
+            "name": "updated_ts",
+            "type": "i64"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          },
+          {
+            "name": "authority",
+            "type": "pubkey"
+          },
+          {
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "name": "protocol_program_id",
+            "type": "pubkey"
+          },
+          {
+            "name": "price",
+            "type": "u64"
+          },
+          {
+            "name": "vault",
+            "type": "pubkey"
+          }
+        ]
+      }
+    },
+    {
       "name": "UpdateStakeVaultArgs",
       "type": {
         "kind": "struct",
@@ -2340,6 +2459,59 @@
       }
     },
     {
+      "name": "UserPosition",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "ts",
+            "type": "i64"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          },
+          {
+            "name": "total_deposited",
+            "type": "u64"
+          },
+          {
+            "name": "total_withdrawn",
+            "type": "u64"
+          },
+          {
+            "name": "lp_share",
+            "type": "u64"
+          },
+          {
+            "name": "total_positions",
+            "type": "u16"
+          },
+          {
+            "name": "ticker",
+            "type": "pubkey"
+          },
+          {
+            "name": "authority",
+            "type": "pubkey"
+          },
+          {
+            "name": "positions",
+            "type": {
+              "array": [
+                {
+                  "defined": {
+                    "name": "Position"
+                  }
+                },
+                3
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
       "name": "UserTrade",
       "type": {
         "kind": "struct",
@@ -2391,6 +2563,70 @@
             "type": {
               "array": ["u8", 32]
             }
+          }
+        ]
+      }
+    },
+    {
+      "name": "Vault",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "bump",
+            "type": "u8"
+          },
+          {
+            "name": "authority",
+            "type": "pubkey"
+          },
+          {
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "name": "token_account",
+            "type": "pubkey"
+          },
+          {
+            "name": "ticker_address",
+            "type": "pubkey"
+          },
+          {
+            "name": "total_deposited",
+            "type": "u64"
+          },
+          {
+            "name": "total_withdrawn",
+            "type": "u64"
+          },
+          {
+            "name": "init_ts",
+            "type": "i64"
+          },
+          {
+            "name": "net_deposits",
+            "type": "u128"
+          },
+          {
+            "name": "net_withdraws",
+            "type": "u128"
+          },
+          {
+            "name": "long_balance",
+            "type": "u64"
+          },
+          {
+            "name": "short_balance",
+            "type": "u64"
+          },
+          {
+            "name": "long_positions_opened",
+            "type": "u64"
+          },
+          {
+            "name": "short_positions_opened",
+            "type": "u64"
           }
         ]
       }

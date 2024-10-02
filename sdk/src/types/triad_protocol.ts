@@ -5,7 +5,7 @@
  * IDL can be found at `target/idl/triad_protocol.json`.
  */
 export type TriadProtocol = {
-  address: '4YWv2Ex8WjFGyXmYELD6Xqs1ZsuQujVUzZxbvdvM2tCj'
+  address: 'TRDwq3BN4mP3m9KsuNUWSN6QDff93VKGSwE95Jbr9Ss'
   metadata: {
     name: 'triadProtocol'
     version: '0.1.4'
@@ -1530,6 +1530,51 @@ export type TriadProtocol = {
         }
       ]
       args: []
+    },
+    {
+      name: 'withdrawV1'
+      discriminator: [212, 118, 210, 5, 187, 1, 117, 222]
+      accounts: [
+        {
+          name: 'signer'
+          writable: true
+          signer: true
+        },
+        {
+          name: 'ticker'
+          writable: true
+        },
+        {
+          name: 'vault'
+          writable: true
+        },
+        {
+          name: 'userPosition'
+          writable: true
+        },
+        {
+          name: 'vaultTokenAccount'
+          writable: true
+        },
+        {
+          name: 'userTokenAccount'
+          writable: true
+        },
+        {
+          name: 'systemProgram'
+          address: '11111111111111111111111111111111'
+        },
+        {
+          name: 'tokenProgram'
+          address: 'TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA'
+        }
+      ]
+      args: [
+        {
+          name: 'positionIndex'
+          type: 'u8'
+        }
+      ]
     }
   ]
   accounts: [
@@ -1550,12 +1595,24 @@ export type TriadProtocol = {
       discriminator: [192, 112, 65, 125, 129, 151, 173, 226]
     },
     {
+      name: 'ticker'
+      discriminator: [214, 74, 184, 188, 214, 64, 251, 53]
+    },
+    {
       name: 'user'
       discriminator: [159, 117, 95, 227, 239, 151, 58, 236]
     },
     {
+      name: 'userPosition'
+      discriminator: [251, 248, 209, 245, 83, 234, 17, 27]
+    },
+    {
       name: 'userTrade'
       discriminator: [149, 190, 47, 218, 136, 9, 222, 222]
+    },
+    {
+      name: 'vault'
+      discriminator: [211, 8, 232, 43, 2, 152, 117, 119]
     }
   ]
   events: [
@@ -1863,7 +1920,7 @@ export type TriadProtocol = {
           {
             name: 'padding'
             type: {
-              array: ['u8', 56]
+              array: ['u8', 60]
             }
           }
         ]
@@ -2046,7 +2103,7 @@ export type TriadProtocol = {
           {
             name: 'padding'
             type: {
-              array: ['u8', 180]
+              array: ['u8', 200]
             }
           }
         ]
@@ -2111,10 +2168,7 @@ export type TriadProtocol = {
           },
           {
             name: 'price'
-            docs: [
-              'The price of the order (in TRD)',
-              'precision: PRICE_PRECISION (e.g., 1_000_000 = 1 TRD)'
-            ]
+            docs: ['The price of the order (in TRD)']
             type: 'u64'
           },
           {
@@ -2142,13 +2196,6 @@ export type TriadProtocol = {
                 name: 'orderDirection'
               }
             }
-          },
-          {
-            name: 'pnl'
-            docs: [
-              'The amount of pnl settled in this market since opening the position (in TRD)'
-            ]
-            type: 'i64'
           },
           {
             name: 'padding'
@@ -2288,6 +2335,38 @@ export type TriadProtocol = {
             type: {
               option: 'bool'
             }
+          }
+        ]
+      }
+    },
+    {
+      name: 'position'
+      type: {
+        kind: 'struct'
+        fields: [
+          {
+            name: 'amount'
+            type: 'u64'
+          },
+          {
+            name: 'entryPrice'
+            type: 'u64'
+          },
+          {
+            name: 'ts'
+            type: 'i64'
+          },
+          {
+            name: 'isLong'
+            type: 'bool'
+          },
+          {
+            name: 'isOpen'
+            type: 'bool'
+          },
+          {
+            name: 'pnl'
+            type: 'i64'
           }
         ]
       }
@@ -2703,6 +2782,46 @@ export type TriadProtocol = {
       }
     },
     {
+      name: 'ticker'
+      type: {
+        kind: 'struct'
+        fields: [
+          {
+            name: 'initTs'
+            type: 'i64'
+          },
+          {
+            name: 'updatedTs'
+            type: 'i64'
+          },
+          {
+            name: 'bump'
+            type: 'u8'
+          },
+          {
+            name: 'authority'
+            type: 'pubkey'
+          },
+          {
+            name: 'name'
+            type: 'string'
+          },
+          {
+            name: 'protocolProgramId'
+            type: 'pubkey'
+          },
+          {
+            name: 'price'
+            type: 'u64'
+          },
+          {
+            name: 'vault'
+            type: 'pubkey'
+          }
+        ]
+      }
+    },
+    {
       name: 'updateStakeVaultArgs'
       type: {
         kind: 'struct'
@@ -2779,6 +2898,59 @@ export type TriadProtocol = {
       }
     },
     {
+      name: 'userPosition'
+      type: {
+        kind: 'struct'
+        fields: [
+          {
+            name: 'ts'
+            type: 'i64'
+          },
+          {
+            name: 'bump'
+            type: 'u8'
+          },
+          {
+            name: 'totalDeposited'
+            type: 'u64'
+          },
+          {
+            name: 'totalWithdrawn'
+            type: 'u64'
+          },
+          {
+            name: 'lpShare'
+            type: 'u64'
+          },
+          {
+            name: 'totalPositions'
+            type: 'u16'
+          },
+          {
+            name: 'ticker'
+            type: 'pubkey'
+          },
+          {
+            name: 'authority'
+            type: 'pubkey'
+          },
+          {
+            name: 'positions'
+            type: {
+              array: [
+                {
+                  defined: {
+                    name: 'position'
+                  }
+                },
+                3
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
       name: 'userTrade'
       type: {
         kind: 'struct'
@@ -2830,6 +3002,70 @@ export type TriadProtocol = {
             type: {
               array: ['u8', 32]
             }
+          }
+        ]
+      }
+    },
+    {
+      name: 'vault'
+      type: {
+        kind: 'struct'
+        fields: [
+          {
+            name: 'bump'
+            type: 'u8'
+          },
+          {
+            name: 'authority'
+            type: 'pubkey'
+          },
+          {
+            name: 'name'
+            type: 'string'
+          },
+          {
+            name: 'tokenAccount'
+            type: 'pubkey'
+          },
+          {
+            name: 'tickerAddress'
+            type: 'pubkey'
+          },
+          {
+            name: 'totalDeposited'
+            type: 'u64'
+          },
+          {
+            name: 'totalWithdrawn'
+            type: 'u64'
+          },
+          {
+            name: 'initTs'
+            type: 'i64'
+          },
+          {
+            name: 'netDeposits'
+            type: 'u128'
+          },
+          {
+            name: 'netWithdraws'
+            type: 'u128'
+          },
+          {
+            name: 'longBalance'
+            type: 'u64'
+          },
+          {
+            name: 'shortBalance'
+            type: 'u64'
+          },
+          {
+            name: 'longPositionsOpened'
+            type: 'u64'
+          },
+          {
+            name: 'shortPositionsOpened'
+            type: 'u64'
           }
         ]
       }

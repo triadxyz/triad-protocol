@@ -48,7 +48,7 @@ pub struct Market {
     pub current_question_end: i64,
     /// The question or prediction topic for the current week
     pub current_question: [u8; 80],
-    pub padding: [u8; 180],
+    pub padding: [u8; 200],
 }
 
 #[derive(AnchorSerialize, AnchorDeserialize, Clone, Copy)]
@@ -153,7 +153,7 @@ impl Default for Market {
             current_question_start: 0,
             current_question_end: 0,
             current_question: [0; 80],
-            padding: [0; 180],
+            padding: [0; 200],
         }
     }
 }

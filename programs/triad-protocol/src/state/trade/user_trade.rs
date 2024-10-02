@@ -24,7 +24,6 @@ pub struct Order {
     pub market_id: u64,
     pub status: OrderStatus,
     /// The price of the order (in TRD)
-    /// precision: PRICE_PRECISION (e.g., 1_000_000 = 1 TRD)
     pub price: u64,
     /// The total amount of TRD committed to this order
     pub total_amount: u64,
@@ -32,8 +31,6 @@ pub struct Order {
     pub total_shares: u64,
     pub order_type: OrderType,
     pub direction: OrderDirection,
-    /// The amount of pnl settled in this market since opening the position (in TRD)
-    pub pnl: i64,
     pub padding: [u8; 32],
 }
 

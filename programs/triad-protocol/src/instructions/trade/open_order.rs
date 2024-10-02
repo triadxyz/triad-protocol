@@ -116,7 +116,6 @@ pub fn open_order(ctx: Context<OpenOrder>, args: OpenOrderArgs) -> Result<()> {
         total_shares,
         order_type: OrderType::Market,
         direction: args.direction,
-        pnl: 0,
         padding: [0; 32],
     };
     user_trade.opened_orders = user_trade.opened_orders.checked_add(1).unwrap();
@@ -191,7 +190,7 @@ pub fn open_order(ctx: Context<OpenOrder>, args: OpenOrderArgs) -> Result<()> {
         order_status: current_order.status,
         total_shares: current_order.total_shares,
         total_amount: current_order.total_amount,
-        pnl: current_order.pnl,
+        pnl: 0,
         price,
         comment: args.comment,
         refund_amount: None,
