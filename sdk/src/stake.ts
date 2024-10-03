@@ -2,9 +2,7 @@ import { AnchorProvider, BN, Program } from '@coral-xyz/anchor'
 import {
   ComputeBudgetProgram,
   PublicKey,
-  TransactionInstruction,
-  TransactionMessage,
-  VersionedTransaction
+  TransactionInstruction
 } from '@solana/web3.js'
 import { TriadProtocol } from './types/triad_protocol'
 import { formatStake, formatStakeVault } from './utils/helpers'
@@ -134,8 +132,6 @@ export default class Stake {
       const rank = getRarityRank(ranks, stake.mint, stake.name)
 
       let available = 0
-
-      await new Promise((resolve) => setTimeout(resolve, 1000))
 
       try {
         available = await this.getStakeRewards({
