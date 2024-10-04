@@ -337,6 +337,61 @@ export default class Stake {
   }
 
   /**
+   *  Claim All Stake Rewards
+   *  @param wallet - User wallet
+   *  @param collections - NFT collections
+   *  @param ranks - Tensor ranks
+   *
+   */
+  async claimAllStakeRewards(
+    {
+      wallet,
+      collections,
+      ranks
+    }: {
+      wallet: PublicKey
+      collections: number
+      ranks: {
+        onchainId: string
+        name: string
+        rarityRankHrtt: number
+      }[]
+    },
+    options?: RpcOptions
+  ) {
+    const stakes = await this.getStakes()
+
+    const ixs: TransactionInstruction[] = []
+
+    for (const stake of stakes) {
+      const rank = getRarityRank(ranks, stake.mint, stake.name)
+
+      if (ixs.length >= 10) {
+        break
+      }
+
+      const tx = await this.claimStakeRewards({
+        wallet,
+        nftName: stake.name,
+        collections,
+        rank
+      })
+
+      ixs.push(...tx.instructions)
+    }
+
+    if (options?.microLamports) {
+      ixs.push(
+        ComputeBudgetProgram.setComputeUnitPrice({
+          microLamports: options.microLamports
+        })
+      )
+    }
+
+    return sendVersionedTransaction(this.provider, ixs, options)
+  }
+
+  /**
    *  Update Boost
    *  @param wallet - User wallet
    *  @param nfts - Name of the nfts
