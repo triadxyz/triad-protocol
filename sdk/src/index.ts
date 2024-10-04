@@ -16,11 +16,9 @@ export default class TriadProtocolClient {
   stake: Stake
 
   constructor(connection: Connection, wallet: Wallet) {
-    this.provider = new AnchorProvider(
-      connection,
-      wallet,
-      AnchorProvider.defaultOptions()
-    )
+    this.provider = new AnchorProvider(connection, wallet, {
+      commitment: 'confirmed'
+    })
     this.program = new Program(IDL as TriadProtocol, this.provider)
 
     this.trade = new Trade(this.program, this.provider)
