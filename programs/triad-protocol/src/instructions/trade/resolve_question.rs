@@ -47,7 +47,6 @@ pub fn resolve_question(ctx: Context<ResolveQuestion>) -> Result<()> {
         padding: [0; 40],
     };
 
-    // Emit QuestionUpdate event
     emit!(QuestionUpdate {
         market_id: market.market_id,
         question_id: market.previous_resolved_question.question_id,

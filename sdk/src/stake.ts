@@ -1,9 +1,5 @@
 import { AnchorProvider, BN, Program } from '@coral-xyz/anchor'
-import {
-  ComputeBudgetProgram,
-  PublicKey,
-  TransactionInstruction
-} from '@solana/web3.js'
+import { Keypair, PublicKey, TransactionInstruction } from '@solana/web3.js'
 import { TriadProtocol } from './types/triad_protocol'
 import { formatStake, formatStakeVault } from './utils/helpers'
 import { RpcOptions } from './types'
@@ -30,6 +26,7 @@ import { toByteArray } from 'base64-js'
 import getRarityRank from './utils/getRarityRank'
 import sendVersionedTransaction from './utils/sendVersionedTransaction'
 import sendTransactionWithOptions from './utils/sendTransactionWithOptions'
+import { convertSecretKeyToKeypair } from './utils/convertSecretKeyToKeypair'
 
 export default class Stake {
   program: Program<TriadProtocol>
@@ -296,58 +293,19 @@ export default class Stake {
   }
 
   /**
-   *  Claim Stake Rewards
-   *  @param wallet - User wallet
-   *  @param mint - NFT mint
-   *  @param nftName - Name of the nft
-   *
-   */
-  async claimStakeRewards(
-    { wallet, nftName, collections, rank }: ClaimStakeRewardsArgs,
-    options?: RpcOptions
-  ) {
-    const stakeVaultPDA = getStakeVaultPDA(
-      this.program.programId,
-      this.stakeVaultName
-    )
-    const stakePDA = getStakePDA(this.program.programId, wallet, nftName)
-
-    const method = this.program.methods
-      .claimStakeRewards({
-        collections,
-        rank
-      })
-      .accounts({
-        signer: wallet,
-        mint: TRD_MINT,
-        stake: stakePDA,
-        stakeVault: stakeVaultPDA,
-        verifier: VERIFIER
-      })
-
-    if (options?.microLamports) {
-      method.postInstructions([
-        ComputeBudgetProgram.setComputeUnitPrice({
-          microLamports: options.microLamports
-        })
-      ])
-    }
-
-    return method.transaction()
-  }
-
-  /**
    *  Claim All Stake Rewards
    *  @param wallet - User wallet
    *  @param collections - NFT collections
    *  @param ranks - Tensor ranks
    *
    */
-  async claimAllStakeRewards(
+  async claimStakeRewards(
     {
       wallet,
       collections,
-      ranks
+      ranks,
+      verifier,
+      isToken
     }: {
       wallet: PublicKey
       collections: number
@@ -356,10 +314,14 @@ export default class Stake {
         name: string
         rarityRankHrtt: number
       }[]
+      verifier: string
+      isToken?: boolean
     },
     options?: RpcOptions
   ) {
-    const stakes = await this.getStakes()
+    const stakes = (await this.getUserStakes(wallet)).sort(
+      (a, b) => a.claimedTs - b.claimedTs
+    )
 
     const ixs: TransactionInstruction[] = []
 
@@ -370,25 +332,39 @@ export default class Stake {
         break
       }
 
-      const tx = await this.claimStakeRewards({
-        wallet,
-        nftName: stake.name,
-        collections,
-        rank
-      })
+      if (isToken && stake.mint !== TRD_MINT.toBase58()) {
+        continue
+      }
 
-      ixs.push(...tx.instructions)
-    }
+      const stakeVaultPDA = getStakeVaultPDA(
+        this.program.programId,
+        this.stakeVaultName
+      )
+      const stakePDA = getStakePDA(this.program.programId, wallet, stake.name)
 
-    if (options?.microLamports) {
       ixs.push(
-        ComputeBudgetProgram.setComputeUnitPrice({
-          microLamports: options.microLamports
-        })
+        await this.program.methods
+          .claimStakeRewards({
+            collections,
+            rank
+          })
+          .accounts({
+            signer: wallet,
+            mint: TRD_MINT,
+            stake: stakePDA,
+            stakeVault: stakeVaultPDA,
+            verifier: VERIFIER
+          })
+          .instruction()
       )
     }
 
-    return sendVersionedTransaction(this.provider, ixs, options)
+    return sendVersionedTransaction(
+      this.provider,
+      ixs,
+      options,
+      convertSecretKeyToKeypair(verifier)
+    )
   }
 
   /**
@@ -398,7 +374,7 @@ export default class Stake {
    *
    */
   async updateBoost({ wallet, nfts }: UpdateBoostArgs, options?: RpcOptions) {
-    const ixs = []
+    const ixs: TransactionInstruction[] = []
 
     for (const nft of nfts) {
       const stakePDA = getStakePDA(

@@ -74,11 +74,9 @@ pub fn open_order(ctx: Context<OpenOrder>, args: OpenOrderArgs) -> Result<()> {
 
     let ts = Clock::get()?.unix_timestamp;
 
-    // Check if the current question period is active
     require!(ts >= market.current_question_start, TriadProtocolError::QuestionPeriodNotStarted);
     require!(ts < market.current_question_end, TriadProtocolError::QuestionPeriodEnded);
 
-    // Check if the market is active
     require!(market.is_active, TriadProtocolError::MarketInactive);
 
     let price = match args.direction {
