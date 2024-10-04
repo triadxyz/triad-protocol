@@ -50,6 +50,8 @@ pub struct CloseOrder<'info> {
     pub system_program: Program<'info, System>,
 }
 
+// Update market liquidity and shares
+//
 pub fn close_order(ctx: Context<CloseOrder>, order_id: u64) -> Result<()> {
     let market = &mut ctx.accounts.market;
     let user_trade = &mut ctx.accounts.user_trade;
