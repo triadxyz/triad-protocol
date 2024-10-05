@@ -3,11 +3,12 @@ import { Connection, PublicKey } from '@solana/web3.js'
 import { TriadProtocol } from './types/triad_protocol'
 import IDL from './types/idl_triad_protocol.json'
 import Trade from './trade'
-import { formatUser } from './utils/helpers'
+import { encodeString, formatUser } from './utils/helpers'
 import { getUserPDA } from './utils/pda'
 import Stake from './stake'
 import { CreateUserArgs, RpcOptions } from './types'
 import sendTransactionWithOptions from './utils/sendTransactionWithOptions'
+import { bs58 } from '@coral-xyz/anchor/dist/cjs/utils/bytes'
 
 export default class TriadProtocolClient {
   program: Program<TriadProtocol>
@@ -76,8 +77,8 @@ export default class TriadProtocolClient {
       const users = await this.program.account.user.all([
         {
           memcmp: {
-            offset: 8,
-            bytes: Buffer.from(name).toString('base64')
+            offset: 89 + 4,
+            bytes: bs58.encode(Buffer.from(name))
           }
         }
       ])
