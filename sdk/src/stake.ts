@@ -1,5 +1,10 @@
 import { AnchorProvider, BN, Program } from '@coral-xyz/anchor'
-import { Keypair, PublicKey, TransactionInstruction } from '@solana/web3.js'
+import {
+  Keypair,
+  PublicKey,
+  Transaction,
+  TransactionInstruction
+} from '@solana/web3.js'
 import { TriadProtocol } from './types/triad_protocol'
 import { formatStake, formatStakeVault } from './utils/helpers'
 import { RpcOptions } from './types'
