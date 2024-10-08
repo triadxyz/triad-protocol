@@ -6,11 +6,13 @@ import {
 } from '@solana/web3.js'
 import { RpcOptions } from '../types'
 import { Provider } from '@coral-xyz/anchor'
+import { AddressLookupTableAccount } from '@solana/web3.js'
 
 const sendVersionedTransaction = async (
   provider: Provider,
   ixs: TransactionInstruction[],
-  options?: RpcOptions
+  options?: RpcOptions,
+  addressLookupTableAccounts?: AddressLookupTableAccount[]
 ): Promise<string> => {
   if (options?.microLamports) {
     ixs.push(
@@ -28,7 +30,7 @@ const sendVersionedTransaction = async (
         instructions: ixs,
         recentBlockhash: blockhash,
         payerKey: provider.publicKey
-      }).compileToV0Message()
+      }).compileToV0Message(addressLookupTableAccounts || [])
     ),
     [],
     {

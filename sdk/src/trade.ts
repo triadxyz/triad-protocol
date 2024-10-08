@@ -14,6 +14,10 @@ import {
 import { getTokenATA, getUserPDA } from './utils/pda'
 import sendVersionedTransaction from './utils/sendVersionedTransaction'
 import sendTransactionWithOptions from './utils/sendTransactionWithOptions'
+import { swapToTRD } from './utils/swap'
+import { ComputeBudgetProgram } from '@solana/web3.js'
+import { TransactionMessage } from '@solana/web3.js'
+import { VersionedTransaction } from '@solana/web3.js'
 
 export default class Trade {
   program: Program<TriadProtocol>
@@ -104,13 +108,14 @@ export default class Trade {
    * @param marketId - The ID of the market
    * @param amount - The amount of the order
    * @param direction - The direction of the order
+   * @param token - The token to use for the order
    * @param comment - The comment of the order
    *
    * @param options - RPC options
    *
    */
   async openOrder(
-    { marketId, amount, direction, comment }: OpenOrderArgs,
+    { marketId, amount, direction, token, comment }: OpenOrderArgs,
     options?: RpcOptions
   ): Promise<string> {
     const marketPDA = getMarketPDA(this.program.programId, marketId)
@@ -138,10 +143,30 @@ export default class Trade {
       )
     }
 
+    const {
+      setupInstructions,
+      swapIxs,
+      addressLookupTableAccounts,
+      trdAmount
+    } = await swapToTRD({
+      connection: this.provider.connection,
+      wallet: this.provider.publicKey.toBase58(),
+      inToken: token,
+      amount
+    })
+
+    if (swapIxs.length === 0) {
+      return
+    }
+
+    ixs.push(...setupInstructions)
+
+    ixs.push(...swapIxs)
+
     ixs.push(
       await this.program.methods
         .openOrder({
-          amount: new BN(amount * 10 ** TRD_DECIMALS),
+          amount: new BN(trdAmount * 10 ** TRD_DECIMALS),
           direction: direction,
           comment: encodeString(comment, 64)
         })
@@ -156,7 +181,12 @@ export default class Trade {
         .instruction()
     )
 
-    return sendVersionedTransaction(this.provider, ixs, options)
+    return sendVersionedTransaction(
+      this.provider,
+      ixs,
+      options,
+      addressLookupTableAccounts
+    )
   }
 
   /**
