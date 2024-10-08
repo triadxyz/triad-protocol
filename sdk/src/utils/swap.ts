@@ -6,8 +6,9 @@ import {
   TransactionInstruction,
   ComputeBudgetProgram
 } from '@solana/web3.js'
+import { TRD_MINT } from './constants'
 
-export const swapToTRD = async ({
+export const swap = async ({
   connection,
   wallet,
   inToken,
@@ -18,34 +19,11 @@ export const swapToTRD = async ({
   inToken: string
   amount: number
 }) => {
-  const outToken = 't3DohmswhKk94PPbPYwA6ZKACyY3y5kbcqeQerAJjmV'
-
   const quoteResponse = await axios.get(
-    `https://quote-api.jup.ag/v6/quote?inputMint=${getTokenInfo(inToken).mint}&outputMint=${outToken}&amount=${amount}&slippageBps=10&computeAutoSlippage=true&swapMode=ExactIn&onlyDirectRoutes=false&asLegacyTransaction=false&maxAccounts=64&minimizeSlippage=false&experimentalDexes=Jupiter%20LO0`
+    `https://quote-api.jup.ag/v6/quote?inputMint=${getTokenInfo(inToken).mint}&outputMint=${TRD_MINT.toBase58()}&amount=${amount}&slippageBps=10`
   )
 
   const { data: quoteData } = quoteResponse
-
-  let trdAmount = 0
-
-  console.log(quoteData)
-
-  if (inToken !== 'USDC' && quoteData && quoteData.outAmount) {
-    const outAmountNumber =
-      Number(quoteData.outAmount) / 10 ** getTokenInfo(inToken).decimals
-
-    trdAmount = outAmountNumber
-  }
-
-  if (inToken === 'USDC' && quoteData && quoteData.outAmount) {
-    const outAmountNumber = Number(quoteData.outAmount) / 10 ** 6
-    const inAmountNumber =
-      Number(quoteData.inAmount) / 10 ** getTokenInfo(inToken).decimals
-
-    const tokenAmount = inAmountNumber / outAmountNumber
-
-    trdAmount = tokenAmount
-  }
 
   const swapResponse = await axios.post(
     'https://quote-api.jup.ag/v6/swap-instructions',
@@ -63,13 +41,6 @@ export const swapToTRD = async ({
     cleanupInstruction
   } = swapResponse.data
 
-  console.log(
-    setupInstructions,
-    swapInstruction,
-    addressLookupTableAddresses,
-    cleanupInstruction
-  )
-  
   return {
     swapIxs: [
       deserializeInstruction(swapInstruction),

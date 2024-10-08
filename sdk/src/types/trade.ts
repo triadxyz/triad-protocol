@@ -86,12 +86,10 @@ export type InitializeQuestionArgs = {
   endTime: number
 }
 
-export type Token = 'TRD' | 'USDC' | 'SOL' | 'ORE'
-
 export type OpenOrderArgs = {
   marketId: number
   amount: number
   direction: OrderDirection
-  token: Token
+  token: string
   comment?: string
 }

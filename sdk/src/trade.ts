@@ -1,6 +1,10 @@
 import { AnchorProvider, Program } from '@coral-xyz/anchor'
 import { TriadProtocol } from './types/triad_protocol'
-import { PublicKey, TransactionInstruction } from '@solana/web3.js'
+import {
+  AddressLookupTableAccount,
+  PublicKey,
+  TransactionInstruction
+} from '@solana/web3.js'
 import { InitializeQuestionArgs, Market, OpenOrderArgs } from './types/trade'
 import { RpcOptions } from './types'
 import BN from 'bn.js'
@@ -14,10 +18,7 @@ import {
 import { getTokenATA, getUserPDA } from './utils/pda'
 import sendVersionedTransaction from './utils/sendVersionedTransaction'
 import sendTransactionWithOptions from './utils/sendTransactionWithOptions'
-import { swapToTRD } from './utils/swap'
-import { ComputeBudgetProgram } from '@solana/web3.js'
-import { TransactionMessage } from '@solana/web3.js'
-import { VersionedTransaction } from '@solana/web3.js'
+import { swap } from './utils/swap'
 
 export default class Trade {
   program: Program<TriadProtocol>
@@ -128,6 +129,9 @@ export default class Trade {
     const userFromATA = getTokenATA(this.provider.publicKey, this.mint)
 
     const ixs: TransactionInstruction[] = []
+    const addressLookupTableAccounts: AddressLookupTableAccount[] = []
+
+    let amountInTRD = amount * 10 ** TRD_DECIMALS
 
     try {
       await this.program.account.userTrade.fetch(userTradePDA)
@@ -143,30 +147,34 @@ export default class Trade {
       )
     }
 
-    const {
-      setupInstructions,
-      swapIxs,
-      addressLookupTableAccounts,
-      trdAmount
-    } = await swapToTRD({
-      connection: this.provider.connection,
-      wallet: this.provider.publicKey.toBase58(),
-      inToken: token,
-      amount
-    })
+    if (token !== TRD_MINT.toBase58()) {
+      const {
+        setupInstructions,
+        swapIxs,
+        addressLookupTableAccounts,
+        trdAmount
+      } = await swap({
+        connection: this.provider.connection,
+        wallet: this.provider.publicKey.toBase58(),
+        inToken: token,
+        amount
+      })
 
-    if (swapIxs.length === 0) {
-      return
+      amountInTRD = trdAmount
+
+      if (swapIxs.length === 0) {
+        return
+      }
+
+      ixs.push(...setupInstructions)
+      ixs.push(...swapIxs)
+      addressLookupTableAccounts.push(...addressLookupTableAccounts)
     }
-
-    ixs.push(...setupInstructions)
-
-    ixs.push(...swapIxs)
 
     ixs.push(
       await this.program.methods
         .openOrder({
-          amount: new BN(trdAmount * 10 ** TRD_DECIMALS),
+          amount: new BN(amountInTRD),
           direction: direction,
           comment: encodeString(comment, 64)
         })
