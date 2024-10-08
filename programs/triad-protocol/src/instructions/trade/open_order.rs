@@ -117,14 +117,13 @@ pub fn open_order(ctx: Context<OpenOrder>, args: OpenOrderArgs) -> Result<()> {
         direction: args.direction,
         padding: [0; 32],
     };
+
     user_trade.opened_orders = user_trade.opened_orders.checked_add(1).unwrap();
     user_trade.total_deposits = user_trade.total_deposits.checked_add(net_amount).unwrap();
 
     market.open_orders_count = market.open_orders_count.checked_add(1).unwrap();
     market.total_volume = market.total_volume.checked_add(net_amount).unwrap();
     market.update_ts = ts;
-
-    market.update_price(net_amount, args.direction, args.comment, true)?;
 
     // Update market shares
     match args.direction {
@@ -135,6 +134,8 @@ pub fn open_order(ctx: Context<OpenOrder>, args: OpenOrderArgs) -> Result<()> {
             market.total_flop_shares = market.total_flop_shares.checked_add(total_shares).unwrap();
         }
     }
+
+    market.update_price(net_amount, args.direction, args.comment, true)?;
 
     fee_vault.deposited = fee_vault.deposited.checked_add(fee_amount).unwrap();
     fee_vault.net_balance = fee_vault.net_balance.checked_add(fee_amount).unwrap();

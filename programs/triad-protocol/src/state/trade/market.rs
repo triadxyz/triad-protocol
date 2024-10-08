@@ -185,31 +185,46 @@ impl Market {
         comment: Option<[u8; 64]>,
         is_open: bool
     ) -> Result<()> {
-        let price_impact = ((amount as f64) / 1_000_000.0).min(0.001);
+        let (current_price, current_liquidity) = match direction {
+            OrderDirection::Hype => (self.hype_price, self.hype_liquidity),
+            OrderDirection::Flop => (self.flop_price, self.flop_liquidity),
+        };
+
+        let liquidity_factor = (current_liquidity as f64).max(1.0);
+        let base_impact = (amount as f64) / liquidity_factor;
+        let price_impact = (1.0 - (-base_impact).exp()).min(0.05); // Max 5% impact
+
+        let new_price = if is_open {
+            ((current_price as f64) * (1.0 + price_impact)) as u64
+        } else {
+            ((current_price as f64) * (1.0 - price_impact)) as u64
+        };
 
         match direction {
             OrderDirection::Hype => {
+                self.hype_price = new_price.clamp(1, 999_999);
                 if is_open {
                     self.hype_liquidity = self.hype_liquidity.checked_add(amount).unwrap();
-                    let new_hype_price = ((self.hype_price as f64) * (1.0 + price_impact)) as u64;
-                    self.hype_price = new_hype_price.min(999_999);
                 } else {
                     self.hype_liquidity = self.hype_liquidity.checked_sub(amount).unwrap();
-                    let new_hype_price = ((self.hype_price as f64) * (1.0 - price_impact)) as u64;
-                    self.hype_price = new_hype_price.max(1);
                 }
             }
-
             OrderDirection::Flop => {
+                self.flop_price = new_price.clamp(1, 999_999);
                 if is_open {
                     self.flop_liquidity = self.flop_liquidity.checked_add(amount).unwrap();
-                    let new_flop_price = ((self.flop_price as f64) * (1.0 + price_impact)) as u64;
-                    self.flop_price = new_flop_price.min(999_999);
                 } else {
                     self.flop_liquidity = self.flop_liquidity.checked_sub(amount).unwrap();
-                    let new_flop_price = ((self.flop_price as f64) * (1.0 - price_impact)) as u64;
-                    self.flop_price = new_flop_price.max(1);
                 }
+            }
+        }
+
+        match direction {
+            OrderDirection::Hype => {
+                self.flop_price = 1_000_000 - self.hype_price;
+            }
+            OrderDirection::Flop => {
+                self.hype_price = 1_000_000 - self.flop_price;
             }
         }
 

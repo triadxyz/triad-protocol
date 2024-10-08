@@ -140,7 +140,10 @@ pub fn close_order(ctx: Context<CloseOrder>, order_id: u64) -> Result<()> {
         refund_amount: Some(current_amount),
         timestamp: ts,
         is_question_winner: None,
-        pnl: (current_amount - total_amount) as i64,
+        pnl: current_amount
+            .checked_sub(total_amount)
+            .map(|v| v as i64)
+            .unwrap_or(-(total_amount as i64)),
     });
 
     Ok(())
