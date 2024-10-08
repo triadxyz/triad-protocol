@@ -42,7 +42,13 @@ pub struct OpenOrder<'info> {
     #[account(mut)]
     pub mint: Box<InterfaceAccount<'info, Mint>>,
 
-    #[account(mut, constraint = user_from_ata.amount >= args.amount)]
+    #[account(
+        mut, 
+        constraint = user_from_ata.amount >= args.amount,
+        associated_token::mint = mint,
+        associated_token::authority = signer,
+        associated_token::token_program = token_program
+    )]
     pub user_from_ata: Box<InterfaceAccount<'info, TokenAccount>>,
 
     #[account(

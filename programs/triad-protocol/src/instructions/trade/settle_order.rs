@@ -61,7 +61,10 @@ pub fn settle_order(ctx: Context<SettleOrder>, order_id: u64) -> Result<()> {
 
     let order = user_trade.orders[order_index];
 
-    require!(market.current_question_id > order.question_id, TriadProtocolError::MarketStillActive);
+    require!(
+        market.current_question_id >= order.question_id,
+        TriadProtocolError::MarketStillActive
+    );
 
     let winning_direction = market.previous_resolved_question.winning_direction;
 
