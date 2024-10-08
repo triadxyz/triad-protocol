@@ -1743,7 +1743,7 @@
           {
             "name": "fee_bps",
             "docs": [
-              "Fees applied to trades (in basis points, e.g., 1.131% fee)"
+              "Fees applied to trades (in basis points, e.g., 2.131% fee)"
             ],
             "type": "u16"
           },

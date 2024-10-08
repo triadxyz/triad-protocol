@@ -34,7 +34,7 @@ pub struct Market {
     pub open_orders_count: u64,
     /// Next available order ID
     pub next_order_id: u64,
-    /// Fees applied to trades (in basis points, e.g., 1.131% fee)
+    /// Fees applied to trades (in basis points, e.g., 2.131% fee)
     pub fee_bps: u16,
     /// Vault to Receive fees
     pub fee_vault: Pubkey,
@@ -144,7 +144,7 @@ impl Default for Market {
             update_ts: 0,
             open_orders_count: 0,
             next_order_id: 0,
-            fee_bps: 1131, // 1.131% fee
+            fee_bps: 2131, // 2.131% fee
             fee_vault: Pubkey::default(),
             is_active: true,
             market_price: 0,

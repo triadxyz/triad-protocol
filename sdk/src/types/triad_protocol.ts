@@ -2270,7 +2270,7 @@ export type TriadProtocol = {
           },
           {
             name: 'feeBps'
-            docs: ['Fees applied to trades (in basis points, e.g., 1.131% fee)']
+            docs: ['Fees applied to trades (in basis points, e.g., 2.131% fee)']
             type: 'u16'
           },
           {
