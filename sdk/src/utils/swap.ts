@@ -19,8 +19,16 @@ export const swap = async ({
   inToken: string
   amount: number
 }) => {
+  const token = TOKENS[inToken]
+
+  if (!token) {
+    throw new Error('Token not found')
+  }
+
+  const formattedAmountIn = amount * 10 ** token.decimals
+
   const quoteResponse = await axios.get(
-    `https://quote-api.jup.ag/v6/quote?inputMint=${getTokenInfo(inToken).mint}&outputMint=${TRD_MINT.toBase58()}&amount=${amount}&slippageBps=10`
+    `https://quote-api.jup.ag/v6/quote?inputMint=${inToken}&outputMint=${TRD_MINT.toBase58()}&amount=${formattedAmountIn}&slippageBps=10`
   )
 
   const { data: quoteData } = quoteResponse
@@ -104,21 +112,17 @@ const getPriorityFee = async () => {
   return response.data[15].priorityTx || 1000
 }
 
-const getTokenInfo = (token: string) => {
-  const tokens: Record<string, { mint: string; decimals: number }> = {
-    ORE: {
-      mint: 'oreoU2P8bN6jkk3jbaiVxYnG1dCXcYxwhwyK9jSybcp',
-      decimals: 11
-    },
-    SOL: {
-      mint: 'So11111111111111111111111111111111111111112',
-      decimals: 9
-    },
-    USDC: {
-      mint: 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v',
-      decimals: 6
-    }
+const TOKENS: Record<string, { mint: string; decimals: number }> = {
+  oreoU2P8bN6jkk3jbaiVxYnG1dCXcYxwhwyK9jSybcp: {
+    mint: 'oreoU2P8bN6jkk3jbaiVxYnG1dCXcYxwhwyK9jSybcp',
+    decimals: 11
+  },
+  So11111111111111111111111111111111111111112: {
+    mint: 'So11111111111111111111111111111111111111112',
+    decimals: 9
+  },
+  EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v: {
+    mint: 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v',
+    decimals: 6
   }
-
-  return tokens[token]
 }

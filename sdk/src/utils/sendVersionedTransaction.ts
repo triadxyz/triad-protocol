@@ -5,7 +5,6 @@ import {
   ComputeBudgetProgram
 } from '@solana/web3.js'
 import { RpcOptions } from '../types'
-import { Provider } from '@coral-xyz/anchor'
 import { AddressLookupTableAccount } from '@solana/web3.js'
 import { AnchorProvider } from '@coral-xyz/anchor'
 import { Keypair } from '@solana/web3.js'
