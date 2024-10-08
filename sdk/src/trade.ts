@@ -152,7 +152,6 @@ export default class Trade {
       this.provider.publicKey
     )
     const userPDA = getUserPDA(this.program.programId, this.provider.publicKey)
-    const userFromATA = getTokenATA(this.provider.publicKey, this.mint)
 
     const ixs: TransactionInstruction[] = []
     const addressLookupTableAccounts: AddressLookupTableAccount[] = []
@@ -209,8 +208,7 @@ export default class Trade {
           market: marketPDA,
           feeVault: feeVualtPDA,
           userTrade: userTradePDA,
-          mint: this.mint,
-          userFromAta: userFromATA
+          mint: this.mint
         })
         .instruction()
     )
