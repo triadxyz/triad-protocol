@@ -1,11 +1,28 @@
-import axios, { AxiosResponse } from 'axios'
+import { bs58 } from "@coral-xyz/anchor/dist/cjs/utils/bytes";
 
-const getPriorityFee = async () => {
-  const response: AxiosResponse<
-    Record<'1' | '5' | '15', { priorityTx: number }>
-  > = await axios.get('https://solanacompass.com/api/fees')
+export async function getPriorityFeeEstimate(priorityLevel, transaction, RPC_URL: string) {
+ const response = await fetch(RPC_URL, {
+   method: "POST",
+   headers: { "Content-Type": "application/json" },
+   body: JSON.stringify({
+     jsonrpc: "2.0",
+     id: "1",
+     method: "getPriorityFeeEstimate",
+     params: [
+       {
+         transaction: bs58.encode(transaction.serialize()), // Pass the serialized transaction in Base58
+         options: { priorityLevel: priorityLevel },
+       },
+     ],
+   }),
+ });
 
-  return response.data[5].priorityTx || 1000
+ const data = await response.json();
+ console.log(
+   "Fee in function for",
+   priorityLevel,
+   " :",
+   data.result.priorityFeeEstimate
+ );
+ return data.result;
 }
-
-export default getPriorityFee

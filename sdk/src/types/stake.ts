@@ -32,7 +32,8 @@ export type UpdateStakeVaultArgs = {
 
 export type RequestWithdrawArgs = {
   wallet: PublicKey
-  nfts: { name: string; mint: PublicKey }[]
+  name: string
+  mint: PublicKey
 }
 
 export type WithdrawArgs = {

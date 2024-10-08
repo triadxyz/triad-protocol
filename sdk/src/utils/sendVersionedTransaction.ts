@@ -5,16 +5,12 @@ import {
   ComputeBudgetProgram
 } from '@solana/web3.js'
 import { RpcOptions } from '../types'
-import { AddressLookupTableAccount } from '@solana/web3.js'
-import { AnchorProvider } from '@coral-xyz/anchor'
-import { Keypair } from '@solana/web3.js'
+import { Provider } from '@coral-xyz/anchor'
 
 const sendVersionedTransaction = async (
-  provider: AnchorProvider,
+  provider: Provider,
   ixs: TransactionInstruction[],
-  options?: RpcOptions,
-  payer?: Keypair,
-  addressLookupTableAccounts?: AddressLookupTableAccount[]
+  options?: RpcOptions
 ): Promise<string> => {
   if (options?.microLamports) {
     ixs.push(
@@ -26,22 +22,20 @@ const sendVersionedTransaction = async (
 
   const { blockhash } = await provider.connection.getLatestBlockhash()
 
-  const tx = new VersionedTransaction(
-    new TransactionMessage({
-      instructions: ixs,
-      recentBlockhash: blockhash,
-      payerKey: provider.publicKey
-    }).compileToV0Message(addressLookupTableAccounts || [])
+  return provider.sendAndConfirm(
+    new VersionedTransaction(
+      new TransactionMessage({
+        instructions: ixs,
+        recentBlockhash: blockhash,
+        payerKey: provider.publicKey
+      }).compileToV0Message()
+    ),
+    [],
+    {
+      skipPreflight: options?.skipPreflight,
+      commitment: 'confirmed'
+    }
   )
-
-  if (payer) {
-    tx.sign([payer])
-  }
-
-  return provider.sendAndConfirm(tx, payer ? [payer] : [], {
-    skipPreflight: options?.skipPreflight,
-    commitment: 'confirmed'
-  })
 }
 
 export default sendVersionedTransaction

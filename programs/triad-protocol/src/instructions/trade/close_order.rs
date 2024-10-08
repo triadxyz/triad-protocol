@@ -9,6 +9,8 @@ use crate::{
     constraints::is_authority_for_user_trade,
 };
 
+// Need check the current status of the Market and of the question to pay the PNL or just close position for the user liquideted
+
 #[derive(Accounts)]
 pub struct CloseOrder<'info> {
     #[account(mut)]
@@ -54,11 +56,14 @@ pub fn close_order(ctx: Context<CloseOrder>, order_id: u64) -> Result<()> {
 
     let ts = Clock::get()?.unix_timestamp;
 
+    // Check if the current question period is active
     require!(ts >= market.current_question_start, TriadProtocolError::QuestionPeriodNotStarted);
     require!(ts < market.current_question_end, TriadProtocolError::QuestionPeriodEnded);
 
+    // Check if the market is active
     require!(market.is_active, TriadProtocolError::MarketInactive);
 
+    // Find the order
     let order_index = user_trade.orders
         .iter()
         .position(|order| order.order_id == order_id)
@@ -66,17 +71,16 @@ pub fn close_order(ctx: Context<CloseOrder>, order_id: u64) -> Result<()> {
 
     let order = user_trade.orders[order_index];
 
-    let current_price = match order.direction {
-        OrderDirection::Hype => market.hype_price,
-        OrderDirection::Flop => market.flop_price,
-    };
+    // Calculate the amount to refund
+    // Based in the shares and the current price of the order
 
-    let current_amount = ((order.total_shares as u128) * (current_price as u128)) / 1_000_000;
-    let current_amount = current_amount as u64;
+    let fee_amount = (((order.total_amount as u64) * (market.fee_bps as u64)) / 100000) as u64;
+    let net_amount = order.total_amount.saturating_sub(fee_amount);
 
-    let total_amount = order.total_amount;
+    let refund_amount = net_amount;
 
-    if current_amount > 0 {
+    if refund_amount > 0 {
+        // Transfer net refund to user
         let signer: &[&[&[u8]]] = &[&[b"market", &market.market_id.to_le_bytes(), &[market.bump]]];
 
         transfer_checked(
@@ -90,36 +94,31 @@ pub fn close_order(ctx: Context<CloseOrder>, order_id: u64) -> Result<()> {
                 },
                 signer
             ),
-            current_amount,
+            refund_amount,
             ctx.accounts.mint.decimals
         )?;
 
-        // Update market price
-        market.update_price(current_amount, order.direction, None, false)?;
-
-        // Update market shares
+        // Update market state
         match order.direction {
             OrderDirection::Hype => {
+                market.hype_liquidity = market.hype_liquidity.checked_sub(refund_amount).unwrap();
                 market.total_hype_shares = market.total_hype_shares
                     .checked_sub(order.total_shares)
                     .unwrap();
             }
             OrderDirection::Flop => {
+                market.flop_liquidity = market.flop_liquidity.checked_sub(refund_amount).unwrap();
                 market.total_flop_shares = market.total_flop_shares
                     .checked_sub(order.total_shares)
                     .unwrap();
             }
         }
 
-        user_trade.total_withdraws = user_trade.total_withdraws
-            .checked_add(current_amount)
-            .unwrap();
-
-        user_trade.opened_orders = user_trade.opened_orders.saturating_sub(1);
+        user_trade.total_withdraws = user_trade.total_withdraws.checked_add(refund_amount).unwrap();
     }
 
+    // Update market state
     market.open_orders_count = market.open_orders_count.saturating_sub(1);
-    market.total_volume = market.total_volume.checked_sub(current_amount).unwrap();
 
     user_trade.orders[order_index] = Order::default();
 
@@ -131,14 +130,14 @@ pub fn close_order(ctx: Context<CloseOrder>, order_id: u64) -> Result<()> {
         order_type: order.order_type,
         question_id: order.question_id,
         order_status: OrderStatus::Closed,
-        price: current_price,
+        price: order.price,
         total_shares: order.total_shares,
         total_amount: order.total_amount,
         comment: None,
-        refund_amount: Some(current_amount),
+        refund_amount: Some(refund_amount),
         timestamp: ts,
         is_question_winner: None,
-        pnl: (current_amount - total_amount) as i64,
+        pnl: 0,
     });
 
     Ok(())

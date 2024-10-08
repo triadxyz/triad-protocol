@@ -1,5 +1,3 @@
-import { PublicKey } from '@solana/web3.js'
-
 export type Market = {
   address: string
   bump: number
@@ -22,6 +20,7 @@ export type Market = {
   feeVault: string
   isActive: boolean
   marketPrice: string
+  isOfficial: boolean
   previousResolvedQuestion: ResolvedQuestion
   currentQuestionId: string
   currentQuestionStart: string
@@ -91,21 +90,5 @@ export type OpenOrderArgs = {
   marketId: number
   amount: number
   direction: OrderDirection
-  token: string
   comment?: string
-}
-
-export type FeeVault = {
-  bump: number
-  authority: PublicKey
-  market: PublicKey
-  deposited: string
-  withdrawn: string
-  netBalance: string
-  projectAvailable: string
-  projectClaimed: string
-  nftHoldersAvailable: string
-  nftHoldersClaimed: string
-  marketAvailable: string
-  marketClaimed: string
 }
