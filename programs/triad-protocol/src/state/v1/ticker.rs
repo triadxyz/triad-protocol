@@ -11,3 +11,9 @@ pub struct Ticker {
     pub price: u64,
     pub vault: Pubkey,
 }
+
+impl Ticker {
+    pub const PREFIX_SEED: &'static [u8] = b"ticker";
+
+    pub const SPACE: usize = 8 + std::mem::size_of::<Self>();
+}

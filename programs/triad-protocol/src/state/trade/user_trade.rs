@@ -52,6 +52,10 @@ pub enum OrderStatus {
     Open,
     /// Order has been closed
     Closed,
+    /// Order has been claimed
+    Claimed,
+    /// Order has been liquidated
+    Liquidated,
 }
 
 #[derive(AnchorSerialize, AnchorDeserialize, Clone, Copy, PartialEq, Eq, Default)]

@@ -74,11 +74,9 @@ pub fn open_order(ctx: Context<OpenOrder>, args: OpenOrderArgs) -> Result<()> {
 
     let ts = Clock::get()?.unix_timestamp;
 
-    // Check if the current question period is active
     require!(ts >= market.current_question_start, TriadProtocolError::QuestionPeriodNotStarted);
     require!(ts < market.current_question_end, TriadProtocolError::QuestionPeriodEnded);
 
-    // Check if the market is active
     require!(market.is_active, TriadProtocolError::MarketInactive);
 
     let price = match args.direction {
@@ -90,9 +88,6 @@ pub fn open_order(ctx: Context<OpenOrder>, args: OpenOrderArgs) -> Result<()> {
     let net_amount = args.amount.saturating_sub(fee_amount);
 
     let total_shares = market.calculate_shares(net_amount, args.direction);
-
-    msg!("total_shares: {}", total_shares);
-    msg!("amount: {}", args.amount);
 
     if total_shares.eq(&0) {
         return Err(TriadProtocolError::InsufficientFunds.into());
@@ -112,33 +107,31 @@ pub fn open_order(ctx: Context<OpenOrder>, args: OpenOrderArgs) -> Result<()> {
         market_id: market.market_id,
         status: OrderStatus::Open,
         price,
-        total_amount: args.amount,
+        total_amount: net_amount,
         total_shares,
         order_type: OrderType::Market,
         direction: args.direction,
         padding: [0; 32],
     };
     user_trade.opened_orders = user_trade.opened_orders.checked_add(1).unwrap();
-    user_trade.total_deposits = user_trade.total_deposits.checked_add(args.amount).unwrap();
+    user_trade.total_deposits = user_trade.total_deposits.checked_add(net_amount).unwrap();
 
     market.open_orders_count = market.open_orders_count.checked_add(1).unwrap();
-    market.total_volume = market.total_volume.checked_add(args.amount).unwrap();
+    market.total_volume = market.total_volume.checked_add(net_amount).unwrap();
     market.update_ts = ts;
 
     market.update_price(net_amount, args.direction, args.comment, true)?;
 
+    // Update market shares
     match args.direction {
         OrderDirection::Hype => {
-            market.hype_liquidity = market.hype_liquidity.checked_add(net_amount).unwrap();
             market.total_hype_shares = market.total_hype_shares.checked_add(total_shares).unwrap();
         }
         OrderDirection::Flop => {
-            market.flop_liquidity = market.flop_liquidity.checked_add(net_amount).unwrap();
             market.total_flop_shares = market.total_flop_shares.checked_add(total_shares).unwrap();
         }
     }
 
-    // Update FeeVault state
     fee_vault.deposited = fee_vault.deposited.checked_add(fee_amount).unwrap();
     fee_vault.net_balance = fee_vault.net_balance.checked_add(fee_amount).unwrap();
 

@@ -6,7 +6,7 @@ triad_protocol = "TRDwq3BN4mP3m9KsuNUWSN6QDff93VKGSwE95Jbr9Ss"
 
 [provider]
 cluster = "mainnet"
-wallet = "~/.config/solana/triad.json"
+wallet = "~/.config/solana/id.json"
 
 [scripts]
 test = "yarn run ts-mocha -p ./tsconfig.json -t 1000000 tests/**/*.ts"

@@ -93,12 +93,12 @@ pub fn claim_stake_rewards(
 
     let mut amount_base = 6.0;
 
-    if stake.claimed_ts > 1726876394 || stake.init_ts > 1726876394 {
-        amount_base = 2.0;
+    if stake.claimed_ts > 1727863429 || stake.init_ts > 1727863429 {
+        amount_base = 1.0;
     }
 
     if stake.boost {
-        amount_base = 3.69;
+        amount_base = 3.0;
     }
 
     let user_base_rewards =

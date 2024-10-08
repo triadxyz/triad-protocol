@@ -1,7 +1,16 @@
 import { AnchorProvider, Program } from '@coral-xyz/anchor'
 import { TriadProtocol } from './types/triad_protocol'
-import { PublicKey, TransactionInstruction } from '@solana/web3.js'
-import { InitializeQuestionArgs, Market, OpenOrderArgs } from './types/trade'
+import {
+  AddressLookupTableAccount,
+  PublicKey,
+  TransactionInstruction
+} from '@solana/web3.js'
+import {
+  FeeVault,
+  InitializeQuestionArgs,
+  Market,
+  OpenOrderArgs
+} from './types/trade'
 import { RpcOptions } from './types'
 import BN from 'bn.js'
 import { TRD_DECIMALS, TRD_MINT } from './utils/constants'
@@ -14,6 +23,7 @@ import {
 import { getTokenATA, getUserPDA } from './utils/pda'
 import sendVersionedTransaction from './utils/sendVersionedTransaction'
 import sendTransactionWithOptions from './utils/sendTransactionWithOptions'
+import { swap } from './utils/swap'
 
 export default class Trade {
   program: Program<TriadProtocol>
@@ -36,6 +46,27 @@ export default class Trade {
           accountToMarket(account, publicKey)
         )
       )
+  }
+
+  async getFeeVault(marketId: number): Promise<FeeVault> {
+    const feeVaultPDA = getFeeVaultPDA(this.program.programId, marketId)
+
+    const response = await this.program.account.feeVault.fetch(feeVaultPDA)
+
+    return {
+      bump: response.bump,
+      authority: response.authority,
+      market: response.market,
+      deposited: response.deposited.toString(),
+      withdrawn: response.withdrawn.toString(),
+      netBalance: response.netBalance.toString(),
+      projectAvailable: response.projectAvailable.toString(),
+      projectClaimed: response.projectClaimed.toString(),
+      nftHoldersAvailable: response.nftHoldersAvailable.toString(),
+      nftHoldersClaimed: response.nftHoldersClaimed.toString(),
+      marketAvailable: response.marketAvailable.toString(),
+      marketClaimed: response.marketClaimed.toString()
+    }
   }
 
   /**
@@ -104,13 +135,14 @@ export default class Trade {
    * @param marketId - The ID of the market
    * @param amount - The amount of the order
    * @param direction - The direction of the order
+   * @param token - The token to use for the order
    * @param comment - The comment of the order
    *
    * @param options - RPC options
    *
    */
   async openOrder(
-    { marketId, amount, direction, comment }: OpenOrderArgs,
+    { marketId, amount, direction, token, comment }: OpenOrderArgs,
     options?: RpcOptions
   ): Promise<string> {
     const marketPDA = getMarketPDA(this.program.programId, marketId)
@@ -123,6 +155,9 @@ export default class Trade {
     const userFromATA = getTokenATA(this.provider.publicKey, this.mint)
 
     const ixs: TransactionInstruction[] = []
+    const addressLookupTableAccounts: AddressLookupTableAccount[] = []
+
+    let amountInTRD = amount * 10 ** TRD_DECIMALS
 
     try {
       await this.program.account.userTrade.fetch(userTradePDA)
@@ -138,10 +173,34 @@ export default class Trade {
       )
     }
 
+    if (token !== TRD_MINT.toBase58()) {
+      const {
+        setupInstructions,
+        swapIxs,
+        addressLookupTableAccounts,
+        trdAmount
+      } = await swap({
+        connection: this.provider.connection,
+        wallet: this.provider.publicKey.toBase58(),
+        inToken: token,
+        amount
+      })
+
+      amountInTRD = trdAmount
+
+      if (swapIxs.length === 0) {
+        return
+      }
+
+      ixs.push(...setupInstructions)
+      ixs.push(...swapIxs)
+      addressLookupTableAccounts.push(...addressLookupTableAccounts)
+    }
+
     ixs.push(
       await this.program.methods
         .openOrder({
-          amount: new BN(amount * 10 ** TRD_DECIMALS),
+          amount: new BN(amountInTRD),
           direction: direction,
           comment: encodeString(comment, 64)
         })
@@ -156,7 +215,13 @@ export default class Trade {
         .instruction()
     )
 
-    return sendVersionedTransaction(this.provider, ixs, options)
+    return sendVersionedTransaction(
+      this.provider,
+      ixs,
+      options,
+      undefined,
+      addressLookupTableAccounts
+    )
   }
 
   /**
@@ -238,5 +303,34 @@ export default class Trade {
     })
 
     return sendTransactionWithOptions(method, options)
+  }
+
+  /**
+   * Settle an order
+   * @param marketId - The ID of the market
+   * @param orderId - The ID of the order to settle
+   *
+   * @param options - RPC options
+   *
+   */
+  async settleOrder(
+    { marketId, orderId }: { marketId: number; orderId: number },
+    options?: RpcOptions
+  ): Promise<string> {
+    const marketPDA = getMarketPDA(this.program.programId, marketId)
+    const userTradePDA = getUserTradePDA(
+      this.program.programId,
+      this.provider.publicKey
+    )
+
+    return sendTransactionWithOptions(
+      this.program.methods.settleOrder(new BN(orderId)).accounts({
+        signer: this.provider.publicKey,
+        userTrade: userTradePDA,
+        market: marketPDA,
+        mint: this.mint
+      }),
+      options
+    )
   }
 }

@@ -89,7 +89,6 @@ export const accountToMarket = (account: any, address: PublicKey): Market => {
     feeVault: account.feeVault.toBase58(),
     isActive: account.isActive,
     marketPrice: account.marketPrice.toString(),
-    isOfficial: account.isOfficial,
     previousResolvedQuestion: accountToResolvedQuestion(
       account.previousResolvedQuestion
     ),

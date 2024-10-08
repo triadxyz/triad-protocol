@@ -121,4 +121,7 @@ pub enum TriadProtocolError {
 
     #[msg("Stake vault is locked")]
     StakeVaultLocked,
+
+    #[msg("Market still active")]
+    MarketStillActive,
 }

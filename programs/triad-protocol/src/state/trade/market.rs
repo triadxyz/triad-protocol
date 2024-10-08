@@ -183,29 +183,33 @@ impl Market {
         amount: u64,
         direction: OrderDirection,
         comment: Option<[u8; 64]>,
-        _is_open: bool
+        is_open: bool
     ) -> Result<()> {
-        let price_impact = ((amount as f64) / 1_000_000.0).min(0.01); // Max 1% impact
+        let price_impact = ((amount as f64) / 1_000_000.0).min(0.001);
 
         match direction {
             OrderDirection::Hype => {
-                self.hype_liquidity += amount;
-                let new_hype_price = ((self.hype_price as f64) * (1.0 + price_impact)) as u64;
-                self.hype_price = new_hype_price.min(999_999);
+                if is_open {
+                    self.hype_liquidity += amount;
+                    let new_hype_price = ((self.hype_price as f64) * (1.0 + price_impact)) as u64;
+                    self.hype_price = new_hype_price.min(999_999);
+                } else {
+                    self.hype_liquidity -= amount;
+                    let new_hype_price = ((self.hype_price as f64) * (1.0 - price_impact)) as u64;
+                    self.hype_price = new_hype_price.max(1);
+                }
             }
-            OrderDirection::Flop => {
-                self.flop_liquidity += amount;
-                let new_flop_price = ((self.flop_price as f64) * (1.0 + price_impact)) as u64;
-                self.flop_price = new_flop_price.min(999_999);
-            }
-        }
 
-        match direction {
-            OrderDirection::Hype => {
-                self.flop_price = 1_000_000 - self.hype_price;
-            }
             OrderDirection::Flop => {
-                self.hype_price = 1_000_000 - self.flop_price;
+                if is_open {
+                    self.flop_liquidity += amount;
+                    let new_flop_price = ((self.flop_price as f64) * (1.0 + price_impact)) as u64;
+                    self.flop_price = new_flop_price.min(999_999);
+                } else {
+                    self.flop_liquidity -= amount;
+                    let new_flop_price = ((self.flop_price as f64) * (1.0 - price_impact)) as u64;
+                    self.flop_price = new_flop_price.max(1);
+                }
             }
         }
 
