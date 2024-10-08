@@ -1,7 +1,12 @@
 import { AnchorProvider, Program } from '@coral-xyz/anchor'
 import { TriadProtocol } from './types/triad_protocol'
 import { PublicKey, TransactionInstruction } from '@solana/web3.js'
-import { InitializeQuestionArgs, Market, OpenOrderArgs } from './types/trade'
+import {
+  FeeVault,
+  InitializeQuestionArgs,
+  Market,
+  OpenOrderArgs
+} from './types/trade'
 import { RpcOptions } from './types'
 import BN from 'bn.js'
 import { TRD_DECIMALS, TRD_MINT } from './utils/constants'
@@ -36,6 +41,27 @@ export default class Trade {
           accountToMarket(account, publicKey)
         )
       )
+  }
+
+  async getFeeVault(marketId: number): Promise<FeeVault> {
+    const feeVaultPDA = getFeeVaultPDA(this.program.programId, marketId)
+
+    const response = await this.program.account.feeVault.fetch(feeVaultPDA)
+
+    return {
+      bump: response.bump,
+      authority: response.authority,
+      market: response.market,
+      deposited: response.deposited.toString(),
+      withdrawn: response.withdrawn.toString(),
+      netBalance: response.netBalance.toString(),
+      projectAvailable: response.projectAvailable.toString(),
+      projectClaimed: response.projectClaimed.toString(),
+      nftHoldersAvailable: response.nftHoldersAvailable.toString(),
+      nftHoldersClaimed: response.nftHoldersClaimed.toString(),
+      marketAvailable: response.marketAvailable.toString(),
+      marketClaimed: response.marketClaimed.toString()
+    }
   }
 
   /**
