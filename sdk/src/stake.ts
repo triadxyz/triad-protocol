@@ -1,10 +1,9 @@
 import { AnchorProvider, BN, Program } from '@coral-xyz/anchor'
 import {
-  ComputeBudgetProgram,
+  Keypair,
   PublicKey,
-  TransactionInstruction,
-  TransactionMessage,
-  VersionedTransaction
+  Transaction,
+  TransactionInstruction
 } from '@solana/web3.js'
 import { TriadProtocol } from './types/triad_protocol'
 import { formatStake, formatStakeVault } from './utils/helpers'
@@ -32,6 +31,7 @@ import { toByteArray } from 'base64-js'
 import getRarityRank from './utils/getRarityRank'
 import sendVersionedTransaction from './utils/sendVersionedTransaction'
 import sendTransactionWithOptions from './utils/sendTransactionWithOptions'
+import { convertSecretKeyToKeypair } from './utils/convertSecretKeyToKeypair'
 
 export default class Stake {
   program: Program<TriadProtocol>
@@ -134,8 +134,6 @@ export default class Stake {
       const rank = getRarityRank(ranks, stake.mint, stake.name)
 
       let available = 0
-
-      await new Promise((resolve) => setTimeout(resolve, 1000))
 
       try {
         available = await this.getStakeRewards({
@@ -242,30 +240,40 @@ export default class Stake {
   /**
    *  Request Withdraw
    *  @param wallet - User wallet
-   *  @param name - Stake name
+   *  @param nfts - NFTs to Request withdraw
    *
    */
   async requestWithdraw(
-    { wallet, name, mint }: RequestWithdrawArgs,
+    { wallet, nfts }: RequestWithdrawArgs,
     options?: RpcOptions
   ) {
+    const ixs: TransactionInstruction[] = []
+
     const stakeVaultPDA = getStakeVaultPDA(
       this.program.programId,
       this.stakeVaultName
     )
-    const stakePDA = getStakePDA(this.program.programId, wallet, name)
+
     const userPDA = getUserPDA(this.program.programId, wallet)
 
-    return sendTransactionWithOptions(
-      this.program.methods.requestWithdrawStake().accounts({
-        signer: wallet,
-        mint: mint,
-        user: userPDA,
-        stake: stakePDA,
-        stakeVault: stakeVaultPDA
-      }),
-      options
-    )
+    for (const nft of nfts) {
+      const stakePDA = getStakePDA(this.program.programId, wallet, nft.name)
+
+      ixs.push(
+        await this.program.methods
+          .requestWithdrawStake()
+          .accounts({
+            signer: wallet,
+            mint: nft.mint,
+            user: userPDA,
+            stake: stakePDA,
+            stakeVault: stakeVaultPDA
+          })
+          .instruction()
+      )
+    }
+
+    return sendVersionedTransaction(this.provider, ixs, options)
   }
 
   /**
@@ -300,44 +308,82 @@ export default class Stake {
   }
 
   /**
-   *  Claim Stake Rewards
+   *  Claim All Stake Rewards
    *  @param wallet - User wallet
-   *  @param mint - NFT mint
-   *  @param nftName - Name of the nft
+   *  @param collections - NFT collections
+   *  @param ranks - Tensor ranks
    *
    */
   async claimStakeRewards(
-    { wallet, nftName, collections, rank }: ClaimStakeRewardsArgs,
+    {
+      wallet,
+      collections,
+      ranks,
+      verifier,
+      isToken
+    }: {
+      wallet: PublicKey
+      collections: number
+      ranks: {
+        onchainId: string
+        name: string
+        rarityRankHrtt: number
+      }[]
+      verifier: string
+      isToken?: boolean
+    },
     options?: RpcOptions
   ) {
-    const stakeVaultPDA = getStakeVaultPDA(
-      this.program.programId,
-      this.stakeVaultName
+    const stakes = (await this.getUserStakes(wallet)).sort(
+      (a, b) => a.claimedTs - b.claimedTs
     )
-    const stakePDA = getStakePDA(this.program.programId, wallet, nftName)
 
-    const method = this.program.methods
-      .claimStakeRewards({
-        collections,
-        rank
-      })
-      .accounts({
-        signer: wallet,
-        mint: TRD_MINT,
-        stake: stakePDA,
-        stakeVault: stakeVaultPDA,
-        verifier: VERIFIER
-      })
+    const ixs: TransactionInstruction[] = []
 
-    if (options?.microLamports) {
-      method.postInstructions([
-        ComputeBudgetProgram.setComputeUnitPrice({
-          microLamports: options.microLamports
-        })
-      ])
+    for (const stake of stakes) {
+      if (stake.withdrawTs !== 0) {
+        continue
+      }
+
+      const rank = getRarityRank(ranks, stake.mint, stake.name)
+
+      if (ixs.length >= 10) {
+        break
+      }
+
+      if (isToken && stake.mint !== TRD_MINT.toBase58()) {
+        continue
+      }
+
+      const stakeVaultPDA = getStakeVaultPDA(
+        this.program.programId,
+        this.stakeVaultName
+      )
+      const stakePDA = getStakePDA(this.program.programId, wallet, stake.name)
+
+      ixs.push(
+        await this.program.methods
+          .claimStakeRewards({
+            collections,
+            rank
+          })
+          .accounts({
+            signer: wallet,
+            mint: TRD_MINT,
+            stake: stakePDA,
+            stakeVault: stakeVaultPDA,
+            verifier: VERIFIER
+          })
+          .instruction()
+      )
     }
 
-    return method.transaction()
+    return sendVersionedTransaction(
+      this.provider,
+      ixs,
+      options,
+      convertSecretKeyToKeypair(verifier)
+    )
   }
 
   /**
@@ -347,7 +393,7 @@ export default class Stake {
    *
    */
   async updateBoost({ wallet, nfts }: UpdateBoostArgs, options?: RpcOptions) {
-    const ixs = []
+    const ixs: TransactionInstruction[] = []
 
     for (const nft of nfts) {
       const stakePDA = getStakePDA(

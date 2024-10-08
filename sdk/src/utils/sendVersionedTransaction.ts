@@ -7,11 +7,14 @@ import {
 import { RpcOptions } from '../types'
 import { Provider } from '@coral-xyz/anchor'
 import { AddressLookupTableAccount } from '@solana/web3.js'
+import { AnchorProvider } from '@coral-xyz/anchor'
+import { Keypair } from '@solana/web3.js'
 
 const sendVersionedTransaction = async (
-  provider: Provider,
+  provider: AnchorProvider,
   ixs: TransactionInstruction[],
   options?: RpcOptions,
+  payer?: Keypair,
   addressLookupTableAccounts?: AddressLookupTableAccount[]
 ): Promise<string> => {
   if (options?.microLamports) {
@@ -24,20 +27,22 @@ const sendVersionedTransaction = async (
 
   const { blockhash } = await provider.connection.getLatestBlockhash()
 
-  return provider.sendAndConfirm(
-    new VersionedTransaction(
-      new TransactionMessage({
-        instructions: ixs,
-        recentBlockhash: blockhash,
-        payerKey: provider.publicKey
-      }).compileToV0Message(addressLookupTableAccounts || [])
-    ),
-    [],
-    {
-      skipPreflight: options?.skipPreflight,
-      commitment: 'confirmed'
-    }
+  const tx = new VersionedTransaction(
+    new TransactionMessage({
+      instructions: ixs,
+      recentBlockhash: blockhash,
+      payerKey: provider.publicKey
+    }).compileToV0Message(addressLookupTableAccounts || [])
   )
+
+  if (payer) {
+    tx.sign([payer])
+  }
+
+  return provider.sendAndConfirm(tx, payer ? [payer] : [], {
+    skipPreflight: options?.skipPreflight,
+    commitment: 'confirmed'
+  })
 }
 
 export default sendVersionedTransaction

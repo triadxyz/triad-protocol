@@ -4,10 +4,17 @@ import { TriadProtocol } from './types/triad_protocol'
 import IDL from './types/idl_triad_protocol.json'
 import Trade from './trade'
 import { formatUser } from './utils/helpers'
-import { getUserPDA } from './utils/pda'
+import { getAssociatedTokenAddress } from '@solana/spl-token'
+import {
+  getTokenVaultAddressSync,
+  getUserPDA,
+  getUserPositionPDA,
+  getVaultAddressSync
+} from './utils/pda'
 import Stake from './stake'
 import { CreateUserArgs, RpcOptions } from './types'
 import sendTransactionWithOptions from './utils/sendTransactionWithOptions'
+import { bs58 } from '@coral-xyz/anchor/dist/cjs/utils/bytes'
 
 export default class TriadProtocolClient {
   program: Program<TriadProtocol>
@@ -16,11 +23,9 @@ export default class TriadProtocolClient {
   stake: Stake
 
   constructor(connection: Connection, wallet: Wallet) {
-    this.provider = new AnchorProvider(
-      connection,
-      wallet,
-      AnchorProvider.defaultOptions()
-    )
+    this.provider = new AnchorProvider(connection, wallet, {
+      commitment: 'confirmed'
+    })
     this.program = new Program(IDL as TriadProtocol, this.provider)
 
     this.trade = new Trade(this.program, this.provider)
@@ -51,6 +56,10 @@ export default class TriadProtocolClient {
       .sort((a, b) => b.referred - a.referred)
   }
 
+  async getTickers() {
+    return await this.program.account.ticker.all()
+  }
+
   /**
    * Check if user exists
    * @param username - User name
@@ -78,8 +87,8 @@ export default class TriadProtocolClient {
       const users = await this.program.account.user.all([
         {
           memcmp: {
-            offset: 8,
-            bytes: Buffer.from(name).toString('base64')
+            offset: 89 + 4,
+            bytes: bs58.encode(Buffer.from(name))
           }
         }
       ])
@@ -117,6 +126,79 @@ export default class TriadProtocolClient {
           signer: wallet,
           referral
         }),
+      options
+    )
+  }
+
+  /**
+   * Get User Positions with amount
+   * @param wallet - User wallet
+   *
+   */
+  async getUserPositionsWithAmount(wallet: PublicKey) {
+    const tickers = await this.program.account.ticker.all()
+
+    const userPositions: PublicKey[] = []
+
+    for (const ticker of tickers) {
+      const userPositionPDA = getUserPositionPDA(
+        this.program.programId,
+        wallet,
+        ticker.publicKey
+      )
+
+      userPositions.push(userPositionPDA)
+    }
+
+    const userPositionsWithAmount =
+      await this.program.account.userPosition.fetchMultiple(userPositions)
+
+    return userPositionsWithAmount.filter(
+      (item) =>
+        item &&
+        parseFloat(item.totalDeposited.toString()) >
+          parseFloat(item.totalWithdrawn.toString())
+    )
+  }
+
+  async withdrawV1(
+    {
+      wallet,
+      ticker,
+      positionIndex
+    }: {
+      wallet: PublicKey
+      ticker: PublicKey
+      positionIndex: number
+    },
+    options?: RpcOptions
+  ) {
+    const vaultPDA = getVaultAddressSync(this.program.programId, ticker)
+
+    const userPositionPDA = getUserPositionPDA(
+      this.program.programId,
+      wallet,
+      ticker
+    )
+
+    const VaultTokenAccountPDA = getTokenVaultAddressSync(
+      this.program.programId,
+      vaultPDA
+    )
+    const userTokenAccount = await getAssociatedTokenAddress(
+      new PublicKey('EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v'),
+      this.provider.wallet.publicKey
+    )
+
+    return sendTransactionWithOptions(
+      this.program.methods.withdrawV1(positionIndex).accounts({
+        signer: wallet,
+        userPosition: userPositionPDA,
+        userTokenAccount,
+        vault: vaultPDA,
+        ticker,
+        vaultTokenAccount: VaultTokenAccountPDA
+      }),
       options
     )
   }

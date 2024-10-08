@@ -18,6 +18,37 @@ export const getTickerPDA = (programId: PublicKey, tickerName: string) => {
   )[0]
 }
 
+export const getVaultAddressSync = (
+  programId: PublicKey,
+  tickerAddress: PublicKey
+): PublicKey => {
+  return PublicKey.findProgramAddressSync(
+    [Buffer.from('vault'), tickerAddress.toBuffer()],
+    programId
+  )[0]
+}
+
+export const getUserPositionPDA = (
+  programId: PublicKey,
+  wallet: PublicKey,
+  ticker: PublicKey
+) => {
+  return PublicKey.findProgramAddressSync(
+    [Buffer.from('user_position'), wallet.toBuffer(), ticker.toBuffer()],
+    programId
+  )[0]
+}
+
+export const getTokenVaultAddressSync = (
+  programId: PublicKey,
+  vault: PublicKey
+) => {
+  return PublicKey.findProgramAddressSync(
+    [Buffer.from('vault_token_account'), vault.toBuffer()],
+    programId
+  )[0]
+}
+
 export const getTokenATA = (address: PublicKey, Mint: PublicKey) => {
   return PublicKey.findProgramAddressSync(
     [address.toBytes(), TOKEN_2022_PROGRAM_ID.toBytes(), Mint.toBytes()],
