@@ -91,6 +91,7 @@ export type OpenOrderArgs = {
   marketId: number
   amount: number
   direction: OrderDirection
+  token: string
   comment?: string
 }
 
