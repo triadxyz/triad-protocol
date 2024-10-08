@@ -94,22 +94,22 @@ pub fn close_order(ctx: Context<CloseOrder>, order_id: u64) -> Result<()> {
             ctx.accounts.mint.decimals
         )?;
 
+        // Update market price
+        market.update_price(current_amount, order.direction, None, false)?;
+
+        // Update market shares
         match order.direction {
             OrderDirection::Hype => {
-                market.hype_liquidity = market.hype_liquidity.checked_sub(current_amount).unwrap();
                 market.total_hype_shares = market.total_hype_shares
                     .checked_sub(order.total_shares)
                     .unwrap();
             }
             OrderDirection::Flop => {
-                market.flop_liquidity = market.flop_liquidity.checked_sub(current_amount).unwrap();
                 market.total_flop_shares = market.total_flop_shares
                     .checked_sub(order.total_shares)
                     .unwrap();
             }
         }
-
-        market.update_price(current_amount, order.direction, None, false)?;
 
         user_trade.total_withdraws = user_trade.total_withdraws
             .checked_add(current_amount)
@@ -119,6 +119,7 @@ pub fn close_order(ctx: Context<CloseOrder>, order_id: u64) -> Result<()> {
     }
 
     market.open_orders_count = market.open_orders_count.saturating_sub(1);
+    market.total_volume = market.total_volume.checked_sub(current_amount).unwrap();
 
     user_trade.orders[order_index] = Order::default();
 

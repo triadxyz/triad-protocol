@@ -122,18 +122,16 @@ pub fn open_order(ctx: Context<OpenOrder>, args: OpenOrderArgs) -> Result<()> {
 
     market.update_price(net_amount, args.direction, args.comment, true)?;
 
+    // Update market shares
     match args.direction {
         OrderDirection::Hype => {
-            market.hype_liquidity = market.hype_liquidity.checked_add(net_amount).unwrap();
             market.total_hype_shares = market.total_hype_shares.checked_add(total_shares).unwrap();
         }
         OrderDirection::Flop => {
-            market.flop_liquidity = market.flop_liquidity.checked_add(net_amount).unwrap();
             market.total_flop_shares = market.total_flop_shares.checked_add(total_shares).unwrap();
         }
     }
 
-    // Update FeeVault state
     fee_vault.deposited = fee_vault.deposited.checked_add(fee_amount).unwrap();
     fee_vault.net_balance = fee_vault.net_balance.checked_add(fee_amount).unwrap();
 
