@@ -240,30 +240,40 @@ export default class Stake {
   /**
    *  Request Withdraw
    *  @param wallet - User wallet
-   *  @param name - Stake name
+   *  @param nfts - NFTs to Request withdraw
    *
    */
   async requestWithdraw(
-    { wallet, name, mint }: RequestWithdrawArgs,
+    { wallet, nfts }: RequestWithdrawArgs,
     options?: RpcOptions
   ) {
+    const ixs: TransactionInstruction[] = []
+
     const stakeVaultPDA = getStakeVaultPDA(
       this.program.programId,
       this.stakeVaultName
     )
-    const stakePDA = getStakePDA(this.program.programId, wallet, name)
+
     const userPDA = getUserPDA(this.program.programId, wallet)
 
-    return sendTransactionWithOptions(
-      this.program.methods.requestWithdrawStake().accounts({
-        signer: wallet,
-        mint: mint,
-        user: userPDA,
-        stake: stakePDA,
-        stakeVault: stakeVaultPDA
-      }),
-      options
-    )
+    for (const nft of nfts) {
+      const stakePDA = getStakePDA(this.program.programId, wallet, nft.name)
+
+      ixs.push(
+        await this.program.methods
+          .requestWithdrawStake()
+          .accounts({
+            signer: wallet,
+            mint: nft.mint,
+            user: userPDA,
+            stake: stakePDA,
+            stakeVault: stakeVaultPDA
+          })
+          .instruction()
+      )
+    }
+
+    return sendVersionedTransaction(this.provider, ixs, options)
   }
 
   /**
