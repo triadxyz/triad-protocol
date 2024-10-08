@@ -239,4 +239,33 @@ export default class Trade {
 
     return sendTransactionWithOptions(method, options)
   }
+
+  /**
+   * Settle an order
+   * @param marketId - The ID of the market
+   * @param orderId - The ID of the order to settle
+   *
+   * @param options - RPC options
+   *
+   */
+  async settleOrder(
+    { marketId, orderId }: { marketId: number; orderId: number },
+    options?: RpcOptions
+  ): Promise<string> {
+    const marketPDA = getMarketPDA(this.program.programId, marketId)
+    const userTradePDA = getUserTradePDA(
+      this.program.programId,
+      this.provider.publicKey
+    )
+
+    return sendTransactionWithOptions(
+      this.program.methods.settleOrder(new BN(orderId)).accounts({
+        signer: this.provider.publicKey,
+        userTrade: userTradePDA,
+        market: marketPDA,
+        mint: this.mint
+      }),
+      options
+    )
+  }
 }
