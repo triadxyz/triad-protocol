@@ -3,8 +3,8 @@ import { Connection, PublicKey } from '@solana/web3.js'
 import { TriadProtocol } from './types/triad_protocol'
 import IDL from './types/idl_triad_protocol.json'
 import Trade from './trade'
-import { encodeString, formatUser } from './utils/helpers'
-import { getAccount, getAssociatedTokenAddress } from '@solana/spl-token'
+import { formatUser } from './utils/helpers'
+import { getAssociatedTokenAddress } from '@solana/spl-token'
 import {
   getTokenVaultAddressSync,
   getUserPDA,
@@ -15,7 +15,6 @@ import Stake from './stake'
 import { CreateUserArgs, RpcOptions } from './types'
 import sendTransactionWithOptions from './utils/sendTransactionWithOptions'
 import { bs58 } from '@coral-xyz/anchor/dist/cjs/utils/bytes'
-import { getUserTradePDA } from './utils/pda/trade'
 
 export default class TriadProtocolClient {
   program: Program<TriadProtocol>
@@ -166,17 +165,21 @@ export default class TriadProtocolClient {
     {
       wallet,
       ticker,
-      userPosition,
       positionIndex
     }: {
       wallet: PublicKey
-      userPosition: PublicKey
       ticker: PublicKey
       positionIndex: number
     },
     options?: RpcOptions
   ) {
     const vaultPDA = getVaultAddressSync(this.program.programId, ticker)
+
+    const userPositionPDA = getUserPositionPDA(
+      this.program.programId,
+      wallet,
+      ticker
+    )
 
     const VaultTokenAccountPDA = getTokenVaultAddressSync(
       this.program.programId,
@@ -190,7 +193,7 @@ export default class TriadProtocolClient {
     return sendTransactionWithOptions(
       this.program.methods.withdrawV1(positionIndex).accounts({
         signer: wallet,
-        userPosition,
+        userPosition: userPositionPDA,
         userTokenAccount,
         vault: vaultPDA,
         ticker,

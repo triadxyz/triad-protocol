@@ -3,6 +3,7 @@ use crate::state::Vault;
 use crate::{ Position, Ticker, UserPosition };
 use anchor_lang::prelude::*;
 use anchor_spl::token::{ self, Token, TokenAccount, Transfer };
+use anchor_spl::associated_token::AssociatedToken;
 
 #[derive(Accounts)]
 #[instruction(position_index: u8)]
@@ -32,6 +33,7 @@ pub struct WithdrawV1<'info> {
     )]
     pub user_token_account: Account<'info, TokenAccount>,
 
+    pub associated_token_program: Program<'info, AssociatedToken>,
     pub system_program: Program<'info, System>,
     pub token_program: Program<'info, Token>,
 }

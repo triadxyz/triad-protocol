@@ -3,14 +3,14 @@ use anchor_spl::token_2022::{ Token2022, transfer_checked, TransferChecked };
 use anchor_spl::{ associated_token::AssociatedToken, token_interface::{ Mint, TokenAccount } };
 
 use crate::{
-    state::{ Market, UserTrade, OrderStatus, OrderDirection, Order },
+    state::{ Market, UserTrade, OrderStatus, OrderDirection, WinningDirection },
     errors::TriadProtocolError,
     events::OrderUpdate,
     constraints::is_authority_for_user_trade,
 };
 
 #[derive(Accounts)]
-pub struct CloseOrder<'info> {
+pub struct SettleOrder<'info> {
     #[account(mut)]
     pub signer: Signer<'info>,
 
@@ -48,35 +48,35 @@ pub struct CloseOrder<'info> {
     pub system_program: Program<'info, System>,
 }
 
-pub fn close_order(ctx: Context<CloseOrder>, order_id: u64) -> Result<()> {
+pub fn settle_order(ctx: Context<SettleOrder>, order_id: u64) -> Result<()> {
     let market = &mut ctx.accounts.market;
     let user_trade = &mut ctx.accounts.user_trade;
 
-    let ts = Clock::get()?.unix_timestamp;
-
-    require!(ts >= market.current_question_start, TriadProtocolError::QuestionPeriodNotStarted);
-    require!(ts < market.current_question_end, TriadProtocolError::QuestionPeriodEnded);
-
-    require!(market.is_active, TriadProtocolError::MarketInactive);
+    require!(!market.is_active, TriadProtocolError::MarketStillActive);
 
     let order_index = user_trade.orders
         .iter()
-        .position(|order| order.order_id == order_id)
+        .position(|order| order.order_id == order_id && order.status == OrderStatus::Open)
         .ok_or(TriadProtocolError::OrderNotFound)?;
 
     let order = user_trade.orders[order_index];
 
-    let current_price = match order.direction {
-        OrderDirection::Hype => market.hype_price,
-        OrderDirection::Flop => market.flop_price,
+    require!(market.current_question_id > order.question_id, TriadProtocolError::MarketStillActive);
+
+    let winning_direction = market.previous_resolved_question.winning_direction;
+
+    let (payout, is_winner) = match (order.direction, winning_direction) {
+        | (OrderDirection::Hype, WinningDirection::Hype)
+        | (OrderDirection::Flop, WinningDirection::Flop) => {
+            let winning_payout = order.total_shares;
+            (winning_payout, true)
+        }
+        (_, WinningDirection::Draw) => { (order.total_amount, false) }
+        _ => { (0, false) }
     };
 
-    let current_amount = ((order.total_shares as u128) * (current_price as u128)) / 1_000_000;
-    let current_amount = current_amount as u64;
-
-    let total_amount = order.total_amount;
-
-    if current_amount > 0 {
+    if payout > 0 {
+        // Transfer the payout to the user
         let signer: &[&[&[u8]]] = &[&[b"market", &market.market_id.to_le_bytes(), &[market.bump]]];
 
         transfer_checked(
@@ -90,54 +90,42 @@ pub fn close_order(ctx: Context<CloseOrder>, order_id: u64) -> Result<()> {
                 },
                 signer
             ),
-            current_amount,
+            payout,
             ctx.accounts.mint.decimals
         )?;
 
-        match order.direction {
-            OrderDirection::Hype => {
-                market.hype_liquidity = market.hype_liquidity.checked_sub(current_amount).unwrap();
-                market.total_hype_shares = market.total_hype_shares
-                    .checked_sub(order.total_shares)
-                    .unwrap();
-            }
-            OrderDirection::Flop => {
-                market.flop_liquidity = market.flop_liquidity.checked_sub(current_amount).unwrap();
-                market.total_flop_shares = market.total_flop_shares
-                    .checked_sub(order.total_shares)
-                    .unwrap();
-            }
-        }
-
-        market.update_price(current_amount, order.direction, None, false)?;
-
-        user_trade.total_withdraws = user_trade.total_withdraws
-            .checked_add(current_amount)
-            .unwrap();
-
-        user_trade.opened_orders = user_trade.opened_orders.saturating_sub(1);
+        // Update user's total withdrawals
+        user_trade.total_withdraws = user_trade.total_withdraws.checked_add(payout).unwrap();
     }
 
+    // Calculate PNL
+    let pnl = (payout as i64) - (order.total_amount as i64);
+
+    // Close the order
+    user_trade.orders[order_index].status = OrderStatus::Closed;
+
+    user_trade.opened_orders = user_trade.opened_orders.saturating_sub(1);
+
+    // Update market state
     market.open_orders_count = market.open_orders_count.saturating_sub(1);
 
-    user_trade.orders[order_index] = Order::default();
-
+    // Emit OrderUpdate event
     emit!(OrderUpdate {
         user: *ctx.accounts.signer.key,
         market_id: market.market_id,
-        order_id,
+        order_id: order.order_id,
         direction: order.direction,
         order_type: order.order_type,
         question_id: order.question_id,
         order_status: OrderStatus::Closed,
-        price: current_price,
+        price: order.price,
         total_shares: order.total_shares,
         total_amount: order.total_amount,
         comment: None,
-        refund_amount: Some(current_amount),
-        timestamp: ts,
-        is_question_winner: None,
-        pnl: (current_amount - total_amount) as i64,
+        refund_amount: Some(payout),
+        timestamp: Clock::get()?.unix_timestamp,
+        is_question_winner: Some(is_winner),
+        pnl,
     });
 
     Ok(())

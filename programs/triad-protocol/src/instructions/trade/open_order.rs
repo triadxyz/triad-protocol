@@ -89,9 +89,6 @@ pub fn open_order(ctx: Context<OpenOrder>, args: OpenOrderArgs) -> Result<()> {
 
     let total_shares = market.calculate_shares(net_amount, args.direction);
 
-    msg!("total_shares: {}", total_shares);
-    msg!("amount: {}", args.amount);
-
     if total_shares.eq(&0) {
         return Err(TriadProtocolError::InsufficientFunds.into());
     }
@@ -110,17 +107,17 @@ pub fn open_order(ctx: Context<OpenOrder>, args: OpenOrderArgs) -> Result<()> {
         market_id: market.market_id,
         status: OrderStatus::Open,
         price,
-        total_amount: args.amount,
+        total_amount: net_amount,
         total_shares,
         order_type: OrderType::Market,
         direction: args.direction,
         padding: [0; 32],
     };
     user_trade.opened_orders = user_trade.opened_orders.checked_add(1).unwrap();
-    user_trade.total_deposits = user_trade.total_deposits.checked_add(args.amount).unwrap();
+    user_trade.total_deposits = user_trade.total_deposits.checked_add(net_amount).unwrap();
 
     market.open_orders_count = market.open_orders_count.checked_add(1).unwrap();
-    market.total_volume = market.total_volume.checked_add(args.amount).unwrap();
+    market.total_volume = market.total_volume.checked_add(net_amount).unwrap();
     market.update_ts = ts;
 
     market.update_price(net_amount, args.direction, args.comment, true)?;

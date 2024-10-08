@@ -20,7 +20,6 @@ export type Market = {
   feeVault: string
   isActive: boolean
   marketPrice: string
-  isOfficial: boolean
   previousResolvedQuestion: ResolvedQuestion
   currentQuestionId: string
   currentQuestionStart: string
