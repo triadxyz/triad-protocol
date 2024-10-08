@@ -102,7 +102,11 @@ pub fn settle_order(ctx: Context<SettleOrder>, order_id: u64) -> Result<()> {
     let pnl = (payout as i64) - (order.total_amount as i64);
 
     // Close the order
-    user_trade.orders[order_index].status = OrderStatus::Closed;
+    user_trade.orders[order_index].status = if pnl >= 0 {
+        OrderStatus::Claimed
+    } else {
+        OrderStatus::Liquidated
+    };
 
     user_trade.opened_orders = user_trade.opened_orders.saturating_sub(1);
 
