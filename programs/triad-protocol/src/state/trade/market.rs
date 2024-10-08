@@ -190,11 +190,11 @@ impl Market {
         match direction {
             OrderDirection::Hype => {
                 if is_open {
-                    self.hype_liquidity += amount;
+                    self.hype_liquidity = self.hype_liquidity.checked_add(amount).unwrap();
                     let new_hype_price = ((self.hype_price as f64) * (1.0 + price_impact)) as u64;
                     self.hype_price = new_hype_price.min(999_999);
                 } else {
-                    self.hype_liquidity -= amount;
+                    self.hype_liquidity = self.hype_liquidity.checked_sub(amount).unwrap();
                     let new_hype_price = ((self.hype_price as f64) * (1.0 - price_impact)) as u64;
                     self.hype_price = new_hype_price.max(1);
                 }
@@ -202,11 +202,11 @@ impl Market {
 
             OrderDirection::Flop => {
                 if is_open {
-                    self.flop_liquidity += amount;
+                    self.flop_liquidity = self.flop_liquidity.checked_add(amount).unwrap();
                     let new_flop_price = ((self.flop_price as f64) * (1.0 + price_impact)) as u64;
                     self.flop_price = new_flop_price.min(999_999);
                 } else {
-                    self.flop_liquidity -= amount;
+                    self.flop_liquidity = self.flop_liquidity.checked_sub(amount).unwrap();
                     let new_flop_price = ((self.flop_price as f64) * (1.0 - price_impact)) as u64;
                     self.flop_price = new_flop_price.max(1);
                 }

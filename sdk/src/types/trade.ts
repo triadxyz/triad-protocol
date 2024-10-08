@@ -42,9 +42,9 @@ export type ResolvedQuestion = {
 }
 
 export enum WinningDirection {
-  Hype = 'Hype',
-  Flop = 'Flop',
-  None = 'None'
+  HYPE = 'Hype',
+  FLOP = 'Flop',
+  NONE = 'None'
 }
 
 export type OrderDirection = { hype: {} } | { flop: {} }
