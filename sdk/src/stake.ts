@@ -341,6 +341,10 @@ export default class Stake {
     const ixs: TransactionInstruction[] = []
 
     for (const stake of stakes) {
+      if (stake.withdrawTs !== 0) {
+        continue
+      }
+
       const rank = getRarityRank(ranks, stake.mint, stake.name)
 
       if (ixs.length >= 10) {

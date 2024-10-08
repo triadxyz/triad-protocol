@@ -809,6 +809,161 @@ export type TriadProtocol = {
       args: []
     },
     {
+      name: 'settleOrder'
+      discriminator: [80, 74, 204, 34, 12, 183, 66, 66]
+      accounts: [
+        {
+          name: 'signer'
+          writable: true
+          signer: true
+        },
+        {
+          name: 'userTrade'
+          writable: true
+        },
+        {
+          name: 'market'
+          writable: true
+        },
+        {
+          name: 'mint'
+          writable: true
+        },
+        {
+          name: 'userAta'
+          writable: true
+          pda: {
+            seeds: [
+              {
+                kind: 'account'
+                path: 'signer'
+              },
+              {
+                kind: 'account'
+                path: 'tokenProgram'
+              },
+              {
+                kind: 'account'
+                path: 'mint'
+              }
+            ]
+            program: {
+              kind: 'const'
+              value: [
+                140,
+                151,
+                37,
+                143,
+                78,
+                36,
+                137,
+                241,
+                187,
+                61,
+                16,
+                41,
+                20,
+                142,
+                13,
+                131,
+                11,
+                90,
+                19,
+                153,
+                218,
+                255,
+                16,
+                132,
+                4,
+                142,
+                123,
+                216,
+                219,
+                233,
+                248,
+                89
+              ]
+            }
+          }
+        },
+        {
+          name: 'marketVault'
+          writable: true
+          pda: {
+            seeds: [
+              {
+                kind: 'account'
+                path: 'market'
+              },
+              {
+                kind: 'account'
+                path: 'tokenProgram'
+              },
+              {
+                kind: 'account'
+                path: 'mint'
+              }
+            ]
+            program: {
+              kind: 'const'
+              value: [
+                140,
+                151,
+                37,
+                143,
+                78,
+                36,
+                137,
+                241,
+                187,
+                61,
+                16,
+                41,
+                20,
+                142,
+                13,
+                131,
+                11,
+                90,
+                19,
+                153,
+                218,
+                255,
+                16,
+                132,
+                4,
+                142,
+                123,
+                216,
+                219,
+                233,
+                248,
+                89
+              ]
+            }
+          }
+        },
+        {
+          name: 'tokenProgram'
+          address: 'TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb'
+        },
+        {
+          name: 'associatedTokenProgram'
+          address: 'ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL'
+        },
+        {
+          name: 'systemProgram'
+          address: '11111111111111111111111111111111'
+        }
+      ]
+      args: [
+        {
+          name: 'orderId'
+          type: 'u64'
+        }
+      ]
+    },
+    {
       name: 'stakeNft'
       discriminator: [38, 27, 66, 46, 69, 65, 151, 219]
       accounts: [
@@ -1561,6 +1716,10 @@ export type TriadProtocol = {
           writable: true
         },
         {
+          name: 'associatedTokenProgram'
+          address: 'ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL'
+        },
+        {
           name: 'systemProgram'
           address: '11111111111111111111111111111111'
         },
@@ -1833,6 +1992,11 @@ export type TriadProtocol = {
       code: 6039
       name: 'stakeVaultLocked'
       msg: 'Stake vault is locked'
+    },
+    {
+      code: 6040
+      name: 'marketStillActive'
+      msg: 'Market still active'
     }
   ]
   types: [
@@ -2233,6 +2397,12 @@ export type TriadProtocol = {
           },
           {
             name: 'closed'
+          },
+          {
+            name: 'claimed'
+          },
+          {
+            name: 'liquidated'
           }
         ]
       }
