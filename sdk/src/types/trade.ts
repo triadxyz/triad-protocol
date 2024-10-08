@@ -47,38 +47,16 @@ export enum WinningDirection {
   None = 'None'
 }
 
-export type OrderDirection =
-  | {
-      hype: {}
-    }
-  | {
-      flop: {}
-    }
+export type OrderDirection = { hype: {} } | { flop: {} }
 
 export type OrderStatus =
-  | {
-      init: {}
-    }
-  | {
-      open: {}
-    }
-  | {
-      filled: {}
-    }
-  | {
-      canceled: {}
-    }
-  | {
-      closed: {}
-    }
+  | { init: {} }
+  | { open: {} }
+  | { closed: {} }
+  | { claimed: {} }
+  | { liquidated: {} }
 
-export type OrderType =
-  | {
-      limit: {}
-    }
-  | {
-      market: {}
-    }
+export type OrderType = { limit: {} } | { market: {} }
 
 export type InitializeQuestionArgs = {
   marketId: number
