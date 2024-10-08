@@ -101,9 +101,7 @@ pub fn open_order(ctx: Context<OpenOrder>, args: OpenOrderArgs) -> Result<()> {
 
     let order_index = user_trade.orders
         .iter()
-        .position(
-            |order| (order.status.eq(&OrderStatus::Init) || order.status.eq(&OrderStatus::Closed))
-        )
+        .position(|order| order.status != OrderStatus::Open)
         .ok_or(TriadProtocolError::NoAvailableOrderSlot)?;
 
     user_trade.orders[order_index] = Order {
