@@ -185,14 +185,14 @@ impl Market {
         comment: Option<[u8; 64]>,
         is_open: bool
     ) -> Result<()> {
-        let (current_price, current_liquidity) = match direction {
-            OrderDirection::Hype => (self.hype_price, self.hype_liquidity),
-            OrderDirection::Flop => (self.flop_price, self.flop_liquidity),
+        let (current_price, current_liquidity, current_shares) = match direction {
+            OrderDirection::Hype => (self.hype_price, self.hype_liquidity, self.total_hype_shares),
+            OrderDirection::Flop => (self.flop_price, self.flop_liquidity, self.total_flop_shares),
         };
 
-        let liquidity_factor = (current_liquidity as f64).max(1.0);
-        let base_impact = (amount as f64) / liquidity_factor;
-        let price_impact = (1.0 - (-base_impact).exp()).min(0.05); // Max 5% impact
+        let liquidity_factor = ((current_liquidity as f64) + (current_shares as f64)).max(1.0);
+        let base_impact = (amount as f64) / (liquidity_factor * 10.0);
+        let price_impact = (1.0 - (-base_impact).exp()).min(0.01); // Max 1% impact
 
         let new_price = if is_open {
             ((current_price as f64) * (1.0 + price_impact)) as u64
@@ -208,6 +208,8 @@ impl Market {
                 } else {
                     self.hype_liquidity = self.hype_liquidity.checked_sub(amount).unwrap();
                 }
+
+                self.flop_price = 1_000_000 - self.hype_price;
             }
             OrderDirection::Flop => {
                 self.flop_price = new_price.clamp(1, 999_999);
@@ -216,20 +218,13 @@ impl Market {
                 } else {
                     self.flop_liquidity = self.flop_liquidity.checked_sub(amount).unwrap();
                 }
-            }
-        }
 
-        match direction {
-            OrderDirection::Hype => {
-                self.flop_price = 1_000_000 - self.hype_price;
-            }
-            OrderDirection::Flop => {
                 self.hype_price = 1_000_000 - self.flop_price;
             }
         }
 
-        self.hype_price = self.hype_price.max(1);
-        self.flop_price = self.flop_price.max(1);
+        self.hype_price = self.hype_price.clamp(1, 999_999);
+        self.flop_price = self.flop_price.clamp(1, 999_999);
 
         self.update_ts = Clock::get()?.unix_timestamp;
 
