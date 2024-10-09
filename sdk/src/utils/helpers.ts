@@ -102,13 +102,15 @@ export const accountToMarket = (account: any, address: PublicKey): Market => {
 }
 
 const accountToResolvedQuestion = (question: any): ResolvedQuestion => {
+  console.log(question)
   return {
     question: Buffer.from(question.question).toString().replace(/\0+$/, ''),
     startTime: question.startTime.toString(),
     endTime: question.endTime.toString(),
     hypeLiquidity: question.hypeLiquidity.toString(),
     flopLiquidity: question.flopLiquidity.toString(),
-    winningDirection: WinningDirection[question.winningDirection],
+    winningDirection:
+      WinningDirection[Object.keys(question.winningDirection)[0].toUpperCase()],
     marketPrice: question.marketPrice.toString(),
     finalHypePrice: question.finalHypePrice.toString(),
     finalFlopPrice: question.finalFlopPrice.toString()

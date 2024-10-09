@@ -66,6 +66,8 @@ pub fn close_order(ctx: Context<CloseOrder>, order_id: u64) -> Result<()> {
 
     let order = user_trade.orders[order_index];
 
+    require!(order.question_id == market.current_question_id, TriadProtocolError::OrderNotOpen);
+
     let current_price = match order.direction {
         OrderDirection::Hype => market.hype_price,
         OrderDirection::Flop => market.flop_price,
@@ -138,7 +140,10 @@ pub fn close_order(ctx: Context<CloseOrder>, order_id: u64) -> Result<()> {
         refund_amount: Some(current_amount),
         timestamp: ts,
         is_question_winner: None,
-        pnl: (current_amount - total_amount) as i64,
+        pnl: current_amount
+            .checked_sub(total_amount)
+            .map(|v| v as i64)
+            .unwrap_or(-(total_amount as i64)),
     });
 
     Ok(())

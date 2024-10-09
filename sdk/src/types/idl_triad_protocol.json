@@ -1522,6 +1522,11 @@
       "code": 6040,
       "name": "MarketStillActive",
       "msg": "Market still active"
+    },
+    {
+      "code": 6041,
+      "name": "OrderNotOpen",
+      "msg": "Order not open"
     }
   ],
   "types": [

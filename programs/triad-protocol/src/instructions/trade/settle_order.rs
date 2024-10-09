@@ -52,7 +52,7 @@ pub fn settle_order(ctx: Context<SettleOrder>, order_id: u64) -> Result<()> {
     let market = &mut ctx.accounts.market;
     let user_trade = &mut ctx.accounts.user_trade;
 
-    require!(!market.is_active, TriadProtocolError::MarketStillActive);
+    require!(market.is_active, TriadProtocolError::MarketInactive);
 
     let order_index = user_trade.orders
         .iter()

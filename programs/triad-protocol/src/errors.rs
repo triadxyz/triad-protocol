@@ -124,4 +124,7 @@ pub enum TriadProtocolError {
 
     #[msg("Market still active")]
     MarketStillActive,
+
+    #[msg("Order not open")]
+    OrderNotOpen,
 }
