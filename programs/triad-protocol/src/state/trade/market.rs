@@ -48,6 +48,7 @@ pub struct Market {
     pub current_question_end: i64,
     /// The question or prediction topic for the current week
     pub current_question: [u8; 80],
+    pub liquidity: u64,
     pub padding: [u8; 200],
 }
 
@@ -153,6 +154,7 @@ impl Default for Market {
             current_question_start: 0,
             current_question_end: 0,
             current_question: [0; 80],
+            liquidity: 0,
             padding: [0; 200],
         }
     }

@@ -63,7 +63,7 @@ pub fn claim_stake_rewards(
     let mut rank = args.rank;
     let collections = args.collections;
 
-    let boost_rewards = if stake.boost { 3.69 * 369.0 } else { 0.0 };
+    let boost_rewards = if stake.boost { 3.0 * 300.0 } else { 0.0 };
     let collections_multiplier = (collections as f64) * 150.0;
 
     let user_staked_amount = if stake.mint.eq(&stake_vault.token_mint) {
@@ -76,7 +76,7 @@ pub fn claim_stake_rewards(
         rank = 963;
     }
 
-    let max_rank = 1823 as f64;
+    let max_rank = 1633 as f64;
     let rank = rank as f64;
     let rank_weight = (max_rank - rank + 1.0) / max_rank;
 
@@ -97,7 +97,7 @@ pub fn claim_stake_rewards(
         amount_base = 1.0;
     }
 
-    if stake.boost {
+    if (stake.claimed_ts < 1727863429 || stake.init_ts < 1727863429) && stake.boost {
         amount_base = 3.0;
     }
 
