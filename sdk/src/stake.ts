@@ -340,19 +340,30 @@ export default class Stake {
 
     const ixs: TransactionInstruction[] = []
 
-    for (const stake of stakes) {
+    let tokenStakes = []
+    let nftStakes = []
+
+    stakes.forEach((stake) => {
       if (stake.withdrawTs !== 0) {
-        continue
+        return
       }
 
+      if (stake.mint === TRD_MINT.toBase58()) {
+        tokenStakes.push(stake)
+
+        return
+      }
+
+      nftStakes.push(stake)
+    })
+
+    let items = isToken ? tokenStakes : nftStakes
+
+    for (const stake of items) {
       const rank = getRarityRank(ranks, stake.mint, stake.name)
 
       if (ixs.length >= 10) {
         break
-      }
-
-      if (isToken && stake.mint !== TRD_MINT.toBase58()) {
-        continue
       }
 
       const stakeVaultPDA = getStakeVaultPDA(
