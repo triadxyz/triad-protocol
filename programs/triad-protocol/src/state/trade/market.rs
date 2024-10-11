@@ -187,12 +187,15 @@ impl Market {
         comment: Option<[u8; 64]>,
         is_open: bool
     ) -> Result<()> {
-        let (current_price, current_liquidity, current_shares) = match direction {
-            OrderDirection::Hype => (self.hype_price, self.hype_liquidity, self.total_hype_shares),
-            OrderDirection::Flop => (self.flop_price, self.flop_liquidity, self.total_flop_shares),
+        let current_price = match direction {
+            OrderDirection::Hype => self.hype_price,
+            OrderDirection::Flop => self.flop_price,
         };
 
-        let liquidity_factor = ((current_liquidity as f64) + (current_shares as f64)).max(1.0);
+        let shares = self.total_hype_shares.checked_add(self.total_flop_shares).unwrap();
+        let liquidity = self.hype_liquidity.checked_add(self.flop_liquidity).unwrap();
+
+        let liquidity_factor = ((liquidity as f64) + (shares as f64)).max(1.0);
         let base_impact = (amount as f64) / (liquidity_factor * 10.0);
         let price_impact = (1.0 - (-base_impact).exp()).min(0.01); // Max 1% impact
 
