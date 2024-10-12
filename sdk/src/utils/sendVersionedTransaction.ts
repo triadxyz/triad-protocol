@@ -31,7 +31,7 @@ const sendVersionedTransaction = async (
       instructions: ixs,
       recentBlockhash: blockhash,
       payerKey: provider.publicKey
-    }).compileToV0Message(addressLookupTableAccounts || [])
+    }).compileToV0Message(addressLookupTableAccounts)
   )
 
   if (payer) {

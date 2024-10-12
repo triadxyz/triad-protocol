@@ -2323,6 +2323,10 @@ export type TriadProtocol = {
             }
           },
           {
+            name: 'liquidity'
+            type: 'u64'
+          },
+          {
             name: 'padding'
             type: {
               array: ['u8', 200]

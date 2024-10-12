@@ -121,9 +121,7 @@ pub fn close_order(ctx: Context<CloseOrder>, order_id: u64) -> Result<()> {
     }
 
     market.open_orders_count = market.open_orders_count.saturating_sub(1);
-    market.total_volume = market.total_volume.checked_sub(current_amount).unwrap();
-
-    user_trade.orders[order_index] = Order::default();
+    market.total_volume = market.total_volume.checked_add(current_amount).unwrap();
 
     emit!(OrderUpdate {
         user: *ctx.accounts.signer.key,
@@ -145,6 +143,8 @@ pub fn close_order(ctx: Context<CloseOrder>, order_id: u64) -> Result<()> {
             .map(|v| v as i64)
             .unwrap_or(-(total_amount as i64)),
     });
+
+    user_trade.orders[order_index] = Order::default();
 
     Ok(())
 }
