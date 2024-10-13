@@ -76,8 +76,6 @@ pub fn close_order(ctx: Context<CloseOrder>, order_id: u64) -> Result<()> {
     let current_amount = ((order.total_shares as u128) * (current_price as u128)) / 1_000_000;
     let current_amount = current_amount as u64;
 
-    let total_amount = order.total_amount;
-
     if current_amount > 0 {
         let signer: &[&[&[u8]]] = &[&[b"market", &market.market_id.to_le_bytes(), &[market.bump]]];
 
@@ -96,32 +94,28 @@ pub fn close_order(ctx: Context<CloseOrder>, order_id: u64) -> Result<()> {
             ctx.accounts.mint.decimals
         )?;
 
-        // Update market price
         market.update_price(current_amount, order.direction, None, false)?;
-
-        // Update market shares
-        match order.direction {
-            OrderDirection::Hype => {
-                market.total_hype_shares = market.total_hype_shares
-                    .checked_sub(order.total_shares)
-                    .unwrap();
-            }
-            OrderDirection::Flop => {
-                market.total_flop_shares = market.total_flop_shares
-                    .checked_sub(order.total_shares)
-                    .unwrap();
-            }
-        }
-
-        user_trade.total_withdraws = user_trade.total_withdraws
-            .checked_add(current_amount)
-            .unwrap();
-
-        user_trade.opened_orders = user_trade.opened_orders.saturating_sub(1);
     }
 
+    match order.direction {
+        OrderDirection::Hype => {
+            market.total_hype_shares = market.total_hype_shares
+                .checked_sub(order.total_shares)
+                .unwrap();
+        }
+        OrderDirection::Flop => {
+            market.total_flop_shares = market.total_flop_shares
+                .checked_sub(order.total_shares)
+                .unwrap();
+        }
+    }
+
+    user_trade.opened_orders = user_trade.opened_orders.saturating_sub(1);
+    user_trade.total_withdraws = user_trade.total_withdraws.checked_add(current_amount).unwrap();
+
     market.open_orders_count = market.open_orders_count.saturating_sub(1);
-    market.total_volume = market.total_volume.checked_add(current_amount).unwrap();
+
+    let total_amount = order.total_amount;
 
     emit!(OrderUpdate {
         user: *ctx.accounts.signer.key,

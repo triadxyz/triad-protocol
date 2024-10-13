@@ -90,6 +90,9 @@ pub fn open_order(ctx: Context<OpenOrder>, args: OpenOrderArgs) -> Result<()> {
         OrderDirection::Flop => market.flop_price,
     };
 
+    require!(price > 0, TriadProtocolError::InvalidPrice);
+    require!(args.amount > price, TriadProtocolError::InsufficientFunds);
+
     let fee_amount = (((args.amount as u64) * (market.fee_bps as u64)) / 100000) as u64;
     let net_amount = args.amount.saturating_sub(fee_amount);
 
@@ -141,9 +144,9 @@ pub fn open_order(ctx: Context<OpenOrder>, args: OpenOrderArgs) -> Result<()> {
     fee_vault.net_balance = fee_vault.net_balance.checked_add(fee_amount).unwrap();
 
     // Calculate fee distribution
-    let project_fee = (fee_amount * 31) / 10000; // 0.031% of the fee 2.131%
-    let nft_holders_fee = (fee_amount * 100) / 10000; // 0.1% of the fee 2.131%
-    let market_fee = fee_amount - project_fee - nft_holders_fee; // Remaining 1.031% of the 2.131% fee
+    let project_fee = (fee_amount * 31) / 10000; // 0.031%
+    let nft_holders_fee = (fee_amount * 100) / 10000; // 0.1%
+    let market_fee = fee_amount - project_fee - nft_holders_fee; // Remaining 0.131% fee
 
     fee_vault.project_available = fee_vault.project_available.checked_add(project_fee).unwrap();
     fee_vault.nft_holders_available = fee_vault.nft_holders_available
