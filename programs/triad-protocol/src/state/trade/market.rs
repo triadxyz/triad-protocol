@@ -177,7 +177,7 @@ impl Market {
             OrderDirection::Flop => self.flop_price,
         };
 
-        ((amount * 1_000_000) / price) as u64
+        (amount / price) * 1_000_000
     }
 
     pub fn update_price(
@@ -192,10 +192,18 @@ impl Market {
             OrderDirection::Flop => self.flop_price,
         };
 
-        let shares = self.total_hype_shares.checked_add(self.total_flop_shares).unwrap();
-        let liquidity = self.hype_liquidity.checked_add(self.flop_liquidity).unwrap();
+        let shares = match direction {
+            OrderDirection::Hype => self.total_hype_shares,
+            OrderDirection::Flop => self.total_flop_shares,
+        };
+
+        let liquidity = match direction {
+            OrderDirection::Hype => self.hype_liquidity,
+            OrderDirection::Flop => self.flop_liquidity,
+        };
 
         let liquidity_factor = ((liquidity as f64) + (shares as f64)).max(1.0);
+
         let base_impact = (amount as f64) / (liquidity_factor * 10.0);
         let price_impact = (1.0 - (-base_impact).exp()).min(0.01); // Max 1% impact
 

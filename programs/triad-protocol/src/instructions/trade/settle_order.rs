@@ -54,6 +54,11 @@ pub fn settle_order(ctx: Context<SettleOrder>, order_id: u64) -> Result<()> {
 
     require!(market.is_active, TriadProtocolError::MarketInactive);
 
+    require!(
+        market.previous_resolved_question.question_id == market.current_question_id,
+        TriadProtocolError::MarketStillActive
+    );
+
     let order_index = user_trade.orders
         .iter()
         .position(|order| order.order_id == order_id && order.status == OrderStatus::Open)
@@ -79,7 +84,6 @@ pub fn settle_order(ctx: Context<SettleOrder>, order_id: u64) -> Result<()> {
     };
 
     if payout > 0 {
-        // Transfer the payout to the user
         let signer: &[&[&[u8]]] = &[&[b"market", &market.market_id.to_le_bytes(), &[market.bump]]];
 
         transfer_checked(
@@ -97,14 +101,11 @@ pub fn settle_order(ctx: Context<SettleOrder>, order_id: u64) -> Result<()> {
             ctx.accounts.mint.decimals
         )?;
 
-        // Update user's total withdrawals
         user_trade.total_withdraws = user_trade.total_withdraws.checked_add(payout).unwrap();
     }
 
-    // Calculate PNL
     let pnl = (payout as i64) - (order.total_amount as i64);
 
-    // Close the order
     user_trade.orders[order_index].status = if pnl >= 0 {
         OrderStatus::Claimed
     } else {
@@ -113,10 +114,8 @@ pub fn settle_order(ctx: Context<SettleOrder>, order_id: u64) -> Result<()> {
 
     user_trade.opened_orders = user_trade.opened_orders.saturating_sub(1);
 
-    // Update market state
     market.open_orders_count = market.open_orders_count.saturating_sub(1);
 
-    // Emit OrderUpdate event
     emit!(OrderUpdate {
         user: *ctx.accounts.signer.key,
         market_id: market.market_id,

@@ -73,7 +73,7 @@ pub fn close_order(ctx: Context<CloseOrder>, order_id: u64) -> Result<()> {
         OrderDirection::Flop => market.flop_price,
     };
 
-    let current_amount = ((order.total_shares as u128) * (current_price as u128)) / 1_000_000;
+    let current_amount = (order.total_shares * current_price) / 1_000_000;
     let current_amount = current_amount as u64;
 
     if current_amount > 0 {

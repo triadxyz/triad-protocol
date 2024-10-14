@@ -35,6 +35,8 @@ pub fn initialize_question(
 
     require!(args.end_time > args.start_time, TriadProtocolError::InvalidEndTime);
 
+    require!(market.open_orders_count == 0, TriadProtocolError::HasOpenedOrders);
+
     market.current_question_id = market.current_question_id.checked_add(1).unwrap();
     market.current_question_start = args.start_time;
     market.current_question_end = args.end_time;
@@ -48,6 +50,7 @@ pub fn initialize_question(
     market.flop_liquidity = 0;
     market.total_hype_shares = 0;
     market.total_flop_shares = 0;
+    market.open_orders_count = 0;
 
     emit!(QuestionUpdate {
         market_id: market.market_id,

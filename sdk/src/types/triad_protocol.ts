@@ -2055,6 +2055,11 @@ export type TriadProtocol = {
       code: 6041
       name: 'orderNotOpen'
       msg: 'Order not open'
+    },
+    {
+      code: 6042
+      name: 'hasOpenedOrders'
+      msg: 'Has opened orders'
     }
   ]
   types: [

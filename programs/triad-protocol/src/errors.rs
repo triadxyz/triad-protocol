@@ -127,4 +127,7 @@ pub enum TriadProtocolError {
 
     #[msg("Order not open")]
     OrderNotOpen,
+
+    #[msg("Has opened orders")]
+    HasOpenedOrders,
 }

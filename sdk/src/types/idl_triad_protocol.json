@@ -1527,6 +1527,11 @@
       "code": 6041,
       "name": "OrderNotOpen",
       "msg": "Order not open"
+    },
+    {
+      "code": 6042,
+      "name": "HasOpenedOrders",
+      "msg": "Has opened orders"
     }
   ],
   "types": [
