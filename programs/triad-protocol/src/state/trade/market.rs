@@ -187,30 +187,30 @@ impl Market {
         comment: Option<[u8; 64]>,
         is_open: bool
     ) -> Result<()> {
-        let current_price = match direction {
-            OrderDirection::Hype => self.hype_price,
-            OrderDirection::Flop => self.flop_price,
+        let (current_price, liquidity, shares) = match direction {
+            OrderDirection::Hype => (self.hype_price, self.hype_liquidity, self.total_hype_shares),
+            OrderDirection::Flop => (self.flop_price, self.flop_liquidity, self.total_flop_shares),
         };
 
-        let shares = match direction {
-            OrderDirection::Hype => self.total_hype_shares,
-            OrderDirection::Flop => self.total_flop_shares,
-        };
-
-        let liquidity = match direction {
-            OrderDirection::Hype => self.hype_liquidity,
-            OrderDirection::Flop => self.flop_liquidity,
+        let total_liquidity = self.hype_liquidity + self.flop_liquidity;
+        let liquidity_ratio = if total_liquidity > 0 {
+            (liquidity as f64) / (total_liquidity as f64)
+        } else {
+            0.5
         };
 
         let liquidity_factor = ((liquidity as f64) + (shares as f64)).max(1.0);
+        let base_impact = (amount as f64) / (liquidity_factor * 100.0);
 
-        let base_impact = (amount as f64) / (liquidity_factor * 10.0);
-        let price_impact = (1.0 - (-base_impact).exp()).min(0.01); // Max 1% impact
+        let adjusted_impact = base_impact * (1.0 - liquidity_ratio);
+
+        let max_price_change = (current_price as f64) * 0.01;
+        let price_change = (adjusted_impact * (current_price as f64)).min(max_price_change);
 
         let new_price = if is_open {
-            ((current_price as f64) * (1.0 + price_impact)) as u64
+            ((current_price as f64) + price_change) as u64
         } else {
-            ((current_price as f64) * (1.0 - price_impact)) as u64
+            ((current_price as f64) - price_change) as u64
         };
 
         match direction {
