@@ -31,7 +31,7 @@ pub fn initialize_question(
         TriadProtocolError::QuestionPeriodNotEnded
     );
 
-    require!(args.start_time > current_timestamp, TriadProtocolError::InvalidStartTime);
+    require!(!market.is_active, TriadProtocolError::MarketStillActive);
 
     require!(args.end_time > args.start_time, TriadProtocolError::InvalidEndTime);
 

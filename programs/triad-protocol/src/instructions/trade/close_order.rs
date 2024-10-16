@@ -73,8 +73,11 @@ pub fn close_order(ctx: Context<CloseOrder>, order_id: u64) -> Result<()> {
         OrderDirection::Flop => market.flop_price,
     };
 
-    let current_amount = (order.total_shares * current_price) / 1_000_000;
-    let current_amount = current_amount as u64;
+    let initial_amount = (order.total_shares * current_price) / 1_000_000;
+
+    let price_impact = market.calculate_price_impact(initial_amount, order.direction);
+
+    let current_amount = ((initial_amount as f64) * (1.0 - price_impact / 100.0)).round() as u64;
 
     if current_amount > 0 {
         let signer: &[&[&[u8]]] = &[&[b"market", &market.market_id.to_le_bytes(), &[market.bump]]];

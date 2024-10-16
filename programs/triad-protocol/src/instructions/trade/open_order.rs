@@ -39,7 +39,7 @@ pub struct OpenOrder<'info> {
     )]
     pub fee_vault: Box<Account<'info, FeeVault>>,
 
-    #[account(mut)]
+    #[account(mut, constraint = mint.key() == market.mint)]
     pub mint: Box<InterfaceAccount<'info, Mint>>,
 
     #[account(
@@ -180,6 +180,10 @@ pub fn open_order(ctx: Context<OpenOrder>, args: OpenOrderArgs) -> Result<()> {
     )?;
 
     let current_order = user_trade.orders[order_index];
+
+    if current_order.total_shares == 0 {
+        return Err(TriadProtocolError::InsufficientFunds.into());
+    }
 
     emit!(OrderUpdate {
         timestamp: current_order.ts,
