@@ -20,7 +20,7 @@ import {
   getMarketPDA,
   getUserTradePDA
 } from './utils/pda/trade'
-import { getTokenATA, getUserPDA } from './utils/pda'
+import { getUserPDA } from './utils/pda'
 import sendVersionedTransaction from './utils/sendVersionedTransaction'
 import sendTransactionWithOptions from './utils/sendTransactionWithOptions'
 import { swap } from './utils/swap'
