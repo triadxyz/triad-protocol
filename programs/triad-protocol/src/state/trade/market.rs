@@ -171,48 +171,85 @@ impl Market {
         id
     }
 
+    pub fn calculate_impact_for_open_order(
+        &self,
+        amount: u64,
+        direction: OrderDirection
+    ) -> (u64, u64) {
+        let (current_price, available_liquidity) = match direction {
+            OrderDirection::Hype => (self.hype_price, self.hype_liquidity),
+            OrderDirection::Flop => (self.flop_price, self.flop_liquidity),
+        };
+
+        let impact_ratio = (amount as f64) / (available_liquidity as f64);
+        let scaled_impact_ratio = impact_ratio.powf(3.0);
+        let extra_large_order_factor = if impact_ratio > 0.25 {
+            ((impact_ratio - 0.25) * 4.0).powf(3.0)
+        } else {
+            0.0
+        };
+
+        let impact_factor = scaled_impact_ratio.exp() - 1.0 + extra_large_order_factor;
+
+        let new_price = match direction {
+            OrderDirection::Hype => ((current_price as f64) * (1.0 + impact_factor)) as u64,
+            OrderDirection::Flop => ((current_price as f64) / (1.0 + impact_factor)) as u64,
+        };
+
+        let new_price = new_price.clamp(1, 999_999);
+        let shares = self.calculate_shares(amount, direction);
+
+        (shares, new_price)
+    }
+
+    pub fn calculate_payout_with_impact(
+        &self,
+        amount: u64,
+        direction: OrderDirection
+    ) -> (u64, u64) {
+        let (current_price, available_liquidity) = match direction {
+            OrderDirection::Hype => (self.hype_price, self.hype_liquidity),
+            OrderDirection::Flop => (self.flop_price, self.flop_liquidity),
+        };
+
+        let impact_ratio = (amount as f64) / (available_liquidity as f64);
+        let scaled_impact_ratio = impact_ratio.powf(3.0);
+        let extra_large_order_factor = if impact_ratio > 0.25 {
+            ((impact_ratio - 0.25) * 4.0).powf(3.0)
+        } else {
+            0.0
+        };
+
+        let impact_factor = scaled_impact_ratio.exp() - 1.0 + extra_large_order_factor;
+
+        let new_price = match direction {
+            OrderDirection::Hype => ((current_price as f64) * (1.0 + impact_factor)) as u64,
+            OrderDirection::Flop => ((current_price as f64) / (1.0 + impact_factor)) as u64,
+        };
+
+        let new_price = new_price.clamp(1, 999_999);
+        let actual_amount = ((amount as f64) / (1.0 + impact_factor)) as u64;
+
+        (actual_amount, new_price)
+    }
+
     pub fn calculate_shares(&self, amount: u64, direction: OrderDirection) -> u64 {
         let price = match direction {
             OrderDirection::Hype => self.hype_price,
             OrderDirection::Flop => self.flop_price,
         };
 
-        (amount / price) * 1_000_000
+        ((amount * 1_000_000) / price) as u64
     }
 
     pub fn update_price(
         &mut self,
         amount: u64,
+        new_price: u64,
         direction: OrderDirection,
         comment: Option<[u8; 64]>,
         is_open: bool
     ) -> Result<()> {
-        let (current_price, liquidity, shares) = match direction {
-            OrderDirection::Hype => (self.hype_price, self.hype_liquidity, self.total_hype_shares),
-            OrderDirection::Flop => (self.flop_price, self.flop_liquidity, self.total_flop_shares),
-        };
-
-        let total_liquidity = self.hype_liquidity + self.flop_liquidity;
-        let liquidity_ratio = if total_liquidity > 0 {
-            (liquidity as f64) / (total_liquidity as f64)
-        } else {
-            0.5
-        };
-
-        let liquidity_factor = ((liquidity as f64) + (shares as f64)).max(1.0);
-        let base_impact = (amount as f64) / (liquidity_factor * 100.0);
-
-        let adjusted_impact = base_impact * (1.0 - liquidity_ratio);
-
-        let max_price_change = (current_price as f64) * 0.01;
-        let price_change = (adjusted_impact * (current_price as f64)).min(max_price_change);
-
-        let new_price = if is_open {
-            ((current_price as f64) + price_change) as u64
-        } else {
-            ((current_price as f64) - price_change) as u64
-        };
-
         match direction {
             OrderDirection::Hype => {
                 self.hype_price = new_price.clamp(1, 999_999);
@@ -236,20 +273,15 @@ impl Market {
             }
         }
 
-        self.hype_price = self.hype_price.clamp(1, 999_999);
-        self.flop_price = self.flop_price.clamp(1, 999_999);
-
         self.update_ts = Clock::get()?.unix_timestamp;
-
-        let market_price = self.hype_price.max(self.flop_price);
-        self.market_price = market_price;
+        self.market_price = self.hype_price.max(self.flop_price);
 
         emit!(PriceUpdate {
             market_id: self.market_id,
             hype_price: self.hype_price,
             flop_price: self.flop_price,
             direction,
-            market_price,
+            market_price: self.market_price,
             timestamp: Clock::get()?.unix_timestamp,
             comment,
         });

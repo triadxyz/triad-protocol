@@ -97,7 +97,10 @@ pub fn open_order(ctx: Context<OpenOrder>, args: OpenOrderArgs) -> Result<()> {
 
     require!(net_amount > price, TriadProtocolError::InsufficientFunds);
 
-    let total_shares = market.calculate_shares(net_amount, args.direction);
+    let (total_shares, new_price) = market.calculate_impact_for_open_order(
+        net_amount,
+        args.direction
+    );
 
     if total_shares.eq(&0) {
         return Err(TriadProtocolError::InsufficientFunds.into());
@@ -139,7 +142,7 @@ pub fn open_order(ctx: Context<OpenOrder>, args: OpenOrderArgs) -> Result<()> {
         }
     }
 
-    market.update_price(net_amount, args.direction, args.comment, true)?;
+    market.update_price(net_amount, new_price, args.direction, args.comment, true)?;
 
     fee_vault.deposited = fee_vault.deposited.checked_add(fee_amount).unwrap();
     fee_vault.net_balance = fee_vault.net_balance.checked_add(fee_amount).unwrap();

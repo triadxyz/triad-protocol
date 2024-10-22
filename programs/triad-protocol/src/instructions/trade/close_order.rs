@@ -76,6 +76,11 @@ pub fn close_order(ctx: Context<CloseOrder>, order_id: u64) -> Result<()> {
     let current_amount = (order.total_shares * current_price) / 1_000_000;
     let current_amount = current_amount as u64;
 
+    let (actual_payout, new_price) = market.calculate_payout_with_impact(
+        current_amount,
+        order.direction
+    );
+
     if current_amount > 0 {
         let signer: &[&[&[u8]]] = &[&[b"market", &market.market_id.to_le_bytes(), &[market.bump]]];
 
@@ -94,7 +99,7 @@ pub fn close_order(ctx: Context<CloseOrder>, order_id: u64) -> Result<()> {
             ctx.accounts.mint.decimals
         )?;
 
-        market.update_price(current_amount, order.direction, None, false)?;
+        market.update_price(actual_payout, new_price, order.direction, None, false)?;
     }
 
     match order.direction {
