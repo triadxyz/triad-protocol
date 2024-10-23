@@ -54,9 +54,6 @@ pub fn close_order(ctx: Context<CloseOrder>, order_id: u64) -> Result<()> {
 
     let ts = Clock::get()?.unix_timestamp;
 
-    require!(ts >= market.current_question_start, TriadProtocolError::QuestionPeriodNotStarted);
-    require!(ts < market.current_question_end, TriadProtocolError::QuestionPeriodEnded);
-
     require!(market.is_active, TriadProtocolError::MarketInactive);
 
     let order_index = user_trade.orders
@@ -66,20 +63,16 @@ pub fn close_order(ctx: Context<CloseOrder>, order_id: u64) -> Result<()> {
 
     let order = user_trade.orders[order_index];
 
-    require!(order.question_id == market.current_question_id, TriadProtocolError::OrderNotOpen);
+    require!(market.market_id == order.market_id, TriadProtocolError::Unauthorized);
 
     let current_price = match order.direction {
         OrderDirection::Hype => market.hype_price,
         OrderDirection::Flop => market.flop_price,
     };
 
-    let current_amount = (order.total_shares * current_price) / 1_000_000;
-    let current_amount = current_amount as u64;
+    // let future_price = market.calculate_future_price(order.total_amount, order.direction, false);
 
-    let (actual_payout, new_price) = market.calculate_payout_with_impact(
-        current_amount,
-        order.direction
-    );
+    let current_amount = (order.total_shares * current_price) / 1_000_000;
 
     if current_amount > 0 {
         let signer: &[&[&[u8]]] = &[&[b"market", &market.market_id.to_le_bytes(), &[market.bump]]];
@@ -99,7 +92,7 @@ pub fn close_order(ctx: Context<CloseOrder>, order_id: u64) -> Result<()> {
             ctx.accounts.mint.decimals
         )?;
 
-        market.update_price(actual_payout, new_price, order.direction, None, false)?;
+        market.update_price(current_amount, current_price, order.direction, None, false)?;
     }
 
     match order.direction {
@@ -115,12 +108,12 @@ pub fn close_order(ctx: Context<CloseOrder>, order_id: u64) -> Result<()> {
         }
     }
 
-    user_trade.opened_orders = user_trade.opened_orders.saturating_sub(1);
     user_trade.total_withdraws = user_trade.total_withdraws.checked_add(current_amount).unwrap();
-
-    market.open_orders_count = market.open_orders_count.saturating_sub(1);
+    market.total_volume = market.total_volume.checked_add(current_amount).unwrap();
 
     let total_amount = order.total_amount;
+
+    user_trade.orders[order_index] = Order::default();
 
     emit!(OrderUpdate {
         user: *ctx.accounts.signer.key,
@@ -142,8 +135,6 @@ pub fn close_order(ctx: Context<CloseOrder>, order_id: u64) -> Result<()> {
             .map(|v| v as i64)
             .unwrap_or(-(total_amount as i64)),
     });
-
-    user_trade.orders[order_index] = Order::default();
 
     Ok(())
 }

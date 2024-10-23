@@ -80,27 +80,46 @@ pub fn open_order(ctx: Context<OpenOrder>, args: OpenOrderArgs) -> Result<()> {
 
     let ts = Clock::get()?.unix_timestamp;
 
-    require!(ts >= market.current_question_start, TriadProtocolError::QuestionPeriodNotStarted);
-    require!(ts < market.current_question_end, TriadProtocolError::QuestionPeriodEnded);
-
     require!(market.is_active, TriadProtocolError::MarketInactive);
 
-    let price = match args.direction {
-        OrderDirection::Hype => market.hype_price,
-        OrderDirection::Flop => market.flop_price,
+    let (current_price, current_liquidity) = match args.direction {
+        OrderDirection::Hype => (market.hype_price, market.hype_liquidity),
+        OrderDirection::Flop => (market.flop_price, market.flop_liquidity),
     };
 
-    require!(price > 0, TriadProtocolError::InvalidPrice);
+    require!(current_price > 0, TriadProtocolError::InvalidPrice);
 
     let fee_amount = (((args.amount as u64) * (market.fee_bps as u64)) / 100000) as u64;
     let net_amount = args.amount.saturating_sub(fee_amount);
 
-    require!(net_amount > price, TriadProtocolError::InsufficientFunds);
+    require!(net_amount > current_price, TriadProtocolError::InsufficientFunds);
 
-    let (total_shares, new_price) = market.calculate_impact_for_open_order(
-        net_amount,
-        args.direction
-    );
+    let price_impact = (((net_amount as f64) / (current_liquidity as f64)) *
+        (current_price as f64) *
+        0.1) as u64;
+
+    let future_price = match args.direction {
+        OrderDirection::Hype => {
+            let price = current_price.checked_add(price_impact).unwrap();
+            price.clamp(1, 999_999)
+        }
+        OrderDirection::Flop => {
+            let price = current_price.checked_add(price_impact).unwrap();
+            price.clamp(1, 999_999)
+        }
+    };
+
+    let price_diff = if future_price > current_price {
+        future_price - current_price
+    } else {
+        current_price - future_price
+    };
+
+    let price_adjustment = price_diff / 100;
+
+    let new_price = current_price.checked_add(price_adjustment).unwrap();
+
+    let total_shares = ((net_amount * 1_000_000) / new_price) as u64;
 
     if total_shares.eq(&0) {
         return Err(TriadProtocolError::InsufficientFunds.into());
@@ -117,7 +136,7 @@ pub fn open_order(ctx: Context<OpenOrder>, args: OpenOrderArgs) -> Result<()> {
         question_id: market.current_question_id,
         market_id: market.market_id,
         status: OrderStatus::Open,
-        price,
+        price: new_price,
         total_amount: net_amount,
         total_shares,
         order_type: OrderType::Market,
@@ -196,7 +215,7 @@ pub fn open_order(ctx: Context<OpenOrder>, args: OpenOrderArgs) -> Result<()> {
         total_shares: current_order.total_shares,
         total_amount: current_order.total_amount,
         pnl: 0,
-        price,
+        price: current_order.price,
         comment: args.comment,
         refund_amount: None,
         is_question_winner: None,
