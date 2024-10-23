@@ -138,7 +138,9 @@ pub fn close_order(ctx: Context<CloseOrder>, order_id: u64) -> Result<()> {
     }
 
     user_trade.total_withdraws = user_trade.total_withdraws.checked_add(current_amount).unwrap();
+
     market.total_volume = market.total_volume.checked_add(current_amount).unwrap();
+    market.open_orders_count = market.open_orders_count.checked_sub(1).unwrap();
 
     let total_amount = order.total_amount;
 
