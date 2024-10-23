@@ -130,4 +130,7 @@ pub enum TriadProtocolError {
 
     #[msg("Has opened orders")]
     HasOpenedOrders,
+
+    #[msg("Insufficient liquidity")]
+    InsufficientLiquidity,
 }

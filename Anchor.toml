@@ -1,11 +1,11 @@
 [features]
 skip-lint = false
 
-[programs.mainnet]
+[programs.localnet]
 triad_protocol = "TRDwq3BN4mP3m9KsuNUWSN6QDff93VKGSwE95Jbr9Ss"
 
 [provider]
-cluster = "mainnet"
+cluster = "localnet"
 wallet = "~/.config/solana/id.json"
 
 [scripts]

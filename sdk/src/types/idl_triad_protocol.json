@@ -1532,6 +1532,11 @@
       "code": 6042,
       "name": "HasOpenedOrders",
       "msg": "Has opened orders"
+    },
+    {
+      "code": 6043,
+      "name": "InsufficientLiquidity",
+      "msg": "Insufficient liquidity"
     }
   ],
   "types": [
