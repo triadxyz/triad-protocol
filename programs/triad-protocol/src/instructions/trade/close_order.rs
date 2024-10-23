@@ -65,14 +65,43 @@ pub fn close_order(ctx: Context<CloseOrder>, order_id: u64) -> Result<()> {
 
     require!(market.market_id == order.market_id, TriadProtocolError::Unauthorized);
 
-    let current_price = match order.direction {
-        OrderDirection::Hype => market.hype_price,
-        OrderDirection::Flop => market.flop_price,
+    let (current_price, current_liquidity) = match order.direction {
+        OrderDirection::Hype => (market.hype_price, market.hype_liquidity),
+        OrderDirection::Flop => (market.flop_price, market.flop_liquidity),
     };
 
-    // let future_price = market.calculate_future_price(order.total_amount, order.direction, false);
+    require!(current_liquidity > 0, TriadProtocolError::InsufficientLiquidity);
 
     let current_amount = (order.total_shares * current_price) / 1_000_000;
+
+    let price_impact = (((current_amount as f64) / (current_liquidity as f64)) *
+        (current_price as f64) *
+        0.1) as u64;
+
+    let future_price = match order.direction {
+        OrderDirection::Hype => {
+            let price = current_price.checked_sub(price_impact).unwrap_or(1);
+            price.clamp(1, 999_999)
+        }
+        OrderDirection::Flop => {
+            let price = current_price.checked_sub(price_impact).unwrap_or(1);
+            price.clamp(1, 999_999)
+        }
+    };
+
+    let price_diff = if future_price > current_price {
+        future_price - current_price
+    } else {
+        current_price - future_price
+    };
+
+    let price_adjustment = price_diff / 100;
+
+    let new_price = current_price.checked_sub(price_adjustment).unwrap_or(1);
+
+    let current_amount = (order.total_shares * new_price) / 1_000_000;
+
+    require!(current_liquidity > current_amount, TriadProtocolError::InsufficientLiquidity);
 
     if current_amount > 0 {
         let signer: &[&[&[u8]]] = &[&[b"market", &market.market_id.to_le_bytes(), &[market.bump]]];
@@ -92,7 +121,7 @@ pub fn close_order(ctx: Context<CloseOrder>, order_id: u64) -> Result<()> {
             ctx.accounts.mint.decimals
         )?;
 
-        market.update_price(current_amount, current_price, order.direction, None, false)?;
+        market.update_price(current_amount, future_price, order.direction, None, false)?;
     }
 
     match order.direction {

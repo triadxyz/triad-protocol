@@ -88,6 +88,7 @@ pub fn open_order(ctx: Context<OpenOrder>, args: OpenOrderArgs) -> Result<()> {
     };
 
     require!(current_price > 0, TriadProtocolError::InvalidPrice);
+    require!(current_liquidity > 0, TriadProtocolError::InsufficientLiquidity);
 
     let fee_amount = (((args.amount as u64) * (market.fee_bps as u64)) / 100000) as u64;
     let net_amount = args.amount.saturating_sub(fee_amount);
