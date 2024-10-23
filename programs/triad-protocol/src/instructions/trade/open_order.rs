@@ -39,7 +39,7 @@ pub struct OpenOrder<'info> {
     )]
     pub fee_vault: Box<Account<'info, FeeVault>>,
 
-    #[account(mut)]
+    #[account(mut, constraint = mint.key() == market.mint)]
     pub mint: Box<InterfaceAccount<'info, Mint>>,
 
     #[account(
